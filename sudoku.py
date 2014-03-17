@@ -95,7 +95,10 @@ class sudoku():
             if index % (gridSize * subGridsX) == 0: #last number of last subGrid in Row
                 rowInSubGrid = subGridsX
             else:
-                rowInSubGrid = ((((index) % (gridSize * subGridsX)))/ gridSize) + 1
+                if index % gridSize == 0:
+                    rowInSubGrid = (((index) % (gridSize * subGridsX))) / gridSize
+                else:
+                    rowInSubGrid = ((((index) % (gridSize * subGridsX))) / gridSize) + 1
 
             if subGrid % subGridsX == 0: #last subGrid in row
                 membersInHorzAdjSubGrids = (subGridsX - 1) * gridSize
@@ -117,10 +120,11 @@ class sudoku():
 ##            if index in [36]:
 ##                print index, position, subGrid, membersInHorzAdjSubGrids, \
 ##                       membersInAboveRowsInSubGrid, membersLeftInRowIncSelf
-            if index % gridSize == 0:
-                print index, subGrid
+            if index % (gridSize * subGridsX) == 0:
+                print index, rowInSubGrid
             else:
-                print index, subGrid
+                print index, rowInSubGrid
+                
 
             return position
 
@@ -331,7 +335,7 @@ string9 = "030647080709000206010903040301070804800304002402050603080501020103000
 string6 = "020000000020054100100064200043300010"
 ##string9 = "100920000524010000000000070050008102000000000402700090060000000000030945000071006"
 string9 = "904200007010000000000706500000800090020904060040002000001607000000000030300005702"
-###puzzle9 = sudoku(9,3,3,string9)
+puzzle9 = sudoku(9,3,3,string9)
 
 ##print puzzle9
 ##puzzle9.oneGhostLeft()
