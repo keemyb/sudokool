@@ -59,4 +59,4 @@ puzzle6 = sudoku(6,2,3,string6)
 print puzzle8
 ##puzzle8.populateGhosts()
 for i in xrange(64):
-    print i + 1, puzzle8.getSubGridMembers(i + 1)
+    print i + 1, puzzle8.getRowInSubGrid(i + 1)

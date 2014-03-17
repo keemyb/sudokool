@@ -134,6 +134,7 @@ class sudoku():
     def getRowInSubGrid(self, location):
         gridSize = self.getGridSize()
         subGridsY = self.getSubGridsY()
+        subGridsX = self.getSubGridsX()
 
         if location % gridSize == 0: #last number in box
             return subGridsX
