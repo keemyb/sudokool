@@ -133,12 +133,12 @@ class sudoku():
 
     def getRowInSubGrid(self, location):
         gridSize = self.getGridSize()
-        subGridsX = self.getSubGridsX()
+        subGridsY = self.getSubGridsY()
 
         if location % gridSize == 0: #last number in box
-            return gridSize / subGridsX
+            return gridSize / subGridsY
         else:
-            return (((location % gridSize) - 1) / subGridsX) + 1
+            return (((location % gridSize) - 1) / subGridsY) + 1
 
     def getColumnInSubGrid(self, location):
         gridSize = self.getGridSize()
@@ -178,6 +178,7 @@ class sudoku():
         firstSubGridInRow = ((subGridRow - 1) * subGridsY) + 1
         lastSubGridInRow = firstSubGridInRow + subGridsY
         subGridsInRow = range(firstSubGridInRow, lastSubGridInRow)
+        print subGridsInRow
 
         for i in subGridsInRow:
             firstMemberInSubGrid = ((i - 1) * gridSize) + 1
