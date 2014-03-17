@@ -154,10 +154,14 @@ class sudoku():
         gridSize = self.getGridSize()
 
         resolvedMembers = []
-        
-        firstMember = location - (location % gridSize) + 1
-        lastMember = firstMember + gridSize
-        subGridMembers = range(firstMember, lastMember)
+
+        if location % gridSize == 0:
+            firstMember = (location - gridSize) + 1
+        else:
+            firstMember = location - (location % gridSize) + 1
+
+        lastMember = (firstMember + gridSize) - 1
+        subGridMembers = range(firstMember, lastMember + 1)
 
         for i in subGridMembers:
             resolvedMembers.append(self.getData()[i])

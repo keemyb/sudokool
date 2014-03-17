@@ -56,7 +56,7 @@ puzzle6 = sudoku(6,2,3,string6)
 ##puzzle6.oneGhostLeft()
 ##print puzzle6
 
-print puzzle6
+print puzzle8
 ##puzzle8.populateGhosts()
-for i in xrange(36):
-    print i + 1, puzzle6.getColumnInSubGrid(i + 1)
+for i in xrange(64):
+    print i + 1, puzzle8.getSubGridMembers(i + 1)
