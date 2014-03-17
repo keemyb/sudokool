@@ -82,10 +82,11 @@ class sudoku():
             index = index + 1
 
             if index % gridSize == 0: #last number in row
-                subGrid = (index + gridSize) / (gridSize * subGridsX) * subGridsX # wrong
+                subGrid = (((index - 1) / (gridSize * subGridsX)) + 1) * subGridsX
                 columnInSubGrid = subGridsY
             else:
-                subGrid = ((((index) / (gridSize * subGridsX)))) + 1
+                subGrid = ((((index - 1) / (gridSize * subGridsX)) + 1) * subGridsX) - \
+                          (subGridsX - ((((index % gridSize) - 1) / subGridsY) + 1))
                 if index % subGridsY == 0:
                     columnInSubGrid = subGridsY
                 else:
@@ -113,9 +114,13 @@ class sudoku():
             position = membersInAboveSubGrids + membersInHorzAdjSubGrids + \
                        membersInAboveRowsInSubGrid + membersLeftInRowIncSelf
 
-            if index in [4,5,6,7,8,9,16,17,18,19,20,21,28,29,30,31,32,33]:
-                print index, position, subGrid, membersInHorzAdjSubGrids, \
-                       membersInAboveRowsInSubGrid, membersLeftInRowIncSelf
+##            if index in [36]:
+##                print index, position, subGrid, membersInHorzAdjSubGrids, \
+##                       membersInAboveRowsInSubGrid, membersLeftInRowIncSelf
+            if index % gridSize == 0:
+                print index, subGrid
+            else:
+                print index, subGrid
 
             return position
 
@@ -326,14 +331,14 @@ string9 = "030647080709000206010903040301070804800304002402050603080501020103000
 string6 = "020000000020054100100064200043300010"
 ##string9 = "100920000524010000000000070050008102000000000402700090060000000000030945000071006"
 string9 = "904200007010000000000706500000800090020904060040002000001607000000000030300005702"
-puzzle9 = sudoku(9,3,3,string9)
+###puzzle9 = sudoku(9,3,3,string9)
 
-print puzzle9
+##print puzzle9
 ##puzzle9.oneGhostLeft()
 ##print puzzle9
 
 ##print sudoku.easy(puzzle9)
 
 puzzle6 = sudoku(6,2,3,string6)
-#puzzle6.oneGhostLeft()
-print puzzle6
+##puzzle6.oneGhostLeft()
+##print puzzle6
