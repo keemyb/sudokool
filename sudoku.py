@@ -136,18 +136,18 @@ class sudoku():
         subGridsY = self.getSubGridsY()
 
         if location % gridSize == 0: #last number in box
-            return gridSize / subGridsY
+            return subGridsX
         else:
             return (((location % gridSize) - 1) / subGridsY) + 1
 
     def getColumnInSubGrid(self, location):
         gridSize = self.getGridSize()
-        subGridsX = self.getSubGridsX()
+        subGridsY = self.getSubGridsY()
 
-        if location % gridSize == 0: #last number in box
-            return (((location % gridSize) - 1) % subGridsX) + 1
+        if location % subGridsY == 0: #last number in box
+            return subGridsY
         else:
-            return (((location % gridSize) - 1) % subGridsX) + 1
+            return ((location % gridSize) % subGridsY)
 
     def getSubGridMembers(self, location):
         """returns locations of sub grid members, the location given is included in list"""
