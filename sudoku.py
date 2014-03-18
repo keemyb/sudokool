@@ -196,7 +196,7 @@ class sudoku():
             
         return dict(zip(rowMembers,resolvedMembers))
 
-    def getColMembers(self, location):
+    def getColumnMembers(self, location):
         gridSize = self.getGridSize()
         subGridsX = self.getSubGridsX()
         subGridsY = self.getSubGridsY()
@@ -206,16 +206,19 @@ class sudoku():
         resolvedMembers = []
         subGridsInColumn = []
 
-        subGridColumn = self.getSubGrid(location) % subGridsY
-        if subGridColumn == 0:
-            subGridColumn = subGridsY
+        if self.getSubGrid(location) % subGridsX == 0:
+            subGridColumn = subGridsX
+        else:
+            subGridColumn = self.getSubGrid(location) % subGridsX
 
         firstSubGridInColumn = subGridColumn
         for i in xrange(subGridsY):
             subGridsInColumn.append(firstSubGridInColumn + (subGridsX * i))
 
-        for i in subGridsInColumn:
-            firstMemberInSubGrid = ((i - 1) * gridSize) + 1
+        print subGridsInColumn
+
+        for subGrid in subGridsInColumn:
+            firstMemberInSubGrid = ((subGrid - 1) * gridSize) + 1
             firstColumnMemberInSubGrid = firstMemberInSubGrid + columnInSubGrid - 1
 
             j = subGridsX
@@ -249,11 +252,11 @@ class sudoku():
             existingValues = []
             reference = ((i / self.subGridsY) * self.gridSize) + ((i + 1) % self.subGridsY)
 
-            for location, value in self.getColMembers(reference).iteritems():
+            for location, value in self.getColumnMembers(reference).iteritems():
                 if value != '0':
                     existingValues.append(int(value))
 
-            for location, value in self.getColMembers(reference).iteritems():
+            for location, value in self.getColumnMembers(reference).iteritems():
                 if self.resolveMember(location) == '0':
                     setOfExistingGhostValues = set(self.ghostData[location])
                     setOfNonExistingValues = setOfPossibleNumbers.difference(set(existingValues))
