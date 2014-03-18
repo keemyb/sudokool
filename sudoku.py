@@ -178,23 +178,21 @@ class sudoku():
         rowMembers = []
         resolvedMembers = []
 
-        subGridRow = ((self.getSubGrid(location) - 1) / subGridsX) + 1
+        subGridRow = (self.getSubGrid(location) + 1) / subGridsX
         
-        firstSubGridInRow = ((subGridRow - 1) * subGridsY) + 1
-        lastSubGridInRow = firstSubGridInRow + subGridsY
-        subGridsInRow = range(firstSubGridInRow, lastSubGridInRow)
-        print subGridsInRow
+        firstSubGridInRow = ((subGridRow - 1) * subGridsX) + 1
+        lastSubGridInRow = firstSubGridInRow + subGridsX - 1
+        subGridsInRow = range(firstSubGridInRow, lastSubGridInRow + 1)
 
-        for i in subGridsInRow:
-            firstMemberInSubGrid = ((i - 1) * gridSize) + 1
-            firstRowMemberInSubGrid = firstMemberInSubGrid + ((rowInSubGrid - 1) * subGridsX)
+        for subGrid in subGridsInRow:
+            firstMemberInSubGrid = ((subGrid - 1) * gridSize) + 1
+            firstRowMemberInSubGrid = firstMemberInSubGrid + ((rowInSubGrid - 1) * subGridsY)
+            lastRowMemberInSubGrid = firstRowMemberInSubGrid + subGridsY - 1
+            rowMembersInSubGrid = range(firstRowMemberInSubGrid, lastRowMemberInSubGrid + 1)
 
-            j = subGridsX
-            while j != 0:
-                reference = (firstRowMemberInSubGrid + j) - 1
-                rowMembers.append(reference)
-                resolvedMembers.append(self.getData()[reference])
-                j -= 1
+            for member in rowMembersInSubGrid:
+                rowMembers.append(member)
+                resolvedMembers.append(self.getData()[member])
             
         return dict(zip(rowMembers,resolvedMembers))
 
