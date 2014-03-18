@@ -47,16 +47,19 @@ puzzle8 = sudoku(8,2,4,string8)
 
 puzzle6 = sudoku(6,2,3,string6)
 
-##print puzzle9
-##puzzle9.oneGhostLeft()
-##print puzzle9
+print puzzle9
+puzzle9.oneGhostLeft()
+print puzzle9
+print puzzle9.ghostData
 
 ##print easy(puzzle9)
 
 ##puzzle6.oneGhostLeft()
 ##print puzzle6
 
-print puzzle6
-##puzzle8.populateGhosts()
-for i in xrange(36):
-    print i + 1, puzzle6.getColMembers(i + 1)
+##print puzzle6
+##puzzle6.populateGhosts()
+##puzzle6.oneGhostLeft()
+##print puzzle6
+##for i in xrange(36):
+##    print i + 1, puzzle6.getColMembers(i + 1)

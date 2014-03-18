@@ -178,7 +178,7 @@ class sudoku():
         rowMembers = []
         resolvedMembers = []
 
-        subGridRow = (self.getSubGrid(location) + 1) / subGridsX
+        subGridRow = ((self.getSubGrid(location) - 1) / subGridsX) + 1
         
         firstSubGridInRow = ((subGridRow - 1) * subGridsX) + 1
         lastSubGridInRow = firstSubGridInRow + subGridsX - 1
@@ -214,8 +214,6 @@ class sudoku():
         firstSubGridInColumn = subGridColumn
         for i in xrange(subGridsY):
             subGridsInColumn.append(firstSubGridInColumn + (subGridsX * i))
-
-        print subGridsInColumn
 
         for subGrid in subGridsInColumn:
             firstMemberInSubGrid = ((subGrid - 1) * gridSize) + 1
