@@ -10,6 +10,9 @@ class sudoku():
         self.subGridsY = subGridsY
         self.data = {}
         self.ghostData = {}
+        self.subGridStartLocations = self.getSubGridStartLocations()
+        self.rowStartLocations = self.getRowStartLocations()
+        self.columnStartLocations = self.getColumnStartLocations()
 
 ##        try:
 ##            if gridSize % subGridsX != 0 or gridSize % subGridsY != 0:
@@ -58,6 +61,50 @@ class sudoku():
         string += "\n" + (gridSize + (subGridsX * (subGridsY - 1)) + (subGridsX + 1) * 2) * "=" # remaining horizontal tiles
 
         return string
+
+    def getSubGridStartLocations(self):
+        subGridStartLocations = []
+        for subGrid in xrange(self.gridSize):
+            subGridStartLocations.append((subGrid * self.gridSize) + 1)
+        return sorted(subGridStartLocations)
+
+    def getRowStartLocations(self):
+        gridSize = self.getGridSize()
+        subGridsX = self.getSubGridsX()
+        subGridsY = self.getSubGridsY()
+        rowStartLocations = []
+
+        for row in xrange(self.gridSize):
+            membersInAboveSubGrids  = (row / subGridsX) * gridSize * subGridsX
+
+            if (row - 1) % subGridsX != 0:
+                adjustment = ((row - 1) % subGridsX) * subGridsY
+            else:
+                adjustment = 0
+
+            rowStartLocation = membersInAboveSubGrids + adjustment + 1
+            
+            rowStartLocations.append(rowStartLocation)
+        return sorted(rowStartLocations)
+
+    def getColumnStartLocations(self):
+        gridSize = self.getGridSize()
+        subGridsX = self.getSubGridsX()
+        subGridsY = self.getSubGridsY()
+        columnStartLocations = []
+
+        for column in xrange(self.gridSize):
+            membersInLeftwardSubGrids = (column / subGridsY) * gridSize
+
+            if (column + 1) % subGridsY != 0:
+                adjustment = ((column + 1) % subGridsY)
+            else:
+                adjustment = 0
+
+            columnStartLocation = membersInLeftwardSubGrids + adjustment + 1
+
+            columnStartLocations.append(columnStartLocation)
+        return sorted(columnStartLocations)
 
     def indexToStorageLocation(self, index):
             gridSize = self.gridSize
@@ -277,17 +324,69 @@ class sudoku():
 
     def oneGhostLeft(self):
         self.populateGhosts()
-        keysToDelete = []
+        ghostKeysToDelete = []
 
         for location, value in self.ghostData.iteritems():
             if len(value) == 1:
                 self.data[location] = str(value[0])
-                keysToDelete.append(location)
+                ghostKeysToDelete.append(location)
 
-        if len(keysToDelete) > 0:
-            for location in keysToDelete:
+        if len(ghostKeysToDelete) > 0:
+            for location in ghostKeysToDelete:
                 del self.ghostData[location]
             self.populateGhosts()
             self.oneGhostLeft()
         else:
             return
+
+    def oneGhostInACrowd(self):
+        self.populateGhosts()
+
+        for subGridStartLocation in self.subGridStartLocations: #repeated for every subGrid
+            subGridMembers = self.getSubGridMembers(subGridStartLocation)
+
+            subGridLocations = [key for key in subGridMembers.iterkeys()]
+
+            surroundingLocations = subGridLocations
+            for location in subGridLocations:
+                
+                surroundingLocations.remove(location)
+                locationGhosts = []
+                surroundingGhosts = []
+
+                if location in self.ghostData.keys(): # if location is not completed
+                    for ghostValue in self.ghostData[location]:
+                        locationGhosts.append(ghostValue)
+                    setOfLocationGhosts = set(locationGhosts)
+                    
+                    for surroundingLocation in surroundingLocations:
+                        if surroundingLocation in self.ghostData.keys():
+                            for ghostValue in self.ghostData[surroundingLocation]:
+                                surroundingGhosts.append(ghostValue)
+
+                    setOfSurroundingGhosts = set(surroundingGhosts)
+                    setOfUniqueGhosts = setOfSurroundingGhosts - setOfLocationGhosts
+
+                    if len(setOfUniqueGhosts) == 1:
+                        self.data[location] = setOfUniqueGhosts.pop()
+                        del self.ghostData[location]
+                        self.populateGhosts()
+                    
+                    
+            
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
