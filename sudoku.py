@@ -345,48 +345,28 @@ class sudoku():
         for subGridStartLocation in self.subGridStartLocations: #repeated for every subGrid
             subGridMembers = self.getSubGridMembers(subGridStartLocation)
 
-            subGridLocations = [key for key in subGridMembers.iterkeys()]
-
-            surroundingLocations = subGridLocations
+            subGridLocations = [key for key in subGridMembers.iterkeys() if
+                                (key in self.ghostData.keys())]
+            
             for location in subGridLocations:
-                
+                surroundingLocations = subGridLocations
                 surroundingLocations.remove(location)
                 locationGhosts = []
                 surroundingGhosts = []
+                print location, subGridLocations, surroundingLocations
 
-                if location in self.ghostData.keys(): # if location is not completed
-                    for ghostValue in self.ghostData[location]:
-                        locationGhosts.append(ghostValue)
-                    setOfLocationGhosts = set(locationGhosts)
-                    
-                    for surroundingLocation in surroundingLocations:
-                        if surroundingLocation in self.ghostData.keys():
-                            for ghostValue in self.ghostData[surroundingLocation]:
-                                surroundingGhosts.append(ghostValue)
+                locationGhosts = [ghostValue for ghostValue in self.ghostData[location]]
+                setOfLocationGhosts = set(locationGhosts)
+                
+                for surroundingLocation in surroundingLocations:
+                    surroundingGhosts = [ghostValue for ghostValue in
+                                         self.ghostData[surroundingLocation]]
 
-                    setOfSurroundingGhosts = set(surroundingGhosts)
-                    setOfUniqueGhosts = setOfSurroundingGhosts - setOfLocationGhosts
+                setOfSurroundingGhosts = set(surroundingGhosts)
+                setOfUniqueGhosts = setOfSurroundingGhosts - setOfLocationGhosts
 
-                    if len(setOfUniqueGhosts) == 1:
-                        self.data[location] = setOfUniqueGhosts.pop()
-                        del self.ghostData[location]
-                        self.populateGhosts()
-                    
-                    
-            
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                if len(setOfUniqueGhosts) == 1:
+                    print location, setOfUniqueGhosts
+                    self.data[location] = setOfUniqueGhosts.pop()
+                    del self.ghostData[location]
+                    self.populateGhosts()

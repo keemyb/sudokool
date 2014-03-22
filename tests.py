@@ -94,9 +94,9 @@ puzzle6 = sudoku(6,2,3,string6)
 ##print puzzle9.subGridStartLocations
 ##print puzzle9.getSubGridMembers(1)
 
-print easy(puzzle9)
-print   
-print easy2(puzzle9)
+##print easy(puzzle9)
+##print   
+##print easy2(puzzle9)
 
 ##puzzle6.oneGhostLeft()
 ##print puzzle6
@@ -108,14 +108,13 @@ print easy2(puzzle9)
 ##for i in xrange(36):
 ##    print i + 1, puzzle6.getColMembers(i + 1)
 
-##print puzzle9
-##puzzle9.oneGhostLeft()
-##print puzzle9
-##print puzzle9.ghostData
-##puzzle9.oneGhostInACrowd()
-##print puzzle9
-##print puzzle9.ghostData
-
+print puzzle9
+puzzle9.oneGhostLeft()
+print puzzle9
+print puzzle9.ghostData
+puzzle9.oneGhostInACrowd()
+print puzzle9
+print puzzle9.ghostData
 
 ##print puzzle6.rowStartLocations
 ##print puzzle6.columnStartLocations
