@@ -94,14 +94,11 @@ puzzle6 = sudoku(6,2,3,string6)
 ##print puzzle9.subGridStartLocations
 ##print puzzle9.getSubGridMembers(1)
 
-print easy(puzzle9)
-print   
-print easy2(puzzle9)
+##print easy(puzzle9)
+##print   
+##print easy2(puzzle9)
 
 print puzzle9
-puzzle9.nakedSingle()
-print puzzle9
-print puzzle9.ghostData
 puzzle9.hiddenSingle()
 print puzzle9
 

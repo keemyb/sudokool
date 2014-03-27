@@ -341,6 +341,7 @@ class sudoku():
 
     def hiddenSingle(self):
         self.populateGhosts()
+        changes = 0
 
         for subGridStartLocation in self.subGridStartLocations: #repeated for every subGrid
             subGridMembers = self.getSubGridMembers(subGridStartLocation)
@@ -369,7 +370,10 @@ class sudoku():
                 if len(setOfUniqueGhosts) == 1:
                     self.data[location] = setOfUniqueGhosts.pop()
                     del self.ghostData[location]
+                    changes = 1
                     self.populateGhosts()
                     unresolvedLocations = sorted([key for key in subGridMembers.iterkeys() if
                                                   (key in self.ghostData.keys())])
+        if changes == 1:
+            self.hiddenSingle()
 
