@@ -21,7 +21,7 @@ def easy(self):
                 start -= 1
 
         puzzleEasy9 = sudoku(9,3,3,stringEasy9)
-        puzzleEasy9.oneGhostLeft()
+        puzzleEasy9.nakedSingle()
 
         end = 81
         for value in puzzleEasy9.data.itervalues():
@@ -53,8 +53,8 @@ def easy2(self):
                 start -= 1
 
         puzzleEasy9 = sudoku(9,3,3,stringEasy9)
-        puzzleEasy9.oneGhostLeft()
-        puzzleEasy9.oneGhostInACrowd()
+        puzzleEasy9.nakedSingle()
+        puzzleEasy9.hiddenSingle()
 
         end = 81
         for value in puzzleEasy9.data.itervalues():
@@ -94,27 +94,16 @@ puzzle6 = sudoku(6,2,3,string6)
 ##print puzzle9.subGridStartLocations
 ##print puzzle9.getSubGridMembers(1)
 
-##print easy(puzzle9)
-##print   
-##print easy2(puzzle9)
-
-##puzzle6.oneGhostLeft()
-##print puzzle6
-
-##print puzzle6
-##puzzle6.populateGhosts()
-##puzzle6.oneGhostLeft()
-##print puzzle6
-##for i in xrange(36):
-##    print i + 1, puzzle6.getColMembers(i + 1)
+print easy(puzzle9)
+print   
+print easy2(puzzle9)
 
 print puzzle9
-puzzle9.oneGhostLeft()
+puzzle9.nakedSingle()
 print puzzle9
 print puzzle9.ghostData
-puzzle9.oneGhostInACrowd()
+puzzle9.hiddenSingle()
 print puzzle9
-print puzzle9.ghostData
 
-##print puzzle6.rowStartLocations
-##print puzzle6.columnStartLocations
+##print puzzle9.ghostData
+##print puzzle9

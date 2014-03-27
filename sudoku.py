@@ -322,7 +322,7 @@ class sudoku():
                     setOfNonExistingValues = setOfPossibleNumbers.difference(set(existingValues))
                     self.ghostData[location] = list(setOfExistingGhostValues.intersection(setOfNonExistingValues))
 
-    def oneGhostLeft(self):
+    def nakedSingle(self):
         self.populateGhosts()
         ghostKeysToDelete = []
 
@@ -335,38 +335,41 @@ class sudoku():
             for location in ghostKeysToDelete:
                 del self.ghostData[location]
             self.populateGhosts()
-            self.oneGhostLeft()
+            self.nakedSingle()
         else:
             return
 
-    def oneGhostInACrowd(self):
+    def hiddenSingle(self):
         self.populateGhosts()
 
         for subGridStartLocation in self.subGridStartLocations: #repeated for every subGrid
             subGridMembers = self.getSubGridMembers(subGridStartLocation)
 
-            subGridLocations = [key for key in subGridMembers.iterkeys() if
-                                (key in self.ghostData.keys())]
+            unresolvedLocations = sorted([key for key in subGridMembers.iterkeys() if
+                                (key in self.ghostData.keys())])
             
-            for location in subGridLocations:
-                surroundingLocations = subGridLocations
-                surroundingLocations.remove(location)
-                locationGhosts = []
+            for location in unresolvedLocations:
+                surroundingLocations = []
+                for surroundingLocation in unresolvedLocations:
+                    if surroundingLocation != location:
+                        surroundingLocations.append(surroundingLocation)
+                        
                 surroundingGhosts = []
-                print location, subGridLocations, surroundingLocations
+                for surroundingLocation in surroundingLocations:
+                    if surroundingLocation != location:
+                        for ghostValue in self.ghostData[surroundingLocation]:
+                            surroundingGhosts.append(ghostValue)
 
+                setOfSurroundingGhosts = set(surroundingGhosts)                
                 locationGhosts = [ghostValue for ghostValue in self.ghostData[location]]
                 setOfLocationGhosts = set(locationGhosts)
-                
-                for surroundingLocation in surroundingLocations:
-                    surroundingGhosts = [ghostValue for ghostValue in
-                                         self.ghostData[surroundingLocation]]
 
-                setOfSurroundingGhosts = set(surroundingGhosts)
-                setOfUniqueGhosts = setOfSurroundingGhosts - setOfLocationGhosts
+                setOfUniqueGhosts = setOfLocationGhosts - setOfSurroundingGhosts
 
                 if len(setOfUniqueGhosts) == 1:
-                    print location, setOfUniqueGhosts
                     self.data[location] = setOfUniqueGhosts.pop()
                     del self.ghostData[location]
                     self.populateGhosts()
+                    unresolvedLocations = sorted([key for key in subGridMembers.iterkeys() if
+                                                  (key in self.ghostData.keys())])
+
