@@ -13,6 +13,7 @@ class sudoku():
         self.subGridStartLocations = self.getSubGridStartLocations()
         self.rowStartLocations = self.getRowStartLocations()
         self.columnStartLocations = self.getColumnStartLocations()
+        self.setOfPossibleNumbers = set(xrange(1, self.gridSize + 1))
 
 ##        try:
 ##            if gridSize % subGridsX != 0 or gridSize % subGridsY != 0:
@@ -280,7 +281,6 @@ class sudoku():
         return resolvedMember
 
     def populateGhosts(self):
-        setOfPossibleNumbers = set(xrange(1, self.gridSize + 1))
         for i in xrange(self.gridSize): # subGrid
             existingValues = []    
 
@@ -290,7 +290,7 @@ class sudoku():
 
             for location, value in self.getSubGridMembers((i * self.gridSize) + 1).iteritems():
                 if self.resolveMember(location) == '0':
-                    setOfNonExistingValues = setOfPossibleNumbers.difference(set(existingValues))
+                    setOfNonExistingValues = self.setOfPossibleNumbers.difference(set(existingValues))
                     self.ghostData[location] = list(setOfNonExistingValues)
 
         for i in xrange(self.gridSize): #columns
@@ -304,7 +304,7 @@ class sudoku():
             for location, value in self.getColumnMembers(reference).iteritems():
                 if self.resolveMember(location) == '0':
                     setOfExistingGhostValues = set(self.ghostData[location])
-                    setOfNonExistingValues = setOfPossibleNumbers.difference(set(existingValues))
+                    setOfNonExistingValues = self.setOfPossibleNumbers.difference(set(existingValues))
                     self.ghostData[location] = list(setOfExistingGhostValues.intersection(setOfNonExistingValues))
 
         for i in xrange(self.gridSize): #rows
@@ -319,7 +319,7 @@ class sudoku():
             for location, value in self.getRowMembers(reference).iteritems():
                 if self.resolveMember(location) == '0':
                     setOfExistingGhostValues = set(self.ghostData[location])
-                    setOfNonExistingValues = setOfPossibleNumbers.difference(set(existingValues))
+                    setOfNonExistingValues = self.setOfPossibleNumbers.difference(set(existingValues))
                     self.ghostData[location] = list(setOfExistingGhostValues.intersection(setOfNonExistingValues))
 
     def nakedSingle(self):
