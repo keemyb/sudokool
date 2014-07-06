@@ -99,8 +99,9 @@ puzzle6 = sudoku(6,2,3,string6)
 ##print easy2(puzzle9)
 
 print puzzle9
-puzzle9.hiddenSingle()
+puzzle9.nakedSingle()
 print puzzle9
+print type(puzzle9.ghostData[2][0])
 
 ##print puzzle9.ghostData
 ##print puzzle9

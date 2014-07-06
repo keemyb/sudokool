@@ -14,6 +14,7 @@ class sudoku():
         self.rowStartLocations = self.getRowStartLocations()
         self.columnStartLocations = self.getColumnStartLocations()
         self.setOfPossibleNumbers = set(xrange(1, self.gridSize + 1))
+        self.changes = False
 
 ##        try:
 ##            if gridSize % subGridsX != 0 or gridSize % subGridsY != 0:
@@ -323,25 +324,26 @@ class sudoku():
                     self.ghostData[location] = list(setOfExistingGhostValues.intersection(setOfNonExistingValues))
 
     def nakedSingle(self):
+        self.changes = False
         self.populateGhosts()
         ghostKeysToDelete = []
 
         for location, value in self.ghostData.iteritems():
             if len(value) == 1:
-                self.data[location] = str(value[0])
+                self.data[location] = value[0]
                 ghostKeysToDelete.append(location)
+                self.changes = True
 
-        if len(ghostKeysToDelete) > 0:
+        if self.changes:
             for location in ghostKeysToDelete:
                 del self.ghostData[location]
             self.populateGhosts()
-            self.nakedSingle()
-        else:
-            return
+
+        return self.changes
 
     def hiddenSingle(self):
         self.populateGhosts()
-        changes = 0
+        self.changes = False
 
         for subGridStartLocation in self.subGridStartLocations: #repeated for every subGrid
             subGridMembers = self.getSubGridMembers(subGridStartLocation)
@@ -370,10 +372,7 @@ class sudoku():
                 if len(setOfUniqueGhosts) == 1:
                     self.data[location] = setOfUniqueGhosts.pop()
                     del self.ghostData[location]
-                    changes = 1
+                    self.changes = True
                     self.populateGhosts()
                     unresolvedLocations = sorted([key for key in subGridMembers.iterkeys() if
                                                   (key in self.ghostData.keys())])
-        if changes == 1:
-            self.hiddenSingle()
-
