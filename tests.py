@@ -1,6 +1,6 @@
 from sudoku import sudoku
 
-def easy(self):
+def easy(full = True):
     
     easy50 = open("easy50.txt", "r")
     stringEasy = ""
@@ -17,54 +17,34 @@ def easy(self):
 
         start = 81
         for value in stringEasy9:
-            if value == str(0) or int(0):
+            if int(value) == 0:
                 start -= 1
 
         puzzleEasy9 = sudoku(9,3,3,stringEasy9)
-        puzzleEasy9.nakedSingle()
+        if full:
+            print "================================"
+            print puzzleEasy9
+        solver(puzzleEasy9)
+        if full:
+            print puzzleEasy9
 
         end = 81
         for value in puzzleEasy9.data.itervalues():
-            if value == str(0) or int(0):
+            if value == 0:
                 end -= 1
 
         results[i + 1] = [start, end]
                 
     return results
 
-def easy2(self):
-    
-    easy50 = open("easy50.txt", "r")
-    stringEasy = ""
-    for line in easy50:
-        stringEasy += line.strip()
-
-    results = {}
-
-    for i in xrange(50):
-        start = (i * 89)
-        end = start + 9 * 9 
-
-        stringEasy9 = stringEasy[start : end]
-
-        start = 81
-        for value in stringEasy9:
-            if value == str(0) or int(0):
-                start -= 1
-
-        puzzleEasy9 = sudoku(9,3,3,stringEasy9)
-        puzzleEasy9.nakedSingle()
-        puzzleEasy9.hiddenSingle()
-
-        end = 81
-        for value in puzzleEasy9.data.itervalues():
-            if value == str(0) or int(0):
-                end -= 1
-
-        results[i + 1] = [start, end]
-                
-    return results
+def solver(puzzle):
+    methods = [puzzle.nakedSingle, puzzle.hiddenSingle]
+    puzzle.changes = True
+    while puzzle.changes:
+        for method in range(len(methods)):
+            methods[method]()
             
+
 string9 = "030647080709000206010903040301070804800304002402050603080501020103000409020439060"
 string9 = "100920000524010000000000070050008102000000000402700090060000000000030945000071006"
 ##string9 = "904200007010000000000706500000800090020904060040002000001607000000000030300005702"
@@ -80,28 +60,8 @@ puzzle8 = sudoku(8,2,4,string8)
 
 puzzle6 = sudoku(6,2,3,string6)
 
-##print puzzle9
-##puzzle9.oneGhostLeft()
-##print puzzle9
-##print puzzle9.ghostData
-
-##print puzzle8
-##puzzle8.oneGhostLeft()
-##puzzle8.oneGhostLeft()
-##print puzzle8
-##print puzzle8.ghostData
-
-##print puzzle9.subGridStartLocations
-##print puzzle9.getSubGridMembers(1)
-
-##print easy(puzzle9)
-##print   
-##print easy2(puzzle9)
-
 print puzzle9
-puzzle9.nakedSingle()
+solver(puzzle9)
 print puzzle9
-print type(puzzle9.ghostData[2][0])
 
-##print puzzle9.ghostData
-##print puzzle9
+print easy(True)
