@@ -27,6 +27,7 @@ def easy(full = True):
         solver(puzzleEasy9)
         if full:
             print puzzleEasy9
+            print puzzleEasy9.ghostData
 
         end = 81
         for value in puzzleEasy9.data.itervalues():

@@ -324,8 +324,8 @@ class sudoku():
                     self.ghostData[location] = list(setOfExistingGhostValues.intersection(setOfNonExistingValues))
 
     def nakedSingle(self):
-        self.changes = False
         self.populateGhosts()
+        self.changes = False
         ghostKeysToDelete = []
 
         for location, value in self.ghostData.iteritems():
@@ -376,3 +376,73 @@ class sudoku():
                     self.populateGhosts()
                     unresolvedLocations = sorted([key for key in subGridMembers.iterkeys() if
                                                   (key in self.ghostData.keys())])
+
+        for rowStartLocation in self.rowStartLocations: #repeated for every row
+            rowMembers = self.getrowMembers(rowStartLocation)
+
+            unresolvedLocations = sorted([key for key in rowMembers.iterkeys() if
+                                (key in self.ghostData.keys())])
+            
+            for location in unresolvedLocations:
+                surroundingLocations = []
+                for surroundingLocation in unresolvedLocations:
+                    if surroundingLocation != location:
+                        surroundingLocations.append(surroundingLocation)
+                        
+                surroundingGhosts = []
+                for surroundingLocation in surroundingLocations:
+                    if surroundingLocation != location:
+                        for ghostValue in self.ghostData[surroundingLocation]:
+                            surroundingGhosts.append(ghostValue)
+
+                setOfSurroundingGhosts = set(surroundingGhosts)                
+                locationGhosts = [ghostValue for ghostValue in self.ghostData[location]]
+                setOfLocationGhosts = set(locationGhosts)
+
+                setOfUniqueGhosts = setOfLocationGhosts - setOfSurroundingGhosts
+
+                if len(setOfUniqueGhosts) == 1:
+                    self.data[location] = setOfUniqueGhosts.pop()
+                    del self.ghostData[location]
+                    self.changes = True
+                    self.populateGhosts()
+                    unresolvedLocations = sorted([key for key in rowMembers.iterkeys() if
+                                                  (key in self.ghostData.keys())])
+
+        for columnStartLocation in self.columnStartLocations: #repeated for every column
+            columnMembers = self.getcolumnMembers(columnStartLocation)
+
+            unresolvedLocations = sorted([key for key in columnMembers.iterkeys() if
+                                (key in self.ghostData.keys())])
+            
+            for location in unresolvedLocations:
+                surroundingLocations = []
+                for surroundingLocation in unresolvedLocations:
+                    if surroundingLocation != location:
+                        surroundingLocations.append(surroundingLocation)
+                        
+                surroundingGhosts = []
+                for surroundingLocation in surroundingLocations:
+                    if surroundingLocation != location:
+                        for ghostValue in self.ghostData[surroundingLocation]:
+                            surroundingGhosts.append(ghostValue)
+
+                setOfSurroundingGhosts = set(surroundingGhosts)                
+                locationGhosts = [ghostValue for ghostValue in self.ghostData[location]]
+                setOfLocationGhosts = set(locationGhosts)
+
+                setOfUniqueGhosts = setOfLocationGhosts - setOfSurroundingGhosts
+
+                if len(setOfUniqueGhosts) == 1:
+                    self.data[location] = setOfUniqueGhosts.pop()
+                    del self.ghostData[location]
+                    self.changes = True
+                    self.populateGhosts()
+                    unresolvedLocations = sorted([key for key in columnMembers.iterkeys() if
+                                                  (key in self.ghostData.keys())])
+
+
+    def nakedTwin(self):
+        self.populateGhosts()
+        self.changes = False
+
