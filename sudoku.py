@@ -378,7 +378,7 @@ class sudoku():
                                                   (key in self.ghostData.keys())])
 
         for rowStartLocation in self.rowStartLocations: #repeated for every row
-            rowMembers = self.getrowMembers(rowStartLocation)
+            rowMembers = self.getRowMembers(rowStartLocation)
 
             unresolvedLocations = sorted([key for key in rowMembers.iterkeys() if
                                 (key in self.ghostData.keys())])
@@ -410,7 +410,7 @@ class sudoku():
                                                   (key in self.ghostData.keys())])
 
         for columnStartLocation in self.columnStartLocations: #repeated for every column
-            columnMembers = self.getcolumnMembers(columnStartLocation)
+            columnMembers = self.getColumnMembers(columnStartLocation)
 
             unresolvedLocations = sorted([key for key in columnMembers.iterkeys() if
                                 (key in self.ghostData.keys())])

@@ -35,7 +35,8 @@ def easy(full = True):
                 end -= 1
 
         results[i + 1] = [start, end]
-                
+    
+    print            
     return results
 
 def solver(puzzle):
