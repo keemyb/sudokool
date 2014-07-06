@@ -25,9 +25,9 @@ class sudoku():
 ##        except:
 ##            return ValueError
 
-        for zeroBasedIndex in xrange(gridSize**2): #named zero index as xrange starts from zero
+        for zeroBasedIndex in xrange(gridSize ** 2): #named zero index as xrange starts from zero
             position = self.indexToStorageLocation(zeroBasedIndex)           
-            self.data[zeroBasedIndex + 1] = data[position-1]            
+            self.data[zeroBasedIndex + 1] = int(data[position - 1])            
         
     def __repr__(self):
         pass #rebuildable representation
@@ -38,7 +38,7 @@ class sudoku():
         subGridsY = self.getSubGridsY()
         string = ""
 
-        for zeroBasedIndex in xrange(gridSize**2):
+        for zeroBasedIndex in xrange(gridSize ** 2):
 
             position = self.indexToStorageLocation(zeroBasedIndex)
             
