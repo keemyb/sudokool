@@ -413,16 +413,13 @@ class sudoku():
                         if locationOne != locationTwo and len(unresolvedLocations) > 2:
 
                             if len(self.ghostData[locationOne]) == 2 and self.ghostData[locationOne] == self.ghostData[locationTwo]:
-                                print locationOne, locationTwo
                                 for location in unresolvedLocations:
 
-                                    if location != (locationOne or locationTwo):
+                                    if location != locationOne and location != locationTwo:
 
                                         for ghostValue in self.ghostData[locationOne]:
 
                                             if ghostValue in self.ghostData[location]:
-
-                                                print ghostValue
 
                                                 self.changes = True
                                                 self.ghostData[location].remove(ghostValue)
