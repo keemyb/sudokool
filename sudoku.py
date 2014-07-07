@@ -15,6 +15,9 @@ class sudoku():
         self.columnStartLocations = self.getColumnStartLocations()
         self.setOfPossibleNumbers = set(xrange(1, self.gridSize + 1))
         self.changes = False
+        self.intersectionTypes = {"subGrid":[self.subGridStartLocations, self.getSubGridMembers],
+        "row":[self.rowStartLocations, self.getRowMembers],
+        "column":[self.columnStartLocations, self.getColumnMembers]}
 
 ##        try:
 ##            if gridSize % subGridsX != 0 or gridSize % subGridsY != 0:
@@ -28,7 +31,9 @@ class sudoku():
 
         for zeroBasedIndex in xrange(gridSize ** 2): #named zero index as xrange starts from zero
             position = self.indexToStorageLocation(zeroBasedIndex)           
-            self.data[zeroBasedIndex + 1] = int(data[position - 1])            
+            self.data[zeroBasedIndex + 1] = int(data[position - 1])
+
+        self.populateGhosts()            
         
     def __repr__(self):
         pass #rebuildable representation
@@ -329,6 +334,17 @@ class sudoku():
                     setOfNonExistingValues = self.setOfPossibleNumbers.difference(set(existingValues))
                     self.ghostData[location] = list(setOfExistingGhostValues.intersection(setOfNonExistingValues))
 
+    def updateGhosts(self):
+        for location, value in self.ghostData.iteritems():
+            if value == []:
+                del self.ghostData[location]
+
+
+                    
+
+
+
+
     def nakedSingle(self):
         self.populateGhosts()
         self.changes = False
@@ -351,11 +367,7 @@ class sudoku():
         self.populateGhosts()
         self.changes = False
 
-        intersectionTypes = {"subGrid":[self.subGridStartLocations, self.getSubGridMembers],
-        "row":[self.rowStartLocations, self.getRowMembers],
-        "column":[self.columnStartLocations, self.getColumnMembers]}
-
-        for intersectionType in intersectionTypes.itervalues():
+        for intersectionType in self.intersectionTypes.itervalues():
 
             for startLocation in intersectionType[0]:
                 members = intersectionType[1](startLocation)
@@ -393,11 +405,7 @@ class sudoku():
         self.populateGhosts()
         self.changes = False
 
-        intersectionTypes = {"subGrid":[self.subGridStartLocations, self.getSubGridMembers],
-        "row":[self.rowStartLocations, self.getRowMembers],
-        "column":[self.columnStartLocations, self.getColumnMembers]}
-
-        for intersectionType in intersectionTypes.itervalues():
+        for intersectionType in self.intersectionTypes.itervalues():
 
             for startLocation in intersectionType[0]:
                 

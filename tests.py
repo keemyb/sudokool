@@ -71,11 +71,13 @@ puzzle8 = sudoku(8,2,4,string8)
 
 puzzle6 = sudoku(6,2,3,string6)
 
-print puzzle9
-puzzle9.populateGhosts()
-print puzzle9.ghostData
 puzzle9.nakedTwin()
-print puzzle9.ghostData
 print puzzle9
+print puzzle9.ghostData
+# puzzle9.populateGhosts()
+# print puzzle9.ghostData
+# puzzle9.nakedTwin()
+# print puzzle9.ghostData
+# print puzzle9
 
 ##print easy(True)
