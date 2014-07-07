@@ -40,7 +40,7 @@ def easy(full = True):
     return results
 
 def solver(puzzle):
-    methods = [puzzle.nakedSingle, puzzle.hiddenSingle]
+    methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin]
     puzzle.changes = True
     while puzzle.changes:
         for method in range(len(methods)):
@@ -50,6 +50,15 @@ def solver(puzzle):
 string9 = "030647080709000206010903040301070804800304002402050603080501020103000409020439060"
 string9 = "100920000524010000000000070050008102000000000402700090060000000000030945000071006"
 ##string9 = "904200007010000000000706500000800090020904060040002000001607000000000030300005702"
+string9 = "400270600\
+798156234\
+020840007\
+237468951\
+849531726\
+561792843\
+082015479\
+070024300\
+004087002"
 
 string8 = "1004200006000705005008006800100000060052004006008060007000073006"
 
@@ -63,7 +72,10 @@ puzzle8 = sudoku(8,2,4,string8)
 puzzle6 = sudoku(6,2,3,string6)
 
 print puzzle9
-solver(puzzle9)
+puzzle9.populateGhosts()
+print puzzle9.ghostData
+puzzle9.nakedTwin()
+print puzzle9.ghostData
 print puzzle9
 
-print easy(True)
+##print easy(True)

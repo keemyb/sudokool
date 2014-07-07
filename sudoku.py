@@ -393,3 +393,37 @@ class sudoku():
         self.populateGhosts()
         self.changes = False
 
+        intersectionTypes = {"subGrid":[self.subGridStartLocations, self.getSubGridMembers],
+        "row":[self.rowStartLocations, self.getRowMembers],
+        "column":[self.columnStartLocations, self.getColumnMembers]}
+
+        for intersectionType in intersectionTypes.itervalues():
+
+            for startLocation in intersectionType[0]:
+                
+                members = intersectionType[1](startLocation)
+
+                unresolvedLocations = sorted([key for key in members.iterkeys() if
+                        (key in self.ghostData.keys())])
+
+                for locationOne in unresolvedLocations:
+
+                    for locationTwo in unresolvedLocations:
+
+                        if locationOne != locationTwo and len(unresolvedLocations) > 2:
+
+                            if len(self.ghostData[locationOne]) == 2 and self.ghostData[locationOne] == self.ghostData[locationTwo]:
+                                print locationOne, locationTwo
+                                for location in unresolvedLocations:
+
+                                    if location != (locationOne or locationTwo):
+
+                                        for ghostValue in self.ghostData[locationOne]:
+
+                                            if ghostValue in self.ghostData[location]:
+
+                                                print ghostValue
+
+                                                self.changes = True
+                                                self.ghostData[location].remove(ghostValue)
+                                                ##self.populateGhosts()
