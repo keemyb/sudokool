@@ -345,102 +345,43 @@ class sudoku():
         self.populateGhosts()
         self.changes = False
 
-        for subGridStartLocation in self.subGridStartLocations: #repeated for every subGrid
-            subGridMembers = self.getSubGridMembers(subGridStartLocation)
+        intersectionTypes = {"subGrid":[self.subGridStartLocations, self.getSubGridMembers],
+        "row":[self.rowStartLocations, self.getRowMembers],
+        "column":[self.columnStartLocations, self.getColumnMembers]}
 
-            unresolvedLocations = sorted([key for key in subGridMembers.iterkeys() if
-                                (key in self.ghostData.keys())])
-            
-            for location in unresolvedLocations:
-                surroundingLocations = []
-                for surroundingLocation in unresolvedLocations:
-                    if surroundingLocation != location:
-                        surroundingLocations.append(surroundingLocation)
-                        
-                surroundingGhosts = []
-                for surroundingLocation in surroundingLocations:
-                    if surroundingLocation != location:
-                        for ghostValue in self.ghostData[surroundingLocation]:
-                            surroundingGhosts.append(ghostValue)
+        for intersectionType in intersectionTypes.itervalues():
 
-                setOfSurroundingGhosts = set(surroundingGhosts)                
-                locationGhosts = [ghostValue for ghostValue in self.ghostData[location]]
-                setOfLocationGhosts = set(locationGhosts)
+            for startLocation in intersectionType[0]:
+                members = intersectionType[1](startLocation)
 
-                setOfUniqueGhosts = setOfLocationGhosts - setOfSurroundingGhosts
+                unresolvedLocations = sorted([key for key in members.iterkeys() if
+                                    (key in self.ghostData.keys())])
+                
+                for location in unresolvedLocations:
+                    surroundingLocations = []
+                    for surroundingLocation in unresolvedLocations:
+                        if surroundingLocation != location:
+                            surroundingLocations.append(surroundingLocation)
+                            
+                    surroundingGhosts = []
+                    for surroundingLocation in surroundingLocations:
+                        if surroundingLocation != location:
+                            for ghostValue in self.ghostData[surroundingLocation]:
+                                surroundingGhosts.append(ghostValue)
 
-                if len(setOfUniqueGhosts) == 1:
-                    self.data[location] = setOfUniqueGhosts.pop()
-                    del self.ghostData[location]
-                    self.changes = True
-                    self.populateGhosts()
-                    unresolvedLocations = sorted([key for key in subGridMembers.iterkeys() if
-                                                  (key in self.ghostData.keys())])
+                    setOfSurroundingGhosts = set(surroundingGhosts)                
+                    locationGhosts = [ghostValue for ghostValue in self.ghostData[location]]
+                    setOfLocationGhosts = set(locationGhosts)
 
-        for rowStartLocation in self.rowStartLocations: #repeated for every row
-            rowMembers = self.getRowMembers(rowStartLocation)
+                    setOfUniqueGhosts = setOfLocationGhosts - setOfSurroundingGhosts
 
-            unresolvedLocations = sorted([key for key in rowMembers.iterkeys() if
-                                (key in self.ghostData.keys())])
-            
-            for location in unresolvedLocations:
-                surroundingLocations = []
-                for surroundingLocation in unresolvedLocations:
-                    if surroundingLocation != location:
-                        surroundingLocations.append(surroundingLocation)
-                        
-                surroundingGhosts = []
-                for surroundingLocation in surroundingLocations:
-                    if surroundingLocation != location:
-                        for ghostValue in self.ghostData[surroundingLocation]:
-                            surroundingGhosts.append(ghostValue)
-
-                setOfSurroundingGhosts = set(surroundingGhosts)                
-                locationGhosts = [ghostValue for ghostValue in self.ghostData[location]]
-                setOfLocationGhosts = set(locationGhosts)
-
-                setOfUniqueGhosts = setOfLocationGhosts - setOfSurroundingGhosts
-
-                if len(setOfUniqueGhosts) == 1:
-                    self.data[location] = setOfUniqueGhosts.pop()
-                    del self.ghostData[location]
-                    self.changes = True
-                    self.populateGhosts()
-                    unresolvedLocations = sorted([key for key in rowMembers.iterkeys() if
-                                                  (key in self.ghostData.keys())])
-
-        for columnStartLocation in self.columnStartLocations: #repeated for every column
-            columnMembers = self.getColumnMembers(columnStartLocation)
-
-            unresolvedLocations = sorted([key for key in columnMembers.iterkeys() if
-                                (key in self.ghostData.keys())])
-            
-            for location in unresolvedLocations:
-                surroundingLocations = []
-                for surroundingLocation in unresolvedLocations:
-                    if surroundingLocation != location:
-                        surroundingLocations.append(surroundingLocation)
-                        
-                surroundingGhosts = []
-                for surroundingLocation in surroundingLocations:
-                    if surroundingLocation != location:
-                        for ghostValue in self.ghostData[surroundingLocation]:
-                            surroundingGhosts.append(ghostValue)
-
-                setOfSurroundingGhosts = set(surroundingGhosts)                
-                locationGhosts = [ghostValue for ghostValue in self.ghostData[location]]
-                setOfLocationGhosts = set(locationGhosts)
-
-                setOfUniqueGhosts = setOfLocationGhosts - setOfSurroundingGhosts
-
-                if len(setOfUniqueGhosts) == 1:
-                    self.data[location] = setOfUniqueGhosts.pop()
-                    del self.ghostData[location]
-                    self.changes = True
-                    self.populateGhosts()
-                    unresolvedLocations = sorted([key for key in columnMembers.iterkeys() if
-                                                  (key in self.ghostData.keys())])
-
+                    if len(setOfUniqueGhosts) == 1:
+                        self.data[location] = setOfUniqueGhosts.pop()
+                        del self.ghostData[location]
+                        self.changes = True
+                        self.populateGhosts()
+                        unresolvedLocations = sorted([key for key in members.iterkeys() if
+                                                      (key in self.ghostData.keys())])
 
     def nakedTwin(self):
         self.populateGhosts()
