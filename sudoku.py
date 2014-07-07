@@ -53,9 +53,15 @@ class sudoku():
                 string += "||"
 
             if (zeroBasedIndex + 1) % subGridsY == 0: #last number in subGrid row
-                string += str(self.data[position])
+                if self.data[position] == 0:
+                    string += " "
+                else:
+                    string += str(self.data[position])
             else:
-                string += str(self.data[position]) + " "
+                if self.data[position] == 0:
+                    string += "  "
+                else:
+                    string += str(self.data[position]) + " "
 
             if (zeroBasedIndex + 1) % (gridSize * subGridsX) == 0: # pipe after last number in row
                 string += "||"
