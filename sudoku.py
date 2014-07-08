@@ -10,9 +10,7 @@ class sudoku():
         self.subGridsY = subGridsY
         self.data = {position + 1 : int(data[position]) for position in range(gridSize ** 2)}
         self.ghostData = {}
-        self.subGridGroups = self.getSubGridGroups()
-        self.rowGroups = self.getRowGroups()
-        self.columnGroups = self.getColumnGroups()
+        self.intersectionGroups = self.getSubGridGroups() + self.getRowGroups() + self.getColumnGroups()
         # self.setOfPossibleNumbers = set(xrange(1, self.gridSize + 1))
         # self.changes = False
         # self.intersectionTypes = {"subGrid":[self.subGridStartLocations, self.getSubGridMembers],
