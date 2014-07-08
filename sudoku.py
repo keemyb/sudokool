@@ -11,21 +11,8 @@ class sudoku():
         self.data = {position + 1 : int(data[position]) for position in range(gridSize ** 2)}
         self.ghostData = {}
         self.intersectionGroups = self.getSubGridGroups() + self.getRowGroups() + self.getColumnGroups()
-        # self.setOfPossibleNumbers = set(xrange(1, self.gridSize + 1))
-        # self.changes = False
-        # self.intersectionTypes = {"subGrid":[self.subGridStartLocations, self.getSubGridMembers],
-        # "row":[self.rowStartLocations, self.getRowMembers],
-        # "column":[self.columnStartLocations, self.getColumnMembers]}
-
-##        try:
-##            if gridSize % subGridsX != 0 or gridSize % subGridsY != 0:
-##                #return "invalid dimensions"
-##                raise Exception("invalid dimensions")
-##            if gridSize != (subGridsX * subGridsY):
-##                #return "invalid dimensions"
-##                raise Exception("invalid dimensions")
-##        except:
-##            return ValueError
+        self.setOfPossibleNumbers = set(xrange(1, self.gridSize + 1))
+        self.changes = False
 
         #self.populateGhosts()            
         
