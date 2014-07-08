@@ -10,7 +10,7 @@ class sudoku():
         self.subGridsY = subGridsY
         self.data = {position + 1 : int(data[position]) for position in range(gridSize ** 2)}
         self.ghostData = {}
-        self.subGridStartLocations = self.getSubGridStartLocations()
+        self.subGridGroups = self.getSubGridGroups()
         self.rowStartLocations = self.getRowStartLocations()
         self.columnStartLocations = self.getColumnStartLocations()
         # self.setOfPossibleNumbers = set(xrange(1, self.gridSize + 1))
@@ -142,24 +142,23 @@ class sudoku():
         else:
             return ((location % gridSize) % subGridsY)
 
-    def getSubGridMembers(self, location):
-        """returns locations of sub grid members, the location given is included in list"""
-        gridSize = self.getGridSize()
+    def getSubGridGroups(self):
+        gridSize = self.gridSize
+        subGridsY = self.subGridsY
 
-        resolvedMembers = []
+        subGridGroups = []
 
-        if location % gridSize == 0:
-            firstMember = (location - gridSize) + 1
-        else:
-            firstMember = location - (location % gridSize) + 1
+        for startLocation in self.getSubGridStartLocations():
+            subGridGroup = []
+            
+            for position in xrange(gridSize):
+                rowOffset = ((position % gridSize) / subGridsY) * gridSize
+                columnOffset = (position % gridSize) % subGridsY
+                subGridGroup.append(startLocation + rowOffset + columnOffset)
+            
+            subGridGroups.append(subGridGroup)
 
-        lastMember = (firstMember + gridSize) - 1
-        subGridMembers = range(firstMember, lastMember + 1)
-
-        for i in subGridMembers:
-            resolvedMembers.append(self.getData()[i])
-
-        return dict(zip(subGridMembers, resolvedMembers))
+        return subGridGroups
 
     def getRowMembers(self, location):
         gridSize = self.getGridSize()
