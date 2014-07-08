@@ -10,7 +10,7 @@ class sudoku():
         self.subGridsY = subGridsY
         self.data = {position + 1 : int(data[position]) for position in range(gridSize ** 2)}
         self.ghostData = {}
-        # self.subGridStartLocations = self.getSubGridStartLocations()
+        self.subGridStartLocations = self.getSubGridStartLocations()
         # self.rowStartLocations = self.getRowStartLocations()
         # self.columnStartLocations = self.getColumnStartLocations()
         # self.setOfPossibleNumbers = set(xrange(1, self.gridSize + 1))
@@ -35,20 +35,21 @@ class sudoku():
         pass #rebuildable representation
 
     def __str__(self):
-        gridSize = self.getGridSize()
-        subGridsX = self.getSubGridsX()
-        subGridsY = self.getSubGridsY()
+        gridSize = self.gridSize
+        subGridsX = self.subGridsX
+        subGridsY = self.subGridsY
         string = ""
-        vPipe = "|"
+        vPipe = "="
         hPipe = "="
-        hPipeString = hPipe * (len(vPipe) * (subGridsY + 1)) + \
+        # first line to accommodate vertical pipe and following spaces (minus one to account for last v pipe)
+        # second line for numbers (and following spaces)
+        hPipeString = hPipe * ((len(vPipe) + 1) * (subGridsX + 1) - 1) + \
         hPipe * (gridSize * 2) + \
-        hPipe * (subGridsY) + \
         "\n"
 
         for position in xrange(1, gridSize ** 2 + 1):
 
-            if (position - 1) % (gridSize * subGridsY) == 0:
+            if (position - 1) % (gridSize * subGridsX) == 0:
                 string += hPipeString
 
             if (position - 1) % subGridsY == 0 :
@@ -68,15 +69,20 @@ class sudoku():
         return string
 
     def getSubGridStartLocations(self):
+        subGridsX = self.subGridsX
+        subGridsY = self.subGridsY
+        gridSize = self.gridSize
         subGridStartLocations = []
-        for subGrid in xrange(self.gridSize):
-            subGridStartLocations.append((subGrid * self.gridSize) + 1)
-        return sorted(subGridStartLocations)
+        for subGrid in xrange(gridSize):
+            baseLocation = (subGrid / subGridsX) * (gridSize * subGridsX)
+            offset = (subGrid % subGridsX) * subGridsY
+            subGridStartLocations.append(baseLocation + offset + 1)
+        return subGridStartLocations
 
     def getRowStartLocations(self):
-        gridSize = self.getGridSize()
-        subGridsX = self.getSubGridsX()
-        subGridsY = self.getSubGridsY()
+        gridSize = self.getGridSize
+        subGridsX = self.getSubGridsX
+        subGridsY = self.getSubGridsY
         rowStartLocations = []
 
         for row in xrange(self.gridSize):
