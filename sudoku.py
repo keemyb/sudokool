@@ -39,19 +39,31 @@ class sudoku():
         subGridsX = self.getSubGridsX()
         subGridsY = self.getSubGridsY()
         string = ""
-        vpipe = "||"
-        hpipe = "="
+        vPipe = "|"
+        hPipe = "="
+        hPipeString = hPipe * (len(vPipe) * (subGridsY + 1)) + \
+        hPipe * (gridSize * 2) + \
+        hPipe * (subGridsY) + \
+        "\n"
 
         for position in xrange(1, gridSize ** 2 + 1):
 
+            if (position - 1) % (gridSize * subGridsY) == 0:
+                string += hPipeString
+
+            if (position - 1) % subGridsY == 0 :
+                string += vPipe + " "
+
             if self.data[position] == 0:
-                string += " "
+                string += "  "
             else:
-                string += str(self.data[position])
+                string += str(self.data[position]) + " "
 
             if position % gridSize == 0:
+                string += vPipe + "\n"
 
-                string += "\n"
+            if position == gridSize ** 2:
+                string += hPipeString
 
         return string
 
