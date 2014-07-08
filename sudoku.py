@@ -12,7 +12,7 @@ class sudoku():
         self.ghostData = {}
         self.subGridGroups = self.getSubGridGroups()
         self.rowGroups = self.getRowGroups()
-        self.columnStartLocations = self.getColumnStartLocations()
+        self.columnGroups = self.getColumnGroups()
         # self.setOfPossibleNumbers = set(xrange(1, self.gridSize + 1))
         # self.changes = False
         # self.intersectionTypes = {"subGrid":[self.subGridStartLocations, self.getSubGridMembers],
@@ -170,37 +170,15 @@ class sudoku():
             
         return rowGroups
 
-    def getColumnMembers(self, location):
-        gridSize = self.getGridSize()
-        subGridsX = self.getSubGridsX()
-        subGridsY = self.getSubGridsY()
-        columnInSubGrid = self.getColumnInSubGrid(location)
+    def getColumnGroups(self):
+        gridSize = self.gridSize
 
-        columnMembers = []
-        resolvedMembers = []
-        subGridsInColumn = []
+        columnGroups = []
 
-        if self.getSubGrid(location) % subGridsX == 0:
-            subGridColumn = subGridsX
-        else:
-            subGridColumn = self.getSubGrid(location) % subGridsX
+        for startLocation in self.getColumnStartLocations():
+            columnGroups.append([startLocation + offset * gridSize for offset in xrange(gridSize)])
 
-        firstSubGridInColumn = subGridColumn
-        for i in xrange(subGridsY):
-            subGridsInColumn.append(firstSubGridInColumn + (subGridsX * i))
-
-        for subGrid in subGridsInColumn:
-            firstMemberInSubGrid = ((subGrid - 1) * gridSize) + 1
-            firstColumnMemberInSubGrid = firstMemberInSubGrid + columnInSubGrid - 1
-
-            j = subGridsX
-            while j != 0:
-                reference = firstColumnMemberInSubGrid + subGridsY * (j - 1)
-                columnMembers.append(reference)
-                resolvedMembers.append(self.getData()[reference])
-                j -= 1
-
-        return dict(zip(columnMembers,resolvedMembers))
+        return columnGroups
 
     def resolveMember(self, location):
         resolvedMember = self.getData()[location]
@@ -252,12 +230,6 @@ class sudoku():
         for location, value in self.ghostData.iteritems():
             if value == []:
                 del self.ghostData[location]
-
-
-                    
-
-
-
 
     def nakedSingle(self):
         self.populateGhosts()
