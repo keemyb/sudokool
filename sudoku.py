@@ -95,53 +95,6 @@ class sudoku():
 
         return columnStartLocations
 
-    def getGridSize(self):
-        return self.gridSize
-
-    def getSubGridsX(self):
-        return self.subGridsX
-
-    def getSubGridsY(self):
-        return self.subGridsY
-
-    def getData(self):
-        return self.data
-
-    def getSubGrid(self, location):
-        gridSize = self.getGridSize()
-
-        if location % gridSize == 0: #last number in box
-            return location / gridSize
-        else:
-            return (location / gridSize) + 1
-
-    def getPositionInSubGrid(self, location):
-        gridSize = self.getGridSize()
-
-        if location % gridSize == 0: #last number in box
-            return gridSize
-        else:
-            return location % gridSize
-
-    def getRowInSubGrid(self, location):
-        gridSize = self.getGridSize()
-        subGridsY = self.getSubGridsY()
-        subGridsX = self.getSubGridsX()
-
-        if location % gridSize == 0: #last number in box
-            return subGridsX
-        else:
-            return (((location % gridSize) - 1) / subGridsY) + 1
-
-    def getColumnInSubGrid(self, location):
-        gridSize = self.getGridSize()
-        subGridsY = self.getSubGridsY()
-
-        if location % subGridsY == 0: #last number in box
-            return subGridsY
-        else:
-            return ((location % gridSize) % subGridsY)
-
     def getSubGridGroups(self):
         gridSize = self.gridSize
         subGridsY = self.subGridsY
@@ -179,10 +132,6 @@ class sudoku():
             columnGroups.append([startLocation + offset * gridSize for offset in xrange(gridSize)])
 
         return columnGroups
-
-    def resolveMember(self, location):
-        resolvedMember = self.getData()[location]
-        return resolvedMember
 
     def populateGhosts(self):
         for i in xrange(self.gridSize): # subGrid
