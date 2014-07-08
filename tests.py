@@ -73,10 +73,10 @@ puzzle6 = sudoku(6,2,3,string6)
 
 # puzzle9.nakedTwin()
 print puzzle9
-print puzzle9.subGridStartLocations
+print puzzle9.rowStartLocations
 print
 print puzzle8
-print puzzle8.subGridStartLocations
+print puzzle8.rowStartLocations
 # puzzle9.populateGhosts()
 # print puzzle9.ghostData
 # puzzle9.nakedTwin()

@@ -11,7 +11,7 @@ class sudoku():
         self.data = {position + 1 : int(data[position]) for position in range(gridSize ** 2)}
         self.ghostData = {}
         self.subGridStartLocations = self.getSubGridStartLocations()
-        # self.rowStartLocations = self.getRowStartLocations()
+        self.rowStartLocations = self.getRowStartLocations()
         # self.columnStartLocations = self.getColumnStartLocations()
         # self.setOfPossibleNumbers = set(xrange(1, self.gridSize + 1))
         # self.changes = False
@@ -73,30 +73,20 @@ class sudoku():
         subGridsY = self.subGridsY
         gridSize = self.gridSize
         subGridStartLocations = []
+        
         for subGrid in xrange(gridSize):
             baseLocation = (subGrid / subGridsX) * (gridSize * subGridsX)
             offset = (subGrid % subGridsX) * subGridsY
             subGridStartLocations.append(baseLocation + offset + 1)
+        
         return subGridStartLocations
 
     def getRowStartLocations(self):
-        gridSize = self.getGridSize
-        subGridsX = self.getSubGridsX
-        subGridsY = self.getSubGridsY
-        rowStartLocations = []
+        gridSize = self.gridSize
+        
+        rowStartLocations = [(row * gridSize + 1) for row in xrange(gridSize)]
 
-        for row in xrange(self.gridSize):
-            membersInAboveSubGrids  = (row / subGridsX) * gridSize * subGridsX
-
-            if (row - 1) % subGridsX != 0:
-                adjustment = ((row - 1) % subGridsX) * subGridsY
-            else:
-                adjustment = 0
-
-            rowStartLocation = membersInAboveSubGrids + adjustment + 1
-            
-            rowStartLocations.append(rowStartLocation)
-        return sorted(rowStartLocations)
+        return rowStartLocations
 
     def getColumnStartLocations(self):
         gridSize = self.getGridSize()
