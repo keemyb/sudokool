@@ -95,50 +95,6 @@ class sudoku():
 
         return columnStartLocations
 
-    def indexToStorageLocation(self, index):
-            gridSize = self.gridSize
-            subGridsX = self.subGridsX
-            subGridsY = self.subGridsY
-            index = index + 1
-
-            if index % gridSize == 0: #last number in row
-                subGrid = (((index - 1) / (gridSize * subGridsX)) + 1) * subGridsX
-                columnInSubGrid = subGridsY
-            else:
-                subGrid = ((((index - 1) / (gridSize * subGridsX)) + 1) * subGridsX) - \
-                          (subGridsX - ((((index % gridSize) - 1) / subGridsY) + 1))
-                if index % subGridsY == 0:
-                    columnInSubGrid = subGridsY
-                else:
-                    columnInSubGrid = index % subGridsY
-
-            if index % (gridSize * subGridsX) == 0: #last number of last subGrid in Row
-                rowInSubGrid = subGridsX
-            else:
-                if index % gridSize == 0:
-                    rowInSubGrid = (((index) % (gridSize * subGridsX))) / gridSize
-                else:
-                    rowInSubGrid = ((((index) % (gridSize * subGridsX))) / gridSize) + 1
-
-            if subGrid % subGridsX == 0: #last subGrid in row
-                membersInHorzAdjSubGrids = (subGridsX - 1) * gridSize
-            else:
-                membersInHorzAdjSubGrids = ((subGrid % subGridsX) - 1) * gridSize
-
-            membersInAboveSubGrids  = ((subGrid - 1)/subGridsX) * gridSize * subGridsX
-
-            if rowInSubGrid == 1:
-                membersInAboveRowsInSubGrid = 0
-            else:
-                membersInAboveRowsInSubGrid = (rowInSubGrid - 1) * subGridsY
-
-            membersLeftInRowIncSelf = columnInSubGrid
-
-            position = membersInAboveSubGrids + membersInHorzAdjSubGrids + \
-                       membersInAboveRowsInSubGrid + membersLeftInRowIncSelf
-                
-            return position
-
     def getGridSize(self):
         return self.gridSize
 
