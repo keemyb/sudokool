@@ -11,7 +11,7 @@ class sudoku():
         self.data = {position + 1 : int(data[position]) for position in range(gridSize ** 2)}
         self.ghostData = {}
         self.subGridGroups = self.getSubGridGroups()
-        self.rowStartLocations = self.getRowStartLocations()
+        self.rowGroups = self.getRowGroups()
         self.columnStartLocations = self.getColumnStartLocations()
         # self.setOfPossibleNumbers = set(xrange(1, self.gridSize + 1))
         # self.changes = False
@@ -160,32 +160,15 @@ class sudoku():
 
         return subGridGroups
 
-    def getRowMembers(self, location):
-        gridSize = self.getGridSize()
-        subGridsX = self.getSubGridsX()
-        subGridsY = self.getSubGridsY()
-        rowInSubGrid = self.getRowInSubGrid(location)
+    def getRowGroups(self):
+        gridSize = self.gridSize
 
-        rowMembers = []
-        resolvedMembers = []
+        rowGroups = []
 
-        subGridRow = ((self.getSubGrid(location) - 1) / subGridsX) + 1
-        
-        firstSubGridInRow = ((subGridRow - 1) * subGridsX) + 1
-        lastSubGridInRow = firstSubGridInRow + subGridsX - 1
-        subGridsInRow = range(firstSubGridInRow, lastSubGridInRow + 1)
-
-        for subGrid in subGridsInRow:
-            firstMemberInSubGrid = ((subGrid - 1) * gridSize) + 1
-            firstRowMemberInSubGrid = firstMemberInSubGrid + ((rowInSubGrid - 1) * subGridsY)
-            lastRowMemberInSubGrid = firstRowMemberInSubGrid + subGridsY - 1
-            rowMembersInSubGrid = range(firstRowMemberInSubGrid, lastRowMemberInSubGrid + 1)
-
-            for member in rowMembersInSubGrid:
-                rowMembers.append(member)
-                resolvedMembers.append(self.getData()[member])
+        for startLocation in self.getRowStartLocations():
+            rowGroups.append([startLocation + offset for offset in xrange(gridSize)])
             
-        return dict(zip(rowMembers,resolvedMembers))
+        return rowGroups
 
     def getColumnMembers(self, location):
         gridSize = self.getGridSize()
