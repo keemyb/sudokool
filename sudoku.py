@@ -12,7 +12,7 @@ class sudoku():
         self.ghostData = {}
         self.subGridStartLocations = self.getSubGridStartLocations()
         self.rowStartLocations = self.getRowStartLocations()
-        # self.columnStartLocations = self.getColumnStartLocations()
+        self.columnStartLocations = self.getColumnStartLocations()
         # self.setOfPossibleNumbers = set(xrange(1, self.gridSize + 1))
         # self.changes = False
         # self.intersectionTypes = {"subGrid":[self.subGridStartLocations, self.getSubGridMembers],
@@ -89,23 +89,11 @@ class sudoku():
         return rowStartLocations
 
     def getColumnStartLocations(self):
-        gridSize = self.getGridSize()
-        subGridsX = self.getSubGridsX()
-        subGridsY = self.getSubGridsY()
-        columnStartLocations = []
+        gridSize = self.gridSize
 
-        for column in xrange(self.gridSize):
-            membersInLeftwardSubGrids = (column / subGridsY) * gridSize
+        columnStartLocations = range(1, gridSize + 1)
 
-            if (column + 1) % subGridsY != 0:
-                adjustment = ((column + 1) % subGridsY)
-            else:
-                adjustment = 0
-
-            columnStartLocation = membersInLeftwardSubGrids + adjustment + 1
-
-            columnStartLocations.append(columnStartLocation)
-        return sorted(columnStartLocations)
+        return columnStartLocations
 
     def indexToStorageLocation(self, index):
             gridSize = self.gridSize
