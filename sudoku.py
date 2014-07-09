@@ -119,6 +119,8 @@ class sudoku():
         return columnGroups
 
     def populateGhosts(self, modifiedLocations = None):
+        if modifiedLocations == []:
+            return
         if modifiedLocations == None:
             for group in self.intersectionGroups:
                 setOfExistingValues = set([self.values[value] for value in group if self.values[value] != 0])
