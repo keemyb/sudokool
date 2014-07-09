@@ -1,6 +1,6 @@
 from sudoku import sudoku
 
-def easy(full = True):
+def easy(onlyShowSolved, ghostValues = True):
     
     easy50 = open("easy50.txt", "r")
     stringEasy = ""
@@ -17,23 +17,39 @@ def easy(full = True):
 
         start = 81
         for value in stringEasy9:
-            if int(value) == 0:
+            if value == "0":
                 start -= 1
 
-        puzzleEasy9 = sudoku(9,3,3,stringEasy9)
-        if full:
-            print
-            print str(i + 1) + " ======================"
-            print puzzleEasy9
-        solver(puzzleEasy9)
-        if full:
-            print puzzleEasy9
-            print puzzleEasy9.ghostValues
+        pre, post = sudoku(9,3,3,stringEasy9), sudoku(9,3,3,stringEasy9)
+        solver(post)
+        preGhost = {}
+        postGhost = {}
+        for key in post.ghostValues.iterkeys():
+            if post.ghostValues[key] != pre.ghostValues[key]:
+                preGhost[key] = pre.ghostValues[key]
+                postGhost[key] = post.ghostValues[key]
+
+        fullString = "\n" + str(i + 1) + " ======================" + "\n" + str(pre) + str(preGhost) + "\n" + str(post) + str(postGhost)
+        liteString = "\n" + str(i + 1) + " ======================" + "\n" + str(pre) + str(post)
+
+        if onlyShowSolved:
+            if pre.values != post.values:
+                if ghostValues:
+                    print fullString
+                else:
+                    print liteString
+        else:
+            if ghostValues:
+                print fullString
+            else:
+                print liteString
+
 
         end = 81
-        for value in puzzleEasy9.values.itervalues():
+        for value in post.values.itervalues():
             if value == 0:
                 end -= 1
+
 
         results[i + 1] = [start, end]
     
@@ -42,7 +58,7 @@ def easy(full = True):
 
 def solver(puzzle):
     methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin]
-    methods = [puzzle.nakedSingle]
+    methods = [puzzle.hiddenSingle]
     puzzle.changes = True
     while puzzle.changes:
         for method in range(len(methods)):
@@ -74,18 +90,12 @@ puzzle8 = sudoku(8,2,4,string8)
 puzzle6 = sudoku(6,2,3,string6)
 
 # puzzle9.nakedTwin()
-print puzzle9
-print puzzle9.ghostValues
-print
-print puzzle8
-print puzzle8.ghostValues
-puzzle8.nakedSingle()
-print puzzle8
-print puzzle8.ghostValues
-# puzzle9.populateGhosts()
-# print puzzle9.ghostData
-# puzzle9.nakedTwin()
-# print puzzle9.ghostData
-# print puzzle9
+# for puzzle in [puzzle9, puzzle8]:
+#     print puzzle
+#     print puzzle.ghostValues
+#     puzzle.hiddenSingle()
+#     print puzzle
+#     print puzzle.ghostValues
+
 
 print easy(True)

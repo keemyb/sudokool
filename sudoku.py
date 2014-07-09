@@ -149,42 +149,30 @@ class sudoku():
         return self.changes
 
     def hiddenSingle(self):
-        self.populateGhosts()
         self.changes = False
+        ghostKeysToBeRemoved = []
 
-        for intersectionType in self.intersectionTypes.itervalues():
-
-            for startLocation in intersectionType[0]:
-                members = intersectionType[1](startLocation)
-
-                unresolvedLocations = sorted([key for key in members.iterkeys() if
-                                    (key in self.ghostData.keys())])
+        for group in self.intersectionGroups:
+            emptyLocations = (location for location in group if location in self.ghostValues)
+            
+            for location in emptyLocations:
+                setsOfSurroundingGhosts = [self.ghostValues[surroundingLocation] for surroundingLocation in emptyLocations if surroundingLocation != location]
+                setOfSurroundingGhosts = set([ghostValue for ghostValues in setsOfSurroundingGhosts for ghostValue in ghostValues])
+                setOfUniqueGhosts = self.ghostValues[location] - setOfSurroundingGhosts
                 
-                for location in unresolvedLocations:
-                    surroundingLocations = []
-                    for surroundingLocation in unresolvedLocations:
-                        if surroundingLocation != location:
-                            surroundingLocations.append(surroundingLocation)
-                            
-                    surroundingGhosts = []
-                    for surroundingLocation in surroundingLocations:
-                        if surroundingLocation != location:
-                            for ghostValue in self.ghostData[surroundingLocation]:
-                                surroundingGhosts.append(ghostValue)
+                if len(setOfUniqueGhosts) == 1:
+                    self.values[location] = setOfUniqueGhosts.pop()
+                    ghostKeysToBeRemoved.append(location)
+                    self.changes = True
 
-                    setOfSurroundingGhosts = set(surroundingGhosts)                
-                    locationGhosts = [ghostValue for ghostValue in self.ghostData[location]]
-                    setOfLocationGhosts = set(locationGhosts)
+        if self.changes:
+            for location in ghostKeysToBeRemoved:
+                if location in self.ghostValues:
+                    del self.ghostValues[location]
 
-                    setOfUniqueGhosts = setOfLocationGhosts - setOfSurroundingGhosts
+            self.populateGhosts()
 
-                    if len(setOfUniqueGhosts) == 1:
-                        self.data[location] = setOfUniqueGhosts.pop()
-                        del self.ghostData[location]
-                        self.changes = True
-                        self.populateGhosts()
-                        unresolvedLocations = sorted([key for key in members.iterkeys() if
-                                                      (key in self.ghostData.keys())])
+        return self.changes
 
     def nakedTwin(self):
         self.populateGhosts()
