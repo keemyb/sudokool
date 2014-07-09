@@ -8,13 +8,13 @@ class sudoku():
         self.gridSize = gridSize
         self.subGridsX = subGridsX
         self.subGridsY = subGridsY
-        self.data = {position + 1 : int(data[position]) for position in range(gridSize ** 2)}
-        self.ghostData = {}
+        self.values = {position + 1 : int(data[position]) for position in range(gridSize ** 2)}
+        self.ghostValues = {}
         self.intersectionGroups = self.getSubGridGroups() + self.getRowGroups() + self.getColumnGroups()
         self.setOfPossibleNumbers = set(xrange(1, self.gridSize + 1))
         self.changes = False
 
-        #self.populateGhosts()            
+        self.populateGhosts()            
         
     def __repr__(self):
         pass #rebuildable representation
@@ -40,10 +40,10 @@ class sudoku():
             if (position - 1) % subGridsY == 0 :
                 string += vPipe + " "
 
-            if self.data[position] == 0:
+            if self.values[position] == 0:
                 string += "  "
             else:
-                string += str(self.data[position]) + " "
+                string += str(self.values[position]) + " "
 
             if position % gridSize == 0:
                 string += vPipe + "\n"
@@ -119,51 +119,15 @@ class sudoku():
         return columnGroups
 
     def populateGhosts(self):
-        for i in xrange(self.gridSize): # subGrid
-            existingValues = []    
+        for group in self.intersectionGroups:
+            setOfExistingValues = set([self.values[value] for value in group if self.values[value] != 0])
 
-            for location, value in self.getSubGridMembers((i * self.gridSize) + 1).iteritems():
-                if value != 0:
-                    existingValues.append(int(value)) # int for diff
-
-            for location, value in self.getSubGridMembers((i * self.gridSize) + 1).iteritems():
-                if self.resolveMember(location) == 0:
-                    setOfNonExistingValues = self.setOfPossibleNumbers.difference(set(existingValues))
-                    self.ghostData[location] = list(setOfNonExistingValues)
-
-        for i in xrange(self.gridSize): #columns
-            existingValues = []
-            reference = ((i / self.subGridsY) * self.gridSize) + ((i + 1) % self.subGridsY)
-
-            for location, value in self.getColumnMembers(reference).iteritems():
-                if value != 0:
-                    existingValues.append(int(value))
-
-            for location, value in self.getColumnMembers(reference).iteritems():
-                if self.resolveMember(location) == 0:
-                    setOfExistingGhostValues = set(self.ghostData[location])
-                    setOfNonExistingValues = self.setOfPossibleNumbers.difference(set(existingValues))
-                    self.ghostData[location] = list(setOfExistingGhostValues.intersection(setOfNonExistingValues))
-
-        for i in xrange(self.gridSize): #rows
-            existingValues = []
-            reference = ((((i + self.subGridsX) / self.subGridsX) - 1) * self.gridSize * self.subGridsX) + \
-                        ((i % self.subGridsX) * self.subGridsY) + 1
-
-            for location, value in self.getRowMembers(reference).iteritems():
-                if value != 0:
-                    existingValues.append(int(value))            
-
-            for location, value in self.getRowMembers(reference).iteritems():
-                if self.resolveMember(location) == 0:
-                    setOfExistingGhostValues = set(self.ghostData[location])
-                    setOfNonExistingValues = self.setOfPossibleNumbers.difference(set(existingValues))
-                    self.ghostData[location] = list(setOfExistingGhostValues.intersection(setOfNonExistingValues))
-
-    def updateGhosts(self):
-        for location, value in self.ghostData.iteritems():
-            if value == []:
-                del self.ghostData[location]
+            for location in group:
+                if self.values[location] == 0:
+                    if location in self.ghostValues:
+                        self.ghostValues[location] -= setOfExistingValues
+                    else:
+                        self.ghostValues[location] = self.setOfPossibleNumbers - setOfExistingValues
 
     def nakedSingle(self):
         self.populateGhosts()
