@@ -130,19 +130,20 @@ class sudoku():
                         self.ghostValues[location] = self.setOfPossibleNumbers - setOfExistingValues
 
     def nakedSingle(self):
-        self.populateGhosts()
         self.changes = False
-        ghostKeysToDelete = []
 
-        for location, value in self.ghostData.iteritems():
-            if len(value) == 1:
-                self.data[location] = value[0]
-                ghostKeysToDelete.append(location)
+        ghostKeysToBeRemoved = []
+
+        for location, ghostValues in self.ghostValues.iteritems():
+            if len(ghostValues) == 1:
+                self.values[location] = ghostValues.pop()
+                ghostKeysToBeRemoved.append(location)
                 self.changes = True
 
         if self.changes:
-            for location in ghostKeysToDelete:
-                del self.ghostData[location]
+            for location in ghostKeysToBeRemoved:
+                del self.ghostValues[location]
+
             self.populateGhosts()
 
         return self.changes

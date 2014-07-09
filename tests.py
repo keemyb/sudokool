@@ -77,6 +77,9 @@ print puzzle9.ghostValues
 print
 print puzzle8
 print puzzle8.ghostValues
+puzzle8.nakedSingle()
+print puzzle8
+print puzzle8.ghostValues
 # puzzle9.populateGhosts()
 # print puzzle9.ghostData
 # puzzle9.nakedTwin()
