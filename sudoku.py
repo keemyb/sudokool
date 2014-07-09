@@ -152,7 +152,7 @@ class sudoku():
             for location in ghostKeysToBeRemoved:
                 del self.ghostValues[location]
 
-            self.populateGhosts()
+            self.populateGhosts(ghostKeysToBeRemoved)
 
         return self.changes
 
@@ -178,12 +178,14 @@ class sudoku():
                 if location in self.ghostValues:
                     del self.ghostValues[location]
 
-            self.populateGhosts()
+            self.populateGhosts(ghostKeysToBeRemoved)
 
         return self.changes
 
     def nakedTwin(self):
         self.changes = False
+
+        modifiedLocations = []
 
         for group in self.intersectionGroups:
             emptyLocations = [location for location in group if location in self.ghostValues]
@@ -203,7 +205,8 @@ class sudoku():
                                     if location != locationOne and location != locationTwo:
 
                                         self.ghostValues[location] -= self.ghostValues[locationOne]
+                                        modifiedLocations.append(location)
                                         self.changes = True
-                                        self.populateGhosts()
-
+                                        
+        self.populateGhosts([modifiedLocations])
         return self.changes
