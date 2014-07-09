@@ -22,15 +22,16 @@ def easy(full = True):
 
         puzzleEasy9 = sudoku(9,3,3,stringEasy9)
         if full:
-            print "================================"
+            print
+            print str(i + 1) + " ======================"
             print puzzleEasy9
         solver(puzzleEasy9)
         if full:
             print puzzleEasy9
-            print puzzleEasy9.ghostData
+            print puzzleEasy9.ghostValues
 
         end = 81
-        for value in puzzleEasy9.data.itervalues():
+        for value in puzzleEasy9.values.itervalues():
             if value == 0:
                 end -= 1
 
@@ -41,6 +42,7 @@ def easy(full = True):
 
 def solver(puzzle):
     methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin]
+    methods = [puzzle.nakedSingle]
     puzzle.changes = True
     while puzzle.changes:
         for method in range(len(methods)):
@@ -86,4 +88,4 @@ print puzzle8.ghostValues
 # print puzzle9.ghostData
 # print puzzle9
 
-##print easy(True)
+print easy(True)
