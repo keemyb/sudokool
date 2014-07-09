@@ -33,7 +33,7 @@ def easy(onlyShowSolved, ghostValues = True):
         liteString = "\n" + str(i + 1) + " ======================" + "\n" + str(pre) + str(post)
 
         if onlyShowSolved:
-            if pre.values != post.values:
+            if pre.ghostValues != post.ghostValues:
                 if ghostValues:
                     print fullString
                 else:
@@ -58,7 +58,7 @@ def easy(onlyShowSolved, ghostValues = True):
 
 def solver(puzzle):
     methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin]
-    methods = [puzzle.hiddenSingle]
+    methods = [puzzle.nakedTwin]
     puzzle.changes = True
     while puzzle.changes:
         for method in range(len(methods)):
@@ -89,13 +89,14 @@ puzzle8 = sudoku(8,2,4,string8)
 
 puzzle6 = sudoku(6,2,3,string6)
 
-# puzzle9.nakedTwin()
-# for puzzle in [puzzle9, puzzle8]:
-#     print puzzle
-#     print puzzle.ghostValues
-#     puzzle.hiddenSingle()
-#     print puzzle
-#     print puzzle.ghostValues
+for puzzle in [puzzle9, puzzle8]:
+    puzzle.nakedSingle()
+    print puzzle
+    print puzzle.ghostValues
+    puzzle.nakedTwin()
+    print puzzle
+    print puzzle.ghostValues
 
 
 print easy(True)
+

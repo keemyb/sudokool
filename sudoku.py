@@ -175,33 +175,27 @@ class sudoku():
         return self.changes
 
     def nakedTwin(self):
-        self.populateGhosts()
         self.changes = False
 
-        for intersectionType in self.intersectionTypes.itervalues():
-
-            for startLocation in intersectionType[0]:
+        for group in self.intersectionGroups:
+            emptyLocations = [location for location in group if location in self.ghostValues]
+            
+            if len(emptyLocations) > 2:
                 
-                members = intersectionType[1](startLocation)
+                for locationOne in emptyLocations:
+                    
+                    for locationTwo in emptyLocations:
+                        
+                        if locationOne != locationTwo:
 
-                unresolvedLocations = sorted([key for key in members.iterkeys() if
-                        (key in self.ghostData.keys())])
+                            if len(self.ghostValues[locationOne]) == 2 and self.ghostValues[locationOne] == self.ghostValues[locationTwo]:
 
-                for locationOne in unresolvedLocations:
-
-                    for locationTwo in unresolvedLocations:
-
-                        if locationOne != locationTwo and len(unresolvedLocations) > 2:
-
-                            if len(self.ghostData[locationOne]) == 2 and self.ghostData[locationOne] == self.ghostData[locationTwo]:
-                                for location in unresolvedLocations:
+                                for location in emptyLocations:
 
                                     if location != locationOne and location != locationTwo:
 
-                                        for ghostValue in self.ghostData[locationOne]:
+                                        self.ghostValues[location] -= self.ghostValues[locationOne]
+                                        self.changes = True
+                                        self.populateGhosts
 
-                                            if ghostValue in self.ghostData[location]:
-
-                                                self.changes = True
-                                                self.ghostData[location].remove(ghostValue)
-                                                ##self.populateGhosts()
+        return self.changes
