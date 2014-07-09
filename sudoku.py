@@ -118,16 +118,24 @@ class sudoku():
 
         return columnGroups
 
-    def populateGhosts(self):
-        for group in self.intersectionGroups:
-            setOfExistingValues = set([self.values[value] for value in group if self.values[value] != 0])
+    def populateGhosts(self, modifiedLocations = None):
+        if modifiedLocations == None:
+            for group in self.intersectionGroups:
+                setOfExistingValues = set([self.values[value] for value in group if self.values[value] != 0])
 
-            for location in group:
-                if self.values[location] == 0:
-                    if location in self.ghostValues:
-                        self.ghostValues[location] -= setOfExistingValues
-                    else:
-                        self.ghostValues[location] = self.setOfPossibleNumbers - setOfExistingValues
+                for location in group:
+                    if self.values[location] == 0:
+                        if location in self.ghostValues:
+                            self.ghostValues[location] -= setOfExistingValues
+                        else:
+                            self.ghostValues[location] = self.setOfPossibleNumbers - setOfExistingValues
+        else:
+            for group in self.intersectionGroups:
+                for location in group:
+                    if location in modifiedLocations:
+                        if self.values[location] == 0:
+                            self.ghostValues[location] -= setOfExistingValues
+
 
     def nakedSingle(self):
         self.changes = False
@@ -196,6 +204,6 @@ class sudoku():
 
                                         self.ghostValues[location] -= self.ghostValues[locationOne]
                                         self.changes = True
-                                        self.populateGhosts
+                                        self.populateGhosts()
 
         return self.changes

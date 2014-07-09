@@ -59,10 +59,11 @@ def easy(onlyShowSolved, ghostValues = True):
 def solver(puzzle):
     methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin]
     methods = [puzzle.nakedTwin]
-    puzzle.changes = True
-    while puzzle.changes:
-        for method in range(len(methods)):
-            methods[method]()
+    # puzzle.changes = True
+    # while puzzle.changes:
+    #     for method in range(len(methods)):
+    #         methods[method]()
+    puzzle.nakedTwin()
             
 
 string9 = "030647080709000206010903040301070804800304002402050603080501020103000409020439060"
@@ -90,13 +91,18 @@ puzzle8 = sudoku(8,2,4,string8)
 puzzle6 = sudoku(6,2,3,string6)
 
 for puzzle in [puzzle9, puzzle8]:
-    puzzle.nakedSingle()
+    # puzzle.nakedSingle()
+    # print puzzle
+    # print puzzle.ghostValues
+    # puzzle.nakedTwin()
+    # print puzzle
+    # print puzzle.ghostValues
+
     print puzzle
     print puzzle.ghostValues
     puzzle.nakedTwin()
     print puzzle
     print puzzle.ghostValues
 
-
-print easy(True)
+# print easy(True)
 
