@@ -201,7 +201,7 @@ class sudoku():
 
                                 for location in emptyLocations:
 
-                                    if location != locationOne and location != locationTwo:
+                                    if self.ghostValues[locationOne] > self.ghostValues[location]:
 
                                         self.ghostValues[location] -= self.ghostValues[locationOne]
                                         self.changes = True
