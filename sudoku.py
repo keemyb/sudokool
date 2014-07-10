@@ -138,7 +138,6 @@ class sudoku():
                         if self.values[location] == 0:
                             self.ghostValues[location] -= setOfExistingValues
 
-
     def nakedSingle(self):
         self.changes = False
 
@@ -187,8 +186,6 @@ class sudoku():
     def nakedTwin(self):
         self.changes = False
 
-        modifiedLocations = []
-
         for group in self.intersectionGroups:
             emptyLocations = [location for location in group if location in self.ghostValues]
             
@@ -207,8 +204,6 @@ class sudoku():
                                     if location != locationOne and location != locationTwo:
 
                                         self.ghostValues[location] -= self.ghostValues[locationOne]
-                                        modifiedLocations.append(location)
                                         self.changes = True
-                                        
-        self.populateGhosts([modifiedLocations])
+        
         return self.changes
