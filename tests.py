@@ -89,7 +89,6 @@ def solver(puzzle, maxLevel, history = None):
 
     #puzzle is complete if gridSize ^ 2 values are filled
     if reduce(add, [1 for value in puzzle.values.itervalues() if value != 0], 0) == puzzle.gridSize ** 2:
-        print 10
         return True, [entry[0] for entry in history if history != None]
 
     if maxLevel > len(methods):
@@ -99,7 +98,6 @@ def solver(puzzle, maxLevel, history = None):
     if history == None:
         methods[0]()
         history = [(0, puzzle.changes)]
-        print 20
         return solver(puzzle, maxLevel, history)
     
     # #check to see if last couple attempts were all unsuccessful, if so, quit
@@ -114,14 +112,12 @@ def solver(puzzle, maxLevel, history = None):
     #or if unsuccessful, increase level or exit if highest level was tried
     else:
         if lastMethod == maxLevel - 1:
-            print 30
             return False, [entry[0] for entry in history if history != None]
         else:
             nextMethod = lastMethod + 1
 
     methods[nextMethod]()
     history.append((nextMethod, puzzle.changes))
-    print 40, nextMethod, puzzle.changes
     return solver(puzzle, maxLevel, history)
 
 string9 = "030647080709000206010903040301070804800304002402050603080501020103000409020439060"
