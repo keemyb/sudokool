@@ -142,5 +142,4 @@ puzzle6 = sudoku(6,2,3,string6)
 
 for puzzle in [puzzle9]:
     print puzzleSummary(puzzle, 3, True, True, True)
-
 # print fromText("easy50.txt", "========\n", 3, 50, True, False, True, True, True, True)

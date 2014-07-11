@@ -11,7 +11,7 @@ class sudoku():
         self.values = {position + 1 : int(data[position]) for position in range(gridSize ** 2)}
         self.ghostValues = {}
         self.intersectionGroups = self.getSubGridGroups() + self.getRowGroups() + self.getColumnGroups()
-        self.setOfPossibleNumbers = set(xrange(1, self.gridSize + 1))
+        self.setOfPossibleNumbers = frozenset(xrange(1, self.gridSize + 1))
         self.changes = False
 
         self.populateGhosts()            
@@ -130,7 +130,7 @@ class sudoku():
                         if location in self.ghostValues:
                             self.ghostValues[location] -= setOfExistingValues
                         else:
-                            self.ghostValues[location] = self.setOfPossibleNumbers - setOfExistingValues
+                            self.ghostValues[location] = set(self.setOfPossibleNumbers) - setOfExistingValues
         else:
             for group in self.intersectionGroups:
                 for location in group:
