@@ -1,33 +1,6 @@
 from sudoku import sudoku
-from operator import add, or_
+from solver import puzzleSummary, solver
 from math import sqrt
-from copy import deepcopy
-
-def puzzleSummary(puzzle, maxLevel, printPuzzle, breakdown, printGhostValues, no = None):
-
-    preSolved = puzzle
-    postSolved = deepcopy(preSolved)
-
-    solveReport = solver(postSolved, maxLevel, breakdown)
-
-    numberOfPreSolvedValues = reduce(add, [1 for value in preSolved.values.itervalues() if value != 0], 0)
-    numberOfPostSolvedValues = reduce(add, [1 for value in postSolved.values.itervalues() if value != 0], 0)
-
-    if no == None:
-        no = 1
-
-    if printPuzzle:
-        printPuzzle = str(preSolved) + "\n" + str(postSolved) + "\n"
-    else:
-        printPuzzle = ""
-
-    changedGhostsString = ""
-    if printGhostValues:
-        for key in postSolved.ghostValues.iterkeys():
-            if postSolved.ghostValues[key] != preSolved.ghostValues[key]:
-                changedGhostsString += "\n" + str(key) + " " + str(preSolved.ghostValues[key]) + " " + str(postSolved.ghostValues[key])
-
-    return str(no) + " " + str(numberOfPreSolvedValues) + " ---> " + str(numberOfPostSolvedValues) + "\n" + str(solveReport[1]) + str(solveReport[2]) + str(changedGhostsString) + "\n" + printPuzzle + "\n" * 2
 
 def fromText(textfile, seperator, maxLevel, n, specific, breakdown, showModified, showSolved, printPuzzle, printGhostValues):
     
@@ -62,51 +35,6 @@ def fromText(textfile, seperator, maxLevel, n, specific, breakdown, showModified
 
     return results
 
-def solver(puzzle, maxLevel, breakdown, history = None):
-    methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin]
-
-    #puzzle is complete if gridSize ^ 2 values are filled
-    if reduce(add, [1 for value in puzzle.values.itervalues() if value != 0], 0) == puzzle.gridSize ** 2:
-        if breakdown:
-            return False, [entry[0] for entry in history if history != None], [entry[2] for entry in history if history != None]
-        else:
-            return False, [entry[0] for entry in history if history != None], ""
-
-    if maxLevel > len(methods):
-        maxLevel = len(methods)
-
-    #if solver is run for the first time, solve using first method
-    if history == None:
-        methods[0]()
-        if breakdown:
-            history = [(0, puzzle.changes, str(puzzle))]
-        else:
-            history = [(0, puzzle.changes)]
-        return solver(puzzle, maxLevel, breakdown, history)
-    
-    #if last attempt was successful, go back to first level
-
-    lastMethod = history[-1][0]
-    if history[-1][1] == True:
-        nextMethod = 0
-    #or if unsuccessful, increase level or exit if highest level was tried
-    else:
-        if lastMethod == maxLevel - 1:
-            if breakdown:
-                return False, [entry[0] for entry in history if history != None], [entry[2] for entry in history if history != None]
-            else:
-                return False, [entry[0] for entry in history if history != None], ""
-        else:
-            nextMethod = lastMethod + 1
-
-    methods[nextMethod]()
-    if breakdown:
-        history.append((nextMethod, puzzle.changes, str(puzzle)))
-    else:
-        history.append((nextMethod, puzzle.changes))
-    
-    return solver(puzzle, maxLevel, breakdown, history)
-
 string9 = "030647080709000206010903040301070804800304002402050603080501020103000409020439060"
 string9 = "100920000524010000000000070050008102000000000402700090060000000000030945000071006"
 ##string9 = "904200007010000000000706500000800090020904060040002000001607000000000030300005702"
@@ -140,6 +68,15 @@ puzzle8 = sudoku(8,2,4,string8)
 
 puzzle6 = sudoku(6,2,3,string6)
 
-for puzzle in [puzzle9]:
-    print puzzleSummary(puzzle, 3, True, True, True)
-# print fromText("easy50.txt", "========\n", 3, 50, True, False, True, True, True, True)
+# for puzzle in [puzzle9]:
+#     print puzzleSummary(puzzle, 3, True, True, True)
+
+
+methods = ["nakedSingle", "hiddenSingle", "nakedTwin"]
+
+# print puzzleTest
+# for stage in [0, 0, 1, 0, 1, 0, 1, 0, 1, 2, 0, 0, 1, 2]:
+#     puzzleTest.methods[stage]()
+#     print puzzleTest
+
+print fromText("easy50.txt", "========\n", 3, 50, False, False, True, True, True, True)
