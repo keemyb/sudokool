@@ -153,6 +153,9 @@ class sudoku():
                 if location in group:
                     group.remove(location)
 
+        #prune empty intersection groups
+        self.intersectionGroups = filter(None, self.intersectionGroups)
+
     def nakedSingle(self):
         self.changes = False
 
