@@ -89,18 +89,4 @@ puzzle8 = sudoku(8,2,4,string8)
 puzzle6 = sudoku(6,2,3,string6)
 
 
-# # print fromTextPuzzleSummary("easy50.txt", "========\n", 3, 50, False, True, True, True, True)
-# puzzle45 = fromTextToPuzzle("easy50.txt", "========\n", 48)
-# methods = [puzzle45.nakedSingle, puzzle45.hiddenSingle, puzzle45.nakedTwin]
-
-# print puzzle45
-# for stage in [0, 1, 0, 1, 2, 0]:#, 0, 0, 1, 2, 0, 0, 0, 1, 2]:
-#     methods[stage]()
-#     print
-#     stringP = ""
-#     for i in [31,32,33,40,41,42,49,50,51]:
-#         if i in puzzle45.ghostValues:
-#             stringP += str(puzzle45.ghostValues[i]) + "\n"
-#     print puzzle45#, stringP, stage
-
-# print "nope", puzzle45.hiddenSingle()
+print fromTextPuzzleSummary("easy50.txt", "========\n", 3, 50, False, True, True, False, False)

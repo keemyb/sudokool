@@ -156,45 +156,44 @@ class sudoku():
     def nakedSingle(self):
         self.changes = False
 
-        ghostKeysToBeRemoved = []
+        modifiedLocations = []
 
         for location, ghostValues in self.ghostValues.iteritems():
             if len(ghostValues) == 1:
                 self.values[location] = ghostValues.pop()
-                ghostKeysToBeRemoved.append(location)
+                modifiedLocations.append(location)
                 self.changes = True
 
         if self.changes:
-            for location in ghostKeysToBeRemoved:
+            for location in modifiedLocations:
                 del self.ghostValues[location]
 
-            self.updateGhostsAndGroups(ghostKeysToBeRemoved)
+            self.updateGhostsAndGroups(modifiedLocations)
 
         return self.changes
 
     def hiddenSingle(self):
         self.changes = False
-        ghostKeysToBeRemoved = []
+        modifiedLocations = []
 
         for group in self.intersectionGroups:
-            emptyLocations = (location for location in group if location in self.ghostValues)
             
-            for location in emptyLocations:
-                setsOfSurroundingGhosts = [self.ghostValues[surroundingLocation] for surroundingLocation in emptyLocations if surroundingLocation != location]
+            for location in group:
+                setsOfSurroundingGhosts = [self.ghostValues[surroundingLocation] for surroundingLocation in group if surroundingLocation != location]
                 setOfSurroundingGhosts = set([ghostValue for ghostValues in setsOfSurroundingGhosts for ghostValue in ghostValues])
                 setOfUniqueGhosts = self.ghostValues[location] - setOfSurroundingGhosts
                 
                 if len(setOfUniqueGhosts) == 1:
                     self.values[location] = setOfUniqueGhosts.pop()
-                    ghostKeysToBeRemoved.append(location)
+                    modifiedLocations.append(location)
                     self.changes = True
 
         if self.changes:
-            for location in ghostKeysToBeRemoved:
+            for location in modifiedLocations:
                 if location in self.ghostValues:
                     del self.ghostValues[location]
 
-            self.updateGhostsAndGroups(ghostKeysToBeRemoved)
+            self.updateGhostsAndGroups(modifiedLocations)
 
         return self.changes
 
@@ -204,19 +203,18 @@ class sudoku():
         ghostValuesToBeRemoved = {}
 
         for group in self.intersectionGroups:
-            emptyLocations = [location for location in group if location in self.ghostValues]
             
-            if len(emptyLocations) > 2:
+            if len(group) > 2:
                 
-                for locationOne in emptyLocations:
+                for locationOne in group:
                     
-                    for locationTwo in emptyLocations:
+                    for locationTwo in group:
                         
                         if locationOne != locationTwo:
 
                             if len(self.ghostValues[locationOne]) == 2 and self.ghostValues[locationOne] == self.ghostValues[locationTwo]:
 
-                                for surroundingLocation in emptyLocations:
+                                for surroundingLocation in group:
 
                                     if surroundingLocation != locationOne and surroundingLocation != locationTwo:
 
