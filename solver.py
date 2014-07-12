@@ -35,7 +35,7 @@ def solver(puzzle, maxLevel, history = None):
     
     return solver(puzzle, maxLevel, history)
 
-def puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues, no = None):
+def puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues, printHistory, no = None):
 
     preSolved = puzzle
     postSolved = deepcopy(preSolved)
@@ -49,7 +49,7 @@ def puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues, no = None):
         no = 1
 
     if printPuzzle:
-        printPuzzle = str(preSolved) + "\n" + str(postSolved) + "\n"
+        printPuzzle = "\n" + str(preSolved) + "\n" + str(postSolved) + "\n"
     else:
         printPuzzle = ""
 
@@ -59,4 +59,8 @@ def puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues, no = None):
             if postSolved.ghostValues[key] != preSolved.ghostValues[key]:
                 changedGhostsString += "\n" + str(key) + " " + str(preSolved.ghostValues[key]) + " " + str(postSolved.ghostValues[key])
 
-    return str(no) + " " + str(numberOfPreSolvedValues) + " ---> " + str(numberOfPostSolvedValues) + "\n" + str(solveReport[1]) + str(changedGhostsString) + "\n" + printPuzzle + "\n" * 2
+    history = ""
+    if printHistory:
+        history = "\n" + str(solveReport[1])
+
+    return str(no) + " " + str(numberOfPreSolvedValues) + " ---> " + str(numberOfPostSolvedValues) + history + changedGhostsString + printPuzzle + "\n" * 2

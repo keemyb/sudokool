@@ -2,7 +2,7 @@ from sudoku import sudoku
 from solver import puzzleSummary, solver
 from math import sqrt
 
-def fromTextPuzzleSummary(textfile, seperator, maxLevel, n, specific, showModified, showSolved, printPuzzle, printGhostValues):
+def fromTextPuzzleSummary(textfile, seperator, maxLevel, n, specific, showModified, showSolved, printPuzzle, printGhostValues, printHistory):
     
     fileToRead = open(textfile, "r")
     currentPuzzle = ""
@@ -30,7 +30,7 @@ def fromTextPuzzleSummary(textfile, seperator, maxLevel, n, specific, showModifi
         gridSize = int(sqrt(len(puzzleString)))
         subGridsX = int(sqrt(gridSize))
         puzzle = sudoku(gridSize, subGridsX, subGridsX, puzzleString)
-        results += puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues, no)
+        results += puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues, printHistory, no)
         no += 1
 
     return results
@@ -89,4 +89,4 @@ puzzle8 = sudoku(8,2,4,string8)
 puzzle6 = sudoku(6,2,3,string6)
 
 
-print fromTextPuzzleSummary("easy50.txt", "========\n", 3, 50, False, True, True, False, False)
+print fromTextPuzzleSummary("easy50.txt", "========\n", 3, 50, False, True, True, False, False, False)
