@@ -2,7 +2,7 @@ from sudoku import sudoku
 from solver import puzzleSummary, solver
 from math import sqrt
 
-def fromText(textfile, seperator, maxLevel, n, specific, breakdown, showModified, showSolved, printPuzzle, printGhostValues):
+def fromText(textfile, seperator, maxLevel, n, specific, showModified, showSolved, printPuzzle, printGhostValues):
     
     fileToRead = open(textfile, "r")
     currentPuzzle = ""
@@ -30,7 +30,7 @@ def fromText(textfile, seperator, maxLevel, n, specific, breakdown, showModified
         gridSize = int(sqrt(len(puzzleString)))
         subGridsX = int(sqrt(gridSize))
         puzzle = sudoku(gridSize, subGridsX, subGridsX, puzzleString)
-        results += puzzleSummary(puzzle, maxLevel, printPuzzle, breakdown, printGhostValues)
+        results += puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues)
         no += 1
 
     return results
@@ -79,4 +79,4 @@ methods = ["nakedSingle", "hiddenSingle", "nakedTwin"]
 #     puzzleTest.methods[stage]()
 #     print puzzleTest
 
-print fromText("easy50.txt", "========\n", 3, 50, False, False, True, True, True, True)
+print fromText("easy50.txt", "========\n", 3, 50, False, True, True, True, True)
