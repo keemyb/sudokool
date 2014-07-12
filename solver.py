@@ -46,7 +46,9 @@ def puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues, printHistory,
     numberOfPostSolvedValues = reduce(add, [1 for value in postSolved.values.itervalues() if value != 0], 0)
 
     if no == None:
-        no = 1
+        no = ""
+    else:
+        no = str(no) + " "
 
     if printPuzzle:
         printPuzzle = "\n" + str(preSolved) + "\n" + str(postSolved) + "\n"
@@ -63,4 +65,4 @@ def puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues, printHistory,
     if printHistory:
         history = "\n" + str(solveReport[1])
 
-    return str(no) + " " + str(numberOfPreSolvedValues) + " ---> " + str(numberOfPostSolvedValues) + history + changedGhostsString + printPuzzle + "\n" * 2
+    return no + str(numberOfPreSolvedValues) + " ---> " + str(numberOfPostSolvedValues) + history + changedGhostsString + printPuzzle + "\n" * 2

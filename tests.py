@@ -90,3 +90,5 @@ puzzle6 = sudoku(6,2,3,string6)
 
 
 print fromTextPuzzleSummary("easy50.txt", "========\n", 3, 50, False, True, True, False, False, False)
+
+print puzzleSummary(puzzle9, 3, True, True, True)
