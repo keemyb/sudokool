@@ -2,7 +2,7 @@ from sudoku import sudoku
 from solver import puzzleSummary, solver
 from math import sqrt
 
-def fromText(textfile, seperator, maxLevel, n, specific, showModified, showSolved, printPuzzle, printGhostValues):
+def fromTextPuzzleSummary(textfile, seperator, maxLevel, n, specific, showModified, showSolved, printPuzzle, printGhostValues):
     
     fileToRead = open(textfile, "r")
     currentPuzzle = ""
@@ -34,6 +34,26 @@ def fromText(textfile, seperator, maxLevel, n, specific, showModified, showSolve
         no += 1
 
     return results
+
+def fromTextToPuzzle(textfile, seperator, n):
+    fileToRead = open(textfile, "r")
+    currentPuzzle = ""
+    puzzles = []
+    
+    for line in fileToRead:
+        if len(puzzles) <= n:
+            if line == seperator:
+                puzzles.append(currentPuzzle)
+                currentPuzzle = ""
+            else:
+                currentPuzzle += line.strip()
+    if len(currentPuzzle) == len(puzzles[0]):
+        puzzles.append(currentPuzzle)
+
+    puzzle = puzzles[n - 1]
+    gridSize = int(sqrt(len(puzzle)))
+    subGridsX = int(sqrt(gridSize))
+    return sudoku(gridSize, subGridsX, subGridsX, puzzle)
 
 string9 = "030647080709000206010903040301070804800304002402050603080501020103000409020439060"
 string9 = "100920000524010000000000070050008102000000000402700090060000000000030945000071006"
@@ -68,15 +88,15 @@ puzzle8 = sudoku(8,2,4,string8)
 
 puzzle6 = sudoku(6,2,3,string6)
 
-# for puzzle in [puzzle9]:
-#     print puzzleSummary(puzzle, 3, True, True, True)
 
+print fromTextPuzzleSummary("easy50.txt", "========\n", 3, 45, True, True, True, True, True)
+puzzle45 = fromTextToPuzzle("easy50.txt", "========\n", 45)
+methods = [puzzle45.nakedSingle, puzzle45.hiddenSingle, puzzle45.nakedTwin]
 
-methods = ["nakedSingle", "hiddenSingle", "nakedTwin"]
+print puzzle45
+for stage in [0, 0]:#, 1, 0, 1, 0, 1, 0, 1, 2, 0, 0, 1, 2]:
+    methods[stage]()
+    print
+    print puzzle45, puzzle45.ghostValues[32], stage
 
-# print puzzleTest
-# for stage in [0, 0, 1, 0, 1, 0, 1, 0, 1, 2, 0, 0, 1, 2]:
-#     puzzleTest.methods[stage]()
-#     print puzzleTest
-
-print fromText("easy50.txt", "========\n", 3, 50, False, True, True, True, True)
+print 

@@ -121,6 +121,7 @@ class sudoku():
     def populateGhosts(self, modifiedLocations = None):
         if modifiedLocations == []:
             return
+        #Exhaustive
         if modifiedLocations == None:
             for group in self.intersectionGroups:
                 setOfExistingValues = set([self.values[value] for value in group if self.values[value] != 0])
@@ -131,10 +132,12 @@ class sudoku():
                             self.ghostValues[location] -= setOfExistingValues
                         else:
                             self.ghostValues[location] = set(self.setOfPossibleNumbers) - setOfExistingValues
+        #specific
         else:
             for group in self.intersectionGroups:
-                for location in group:
-                    if location in modifiedLocations:
+                setOfExistingValues = set([self.values[value] for value in group if self.values[value] != 0])
+                if any(location in modifiedLocations for location in group):
+                    for location in group:
                         if self.values[location] == 0:
                             self.ghostValues[location] -= setOfExistingValues
 
