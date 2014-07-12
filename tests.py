@@ -30,7 +30,7 @@ def fromText(textfile, seperator, maxLevel, n, specific, showModified, showSolve
         gridSize = int(sqrt(len(puzzleString)))
         subGridsX = int(sqrt(gridSize))
         puzzle = sudoku(gridSize, subGridsX, subGridsX, puzzleString)
-        results += puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues)
+        results += puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues, no)
         no += 1
 
     return results
