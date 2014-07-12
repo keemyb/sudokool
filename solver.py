@@ -7,7 +7,7 @@ def solver(puzzle, maxLevel, history = None):
 
     #puzzle is complete if gridSize ^ 2 values are filled
     if reduce(add, [1 for value in puzzle.values.itervalues() if value != 0], 0) == puzzle.gridSize ** 2:
-        return False, [entry[0] for entry in history if history != None]
+        return True, [entry[0] for entry in history if history != None]
 
     if maxLevel > len(methods):
         maxLevel = len(methods)
