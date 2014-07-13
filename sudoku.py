@@ -126,9 +126,12 @@ class sudoku():
         return columnGroups
 
     def isValid(self):
-        from collections import Counter
-        intersectionGroups = self.getSubGridGroups() + self.getRowGroups() + self.getColumnGroups()
+        for location in xrange(1, self.gridSize ** 2 + 1):
+            if self.values[location] != 0:
+                if self.values[location] not in self.setOfPossibleNumbers:
+                    return False
 
+        intersectionGroups = self.getSubGridGroups() + self.getRowGroups() + self.getColumnGroups()
         for group in intersectionGroups:
 
             values = [self.values[location] for location in group if self.values[location] != 0]
