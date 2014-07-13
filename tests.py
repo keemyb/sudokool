@@ -104,3 +104,4 @@ newPuzzle = puzzle9
 newPuzzleG = puzzle9.ghostValues
 
 print oldPuzzle == newPuzzle, oldPuzzleG == newPuzzleG
+print puzzle9.__class__

@@ -14,7 +14,14 @@ class sudoku():
         self.setOfPossibleNumbers = frozenset(xrange(1, self.gridSize + 1))
         self.changes = False
 
-        self.updateGhostsAndGroups()           
+        self.updateGhostsAndGroups()
+
+    def __eq__(self, other):
+        return (isinstance(other, self.__class__)
+            and self.__dict__ == other.__dict__)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)           
         
     def __repr__(self):
         pass #rebuildable representation
