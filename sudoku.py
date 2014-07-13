@@ -182,31 +182,6 @@ class sudoku():
 
         return self.changes
 
-    def hiddenSingle(self):
-        self.changes = False
-        modifiedLocations = []
-
-        for group in self.intersectionGroups:
-            
-            for location in group:
-                setsOfSurroundingGhosts = [self.ghostValues[surroundingLocation] for surroundingLocation in group if surroundingLocation != location]
-                setOfSurroundingGhosts = set([ghostValue for ghostValues in setsOfSurroundingGhosts for ghostValue in ghostValues])
-                setOfUniqueGhosts = self.ghostValues[location] - setOfSurroundingGhosts
-                
-                if len(setOfUniqueGhosts) == 1:
-                    self.values[location] = setOfUniqueGhosts.pop()
-                    modifiedLocations.append(location)
-                    self.changes = True
-
-        if self.changes:
-            for location in modifiedLocations:
-                if location in self.ghostValues:
-                    del self.ghostValues[location]
-
-            self.updateGhostsAndGroups(modifiedLocations)
-
-        return self.changes
-
     def nakedN(self, n):
         from itertools import combinations
         self.changes = False
@@ -237,3 +212,61 @@ class sudoku():
     def nakedTriplet(self):
 
         return self.nakedN(3)
+
+    def hiddenSingle(self):
+        self.changes = False
+        modifiedLocations = []
+
+        for group in self.intersectionGroups:
+            
+            for location in group:
+                setsOfSurroundingGhosts = [self.ghostValues[surroundingLocation] for surroundingLocation in group if surroundingLocation != location]
+                setOfSurroundingGhosts = set([ghostValue for ghostValues in setsOfSurroundingGhosts for ghostValue in ghostValues])
+                setOfUniqueGhosts = self.ghostValues[location] - setOfSurroundingGhosts
+                
+                if len(setOfUniqueGhosts) == 1:
+                    self.values[location] = setOfUniqueGhosts.pop()
+                    modifiedLocations.append(location)
+                    self.changes = True
+
+        if self.changes:
+            for location in modifiedLocations:
+                if location in self.ghostValues:
+                    del self.ghostValues[location]
+
+            self.updateGhostsAndGroups(modifiedLocations)
+
+        return self.changes
+
+    def hiddenN(self, n):
+        from itertools import combinations
+        self.changes = False
+
+        for group in [group for group in self.intersectionGroups if len(group) > n]:
+
+            for combination in combinations(group, n):
+
+                setsOfCombinationGhosts = [self.ghostValues[location] for location in combination]
+                setOfCombinationGhosts = set([ghostValue for ghostValueSets in setsOfCombinationGhosts for ghostValue in ghostValueSets])
+                setsOfSurroundingGhosts = [self.ghostValues[surroundingLocation] for surroundingLocation in group if surroundingLocation != location]
+                setOfSurroundingGhosts = set([ghostValue for ghostValueSets in setsOfSurroundingGhosts for ghostValue in ghostValueSets])
+                setOfUniqueGhostsToCombination = setOfCombinationGhosts - setOfSurroundingGhosts
+
+                if len(setOfUniqueGhostsToCombination) == n:
+
+                    for location in combination:
+
+                        if len(self.ghostValues[location]) > n:
+
+                            self.ghostValues[location] = setOfUniqueGhostsToCombination
+                            self.changes = True
+
+        return self.changes
+
+    def hiddenTwin(self):
+
+        return self.hiddenN(2)
+
+    def hiddenTriplet(self):
+
+        return self.hiddenN(3)
