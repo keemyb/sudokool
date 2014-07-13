@@ -207,49 +207,6 @@ class sudoku():
 
         return self.changes
 
-    def nakedTwin(self):
-        self.changes = False
-
-        ghostValuesToBeRemoved = {}
-
-        for group in self.intersectionGroups:
-            
-            if len(group) > 2:
-                
-                for locationOne in group:
-                    
-                    for locationTwo in group:
-                        
-                        if locationOne != locationTwo:
-
-                            if len(self.ghostValues[locationOne]) == 2 and self.ghostValues[locationOne] == self.ghostValues[locationTwo]:
-
-                                for surroundingLocation in group:
-
-                                    if surroundingLocation != locationOne and surroundingLocation != locationTwo:
-
-                                        for ghostValue in self.ghostValues[locationOne]:
-
-                                            if ghostValue in self.ghostValues[surroundingLocation]:
-
-                                                if surroundingLocation in ghostValuesToBeRemoved:
-
-                                                    ghostValuesToBeRemoved[surroundingLocation].add(ghostValue)
-
-                                                else:
-
-                                                    ghostValuesToBeRemoved[surroundingLocation] = set([ghostValue])
-
-                                                self.changes = True
-        
-        if self.changes:
-
-            for location, ghostValues in ghostValuesToBeRemoved.iteritems():
-
-                    self.ghostValues[location] -= ghostValues
-
-        return self.changes
-
     def nakedN(self, n):
         from itertools import combinations
         self.changes = False
@@ -273,6 +230,10 @@ class sudoku():
 
         return self.changes
 
-    def nakedTwinTwo(self):
+    def nakedTwin(self):
 
         return self.nakedN(2)
+
+    def nakedTriplet(self):
+
+        return self.nakedN(3)
