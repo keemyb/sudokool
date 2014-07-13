@@ -3,7 +3,7 @@ from operator import add
 from copy import deepcopy
 
 def solver(puzzle, maxLevel, history = None):
-    methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin]
+    methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwinTwo]
 
     #puzzle is complete if gridSize ^ 2 values are filled
     if reduce(add, [1 for value in puzzle.values.itervalues() if value != 0], 0) == puzzle.gridSize ** 2:

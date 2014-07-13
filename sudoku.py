@@ -263,10 +263,16 @@ class sudoku():
                     if len(self.ghostValues[combination[0]]) == n and len(set([tuple(self.ghostValues[location]) for location in combination])) == 1:
 
                         nakedNLocations, nakedNghostValues = combination, self.ghostValues[combination[0]]
-                        self.changes = True
 
-                        for location in [location for location in group if location not in nakedNLocations]:
+                        for surroundingLocation in [location for location in group if location not in nakedNLocations]:
 
-                            self.ghostValues[location] -= nakedNghostValues
+                            if any(ghostValue in nakedNghostValues for ghostValue in self.ghostValues[surroundingLocation]):
+
+                                self.ghostValues[surroundingLocation] -= nakedNghostValues
+                                self.changes = True
 
         return self.changes
+
+    def nakedTwinTwo(self):
+
+        return self.nakedN(2)

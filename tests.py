@@ -91,17 +91,21 @@ puzzle6 = sudoku(6,2,3,string6)
 
 # print fromTextPuzzleSummary("easy50.txt", "========\n", 3, 50, False, True, True, False, False, False)
 
-# print puzzleSummary(puzzle9, 3, True, True, True)
+# # print puzzleSummary(puzzle9, 3, True, True, True)
 
-puzzle9.nakedN(2)
-oldPuzzle = puzzle9
-oldPuzzleG = puzzle9.ghostValues
+print puzzle9.nakedTwinTwo()
+print puzzle9.nakedTwinTwo()
+print puzzle9.nakedTwinTwo()
+# oldPuzzle = puzzle9
+# oldPuzzleG = puzzle9.ghostValues
 
-puzzle9 = sudoku(9,3,3,string9)
+# puzzle9 = sudoku(9,3,3,string9)
 
-puzzle9.nakedTwin()
-newPuzzle = puzzle9
-newPuzzleG = puzzle9.ghostValues
+# puzzle9.nakedTwin()
+# newPuzzle = puzzle9
+# newPuzzleG = puzzle9.ghostValues
 
-print oldPuzzle == newPuzzle, oldPuzzleG == newPuzzleG
-print puzzle9.__class__
+# # puzzle9.ghostValues = {}
+
+# print oldPuzzle == newPuzzle, oldPuzzleG == newPuzzleG
+# print puzzle9.__class__
