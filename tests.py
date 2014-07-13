@@ -98,14 +98,5 @@ puzzle8 = sudoku(8,2,4,string8)
 
 puzzle6 = sudoku(6,2,3,string6)
 
-# for puzzleNo in [6,7,42,47,48,49,50]:
-#     print fromTextPuzzleSummary("easy50.txt", "========\n", 6, puzzleNo, True, True, True, True, True, True)
-
-print puzzle9
-
-solver(puzzle9, 6)
-
-print puzzle9.isValid()
-puzzle9.values[81] = "b"
-print puzzle9
-print puzzle9.isValid()
+for puzzleNo in [6,7,42,47,48,49,50]:
+    print fromTextPuzzleSummary("easy50.txt", "========\n", 6, puzzleNo, True, True, True, True, True, True)

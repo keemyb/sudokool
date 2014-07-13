@@ -207,11 +207,11 @@ class sudoku():
 
                 for combination in combinations(group, n):
 
-                    if len(self.ghostValues[combination[0]]) == n and len(set([tuple(self.ghostValues[location]) for location in combination])) == 1:
+                    if len(set([tuple(self.ghostValues[location]) for location in combination])) == n:
 
-                        nakedNLocations, nakedNghostValues = combination, self.ghostValues[combination[0]]
+                        nakedNghostValues = set([tuple(self.ghostValues[location]) for location in combination])
 
-                        for surroundingLocation in [location for location in group if location not in nakedNLocations]:
+                        for surroundingLocation in [location for location in group if location not in combination]:
 
                             if any(ghostValue in nakedNghostValues for ghostValue in self.ghostValues[surroundingLocation]):
 
