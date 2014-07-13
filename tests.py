@@ -77,6 +77,16 @@ string9 = "003020600\
 800203009\
 005010300"
 
+string9 = "109700032\
+003012549\
+060090008\
+080001004\
+004839200\
+200400080\
+300070020\
+546920100\
+720005806"
+
 string8 = "1004200006000705005008006800100000060052004006008060007000073006"
 
 string6 = "020000000020054100100064200043300010"
@@ -88,24 +98,11 @@ puzzle8 = sudoku(8,2,4,string8)
 
 puzzle6 = sudoku(6,2,3,string6)
 
+# for puzzleNo in [6,7,42,47,48,49,50]:
+#     print fromTextPuzzleSummary("easy50.txt", "========\n", 6, puzzleNo, True, True, True, True, True, True)
 
-print fromTextPuzzleSummary("easy50.txt", "========\n", 6, 50, False, True, True, False, False, True)
+print puzzleSummary(puzzle9, 6, True, True, True)
 
-# # print puzzleSummary(puzzle9, 3, True, True, True)
-
-# print puzzle9.nakedTwinTwo()
-# print puzzle9.nakedTwinTwo()
-# print puzzle9.nakedTwinTwo()
-# oldPuzzle = puzzle9
-# oldPuzzleG = puzzle9.ghostValues
-
-# puzzle9 = sudoku(9,3,3,string9)
-
-# puzzle9.nakedTwin()
-# newPuzzle = puzzle9
-# newPuzzleG = puzzle9.ghostValues
-
-# # puzzle9.ghostValues = {}
-
-# print oldPuzzle == newPuzzle, oldPuzzleG == newPuzzleG
-# print puzzle9.__class__
+print puzzle9.isValid()
+puzzle9.values[81] = 9
+print puzzle9.isValid()
