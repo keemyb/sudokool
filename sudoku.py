@@ -14,7 +14,7 @@ class sudoku():
         self.setOfPossibleNumbers = frozenset(xrange(1, self.gridSize + 1))
         self.changes = False
 
-        self.updateGhostsAndGroups()            
+        self.updateGhostsAndGroups()           
         
     def __repr__(self):
         pass #rebuildable representation
@@ -240,5 +240,26 @@ class sudoku():
             for location, ghostValues in ghostValuesToBeRemoved.iteritems():
 
                     self.ghostValues[location] -= ghostValues
+
+        return self.changes
+
+    def nakedN(self, n):
+        from itertools import combinations
+        self.changes = False
+
+        for group in self.intersectionGroups:
+
+            if len(group) > n:
+
+                for combination in combinations(group, n):
+
+                    if len(self.ghostValues[combination[0]]) == n and len(set([tuple(self.ghostValues[location]) for location in combination])) == 1:
+
+                        nakedNLocations, nakedNghostValues = combination, self.ghostValues[combination[0]]
+                        self.changes = True
+
+                        for location in [location for location in group if location not in nakedNLocations]:
+
+                            self.ghostValues[location] -= nakedNghostValues
 
         return self.changes
