@@ -261,9 +261,11 @@ class sudoku():
 
             for combination in combinations(group, n):
 
+                surroundingLocations = [location for location in group if location not in combination]
+
                 setsOfCombinationGhosts = [self.ghostValues[location] for location in combination]
                 setOfCombinationGhosts = set([ghostValue for ghostValueSets in setsOfCombinationGhosts for ghostValue in ghostValueSets])
-                setsOfSurroundingGhosts = [self.ghostValues[surroundingLocation] for surroundingLocation in group if surroundingLocation != location]
+                setsOfSurroundingGhosts = [self.ghostValues[surroundingLocation] for surroundingLocation in surroundingLocations]
                 setOfSurroundingGhosts = set([ghostValue for ghostValueSets in setsOfSurroundingGhosts for ghostValue in ghostValueSets])
                 setOfUniqueGhostsToCombination = setOfCombinationGhosts - setOfSurroundingGhosts
 
@@ -271,10 +273,16 @@ class sudoku():
 
                     for location in combination:
 
-                        if len(self.ghostValues[location]) > n:
+                        if any(ghostValue in setOfSurroundingGhosts for ghostValue in self.ghostValues[location]):
 
-                            self.ghostValues[location] = setOfUniqueGhostsToCombination
+                            self.ghostValues[location] -= setOfSurroundingGhosts
                             self.changes = True
+
+                    for location in surroundingLocations:
+
+                        if any(ghostValue in setOfUniqueGhostsToCombination for ghostValue in self.ghostValues[location]):
+
+                            self.ghostValues[location] -= setOfUniqueGhostsToCombination
 
         return self.changes
 

@@ -87,6 +87,28 @@ string9 = "109700032\
 546920100\
 720005806"
 
+hiddenTripleTestString = "528600049\
+136490025\
+794205630\
+000100200\
+007826300\
+002509060\
+240300976\
+809702413\
+070904582"
+
+hiddenTripleTestString = "370408100\
+000903704\
+940100083\
+420000005\
+000504000\
+800000046\
+010049000\
+509600400\
+004200931"
+
+hiddenTripleTest = sudoku(9,3,3,hiddenTripleTestString)
+
 string8 = "1004200006000705005008006800100000060052004006008060007000073006"
 
 string6 = "020000000020054100100064200043300010"
@@ -100,3 +122,10 @@ puzzle6 = sudoku(6,2,3,string6)
 
 for puzzleNo in [6,7,42,47,48,49,50]:
     print fromTextPuzzleSummary("easy50.txt", "========\n", 6, puzzleNo, True, True, True, True, True, True)
+
+# hiddenTripleTest.ghostValues[41] = set([2,8])
+# hiddenTripleTest.hiddenTriplet()
+
+# for i in [5,14,23,32,41,50,59,68,77]:
+#     if i in hiddenTripleTest.ghostValues:
+#         print hiddenTripleTest.ghostValues[i]
