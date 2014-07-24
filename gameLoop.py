@@ -1,25 +1,41 @@
-from sudoku import sudoku
+from sudoku import Sudoku
 
-def gameLoop(puzzle):
-        print puzzle
-        while sum([1 for value in puzzle.values.itervalues() if value != 0]) < (puzzle.gridSize ** 2):
-                try:
-                        location = int(raw_input("What location do you want to modify? "))
-                        if puzzle.values[location] != 0:
-                                continue
-                except:
-                        continue
-                else:
-                        try:
-                                value = int(raw_input("What value do you want to place in location " + str(location) + "? "))
-                        except:
-                                continue
-                        if value in puzzle.setOfPossibleNumbers:
-                                puzzle.values[location] = value
-                                print puzzle
-                                print
-        if puzzle.isValid:
-                print "Puzzle Completed"
+def play(puzzle):
+		print puzzle
+		counter = 0
+		while sum([1 for value in puzzle.values.itervalues() if value != 0]) < (puzzle.gridSize ** 2):
+			if counter > 5:
+				return
+			
+			try:
+				location = int(raw_input("What location do you want to modify? "))
+				if puzzle.values[location] != 0:
+					continue
+			except:
+				counter += 1
+				print "Invalid location"
+				continue
+			else:
+				counter = 0
+			
+			try:
+				value = int(raw_input("What value do you want to place in location " + str(location) + "? "))
+			except:
+				counter += 1
+				print "Invalid value"
+				continue
+			else:
+				counter = 0
+			
+			if value in puzzle.setOfPossibleNumbers:
+				puzzle.values[location] = value
+				print puzzle
+				print
+		
+		if puzzle.isValid:
+			print "Puzzle Completed"
+		else:
+			print "Invalid Puzzle"
 string9 = "003020600\
 900305001\
 001806400\
@@ -30,7 +46,7 @@ string9 = "003020600\
 800203009\
 005010300"
 
-puzzle9 = sudoku(9,3,3,string9)
+puzzle9 = Sudoku(string9)
 puzzle9.nakedSingle()
 puzzle9.hiddenSingle()
 puzzle9.nakedSingle()
@@ -39,4 +55,4 @@ puzzle9.nakedSingle()
 puzzle9.hiddenSingle()
 
 
-gameLoop(puzzle9)
+play(puzzle9)
