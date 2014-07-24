@@ -1,20 +1,46 @@
 # -*- coding: cp1252 -*-
 
 #subGridsx = amount of subgrids in X plane
+def factors(n):
+    from math import sqrt, ceil
+    factors = []
+
+    for i in xrange(2, int(n / 2) + 1):
+        if n % i == 0:
+            factors.append(i)
+
+    return factors[len(factors) - 1]
 
 class Sudoku():
         
-    def __init__(self, gridSize, subGridsX, subGridsY, data):
-        self.gridSize = gridSize
-        self.subGridsX = subGridsX
-        self.subGridsY = subGridsY
-        self.values = {position + 1 : int(data[position]) for position in range(gridSize ** 2)}
+    def __init__(self, data, horizontalFormat = True):
+        self.calculateDimensions(data, horizontalFormat)
+
+        self.values = {position + 1 : int(data[position]) for position in range(self.gridSize ** 2)}
         self.ghostValues = {}
         self.intersectionGroups = self.getSubGridGroups() + self.getRowGroups() + self.getColumnGroups()
         self.setOfPossibleNumbers = frozenset(xrange(1, self.gridSize + 1))
         self.changes = False
 
         self.updateGhostsAndGroups()
+
+    def calculateDimensions(self, data, horizontalFormat):
+
+        self.gridSize = int(len(data) ** 0.5)
+
+        if (self.gridSize ** 0.5).is_integer():
+            self.subGridsX = int(self.gridSize ** 0.5)
+            self.subGridsY = self.subGridsX
+            return
+        
+        factor = factors(self.gridSize)
+        if horizontalFormat:
+            self.subGridsY = factor
+            self.subGridsX = self.gridSize / self.subGridsY
+        else:
+            self.subGridsX = factor
+            self.subGridsY = self.gridSize / self.subGridsX    
+            
 
     def __eq__(self, other):
         return (isinstance(other, self.__class__)

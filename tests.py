@@ -27,9 +27,7 @@ def fromTextPuzzleSummary(textfile, seperator, maxLevel, n, specific, showModifi
     results = ""
 
     for puzzleString in puzzles:
-        gridSize = int(sqrt(len(puzzleString)))
-        subGridsX = int(sqrt(gridSize))
-        puzzle = Sudoku(gridSize, subGridsX, subGridsX, puzzleString)
+        puzzle = Sudoku(puzzleString, True)
         results += puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues, printHistory, no)
         no += 1
 
@@ -51,9 +49,7 @@ def fromTextToPuzzle(textfile, seperator, n):
         puzzles.append(currentPuzzle)
 
     puzzle = puzzles[n - 1]
-    gridSize = int(sqrt(len(puzzle)))
-    subGridsX = int(sqrt(gridSize))
-    return Sudoku(gridSize, subGridsX, subGridsX, puzzle)
+    return Sudoku(puzzle, True)
 
 string9 = "030647080709000206010903040301070804800304002402050603080501020103000409020439060"
 string9 = "100920000524010000000000070050008102000000000402700090060000000000030945000071006"
@@ -117,18 +113,18 @@ hiddenTripleTestString = "370408100\
 509600400\
 004200931"
 
-hiddenTripleTest = Sudoku(9,3,3,hiddenTripleTestString)
+hiddenTripleTest = Sudoku(hiddenTripleTestString, True)
 
 string8 = "1004200006000705005008006800100000060052004006008060007000073006"
 
 string6 = "020000000020054100100064200043300010"
 ##string6 = "123456123456123456123456123456123456"
 
-puzzle9 = Sudoku(9,3,3,string9)
+puzzle9 = Sudoku(string9)
 
-puzzle8 = Sudoku(8,2,4,string8)
+puzzle8 = Sudoku(string8)
 
-puzzle6 = Sudoku(6,2,3,string6)
+puzzle6 = Sudoku(string6)
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
 #     print fromTextPuzzleSummary("easy50.txt", "========\n", 6, puzzleNo, True, True, True, True, True, True)
@@ -140,5 +136,9 @@ puzzle6 = Sudoku(6,2,3,string6)
 #     if i in hiddenTripleTest.ghostValues:
 #         print hiddenTripleTest.ghostValues[i]
 
-solver(puzzle9, 6)
+# solver(puzzle9, 6)
+# print puzzle9
+
+print puzzle8
 print puzzle9
+print puzzle6
