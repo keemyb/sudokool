@@ -5,11 +5,11 @@ def factors(n):
     from math import sqrt, ceil
     factors = []
 
-    for i in xrange(2, int(n / 2) + 1):
+    for i in xrange(1, int(n / 2) + 1):
         if n % i == 0:
             factors.append(i)
 
-    return factors[len(factors) - 1]
+    return factors[-1]
 
 class Sudoku():
         
@@ -34,13 +34,13 @@ class Sudoku():
             return
         
         factor = factors(self.gridSize)
+
         if horizontalFormat:
             self.subGridsY = factor
             self.subGridsX = self.gridSize / self.subGridsY
         else:
             self.subGridsX = factor
-            self.subGridsY = self.gridSize / self.subGridsX    
-            
+            self.subGridsY = self.gridSize / self.subGridsX
 
     def __eq__(self, other):
         return (isinstance(other, self.__class__)
@@ -151,6 +151,38 @@ class Sudoku():
 
         return columnGroups
 
+    def getXWingGroups(self):
+        xWingGroups = []
+        gridSize = self.gridSize
+        subGridsX = self.subGridsX
+        subGridsY = self.subGridsY
+
+        # gridSize: gridSize * 2 are the indices for the row groups
+        # we use the indices from intersection groups instead of row groups,
+        # as the row groups in intersection groups will be pre-pruned.
+        for firstRow in self.intersectionGroups[gridSize : gridSize * 2]:
+            if len(firstRow) < 2:
+                continue
+
+            for locationOne in firstRow:
+                for locationTwo in firstRow:
+                    if self.getSubGrid(locationOne) == self.getSubGrid(locationTwo):
+                        continue
+
+                    #offset to provide only the rows that are not in the same subGrid
+                    offset = ((self.getRow(locationOne) - 1) / subGridsX + 1) * subGridsY
+                    
+                    for secondRow in self.intersectionGroups[gridSize + offset: gridSize * 2]:
+                        if len(secondRow) < 2:
+                            continue
+                        
+                        for locationThree in secondRow:
+                            for locationFour in secondRow:
+                                if self.getColumn(locationOne) == self.getColumn(locationThree) and \
+                                self.getColumn(locationTwo) == self.getColumn(locationFour):
+                                    xWingGroups.append([locationOne, locationTwo, locationThree, locationFour])
+        return xWingGroups
+
     def isValid(self):
         for location in xrange(1, self.gridSize ** 2 + 1):
             if self.values[location] != 0:
@@ -202,7 +234,21 @@ class Sudoku():
                     group.remove(location)
 
         #prune empty intersection groups
-        self.intersectionGroups = filter(None, self.intersectionGroups)
+        # self.intersectionGroups = filter(None, self.intersectionGroups)
+
+    def getRow(self, location):
+        return (location - 1) / self.gridSize + 1
+
+    def getColumn(self, location):
+        return (location - 1) % self.gridSize + 1
+
+    def getSubGrid(self, location):
+        subGridRow = (location - 1) / (self.gridSize * self.subGridsX)
+        subGridRowOffset = subGridRow * self.subGridsX
+
+        subGridColumn = self.getColumn(location) / self.subGridsY + 1
+
+        return subGridRowOffset + subGridColumn
 
     def nakedSingle(self):
         self.changes = False
@@ -319,3 +365,7 @@ class Sudoku():
     def hiddenTriplet(self):
 
         return self.hiddenN(3)
+
+    def xWing(self):
+
+        pass

@@ -51,6 +51,40 @@ def fromTextToPuzzle(textfile, seperator, n):
     puzzle = puzzles[n - 1]
     return Sudoku(puzzle, True)
 
+def visualizer(puzzle, group):
+    gridSize = puzzle.gridSize
+    subGridsX = puzzle.subGridsX
+    subGridsY = puzzle.subGridsY
+    string = ""
+    vPipe = "="
+    hPipe = "="
+    # first line to accommodate vertical pipe and following spaces (minus one to account for last v pipe)
+    # second line for numbers (and following spaces)
+    hPipeString = hPipe * ((len(vPipe) + 1) * (subGridsX + 1) - 1) + \
+    hPipe * (gridSize * 2) + \
+    "\n"
+
+    for position in xrange(1, gridSize ** 2 + 1):
+
+        if (position - 1) % (gridSize * subGridsX) == 0:
+            string += hPipeString
+
+        if (position - 1) % subGridsY == 0 :
+            string += vPipe + " "
+
+        if position not in group:
+            string += "  "
+        else:
+            string += "0 "
+
+        if position % gridSize == 0:
+            string += vPipe + "\n"
+
+        if position == gridSize ** 2:
+            string += hPipeString
+
+    return string
+
 string9 = "030647080709000206010903040301070804800304002402050603080501020103000409020439060"
 string9 = "100920000524010000000000070050008102000000000402700090060000000000030945000071006"
 ##string9 = "904200007010000000000706500000800090020904060040002000001607000000000030300005702"
@@ -125,6 +159,7 @@ puzzle9 = Sudoku(string9)
 puzzle8 = Sudoku(string8)
 
 puzzle6 = Sudoku(string6)
+puzzle6 = Sudoku("0" * 36)
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
 #     print fromTextPuzzleSummary("easy50.txt", "========\n", 6, puzzleNo, True, True, True, True, True, True)
@@ -139,6 +174,20 @@ puzzle6 = Sudoku(string6)
 # solver(puzzle9, 6)
 # print puzzle9
 
-print puzzle8
+blankPuz = Sudoku("0" * 81)
+
 print puzzle9
-print puzzle6
+solver(puzzle9, 2)
+print puzzle9
+
+# for i in [1,10,19,28,37,46,55,64,73]:
+#     print i, puzzle9.getRow(i)
+
+# print
+# for i in [1,5,17,21,33,37,49,53]:
+#     print i, puzzle8.getSubGrid(i)
+
+for group in puzzle6.getXWingGroups():
+    print visualizer(puzzle6, group)
+
+# blankPuz.getXWingGroups()
