@@ -147,7 +147,7 @@ hiddenTripleTestString = "370408100\
 509600400\
 004200931"
 
-hiddenTripleTest = Sudoku(hiddenTripleTestString, True)
+hiddenTripleTest = Sudoku(hiddenTripleTestString)
 
 string8 = "1004200006000705005008006800100000060052004006008060007000073006"
 
@@ -180,14 +180,14 @@ print puzzle9
 solver(puzzle9, 2)
 print puzzle9
 
-# for i in [1,10,19,28,37,46,55,64,73]:
-#     print i, puzzle9.getRow(i)
+# for i in xrange(1,65):
+#     print i, puzzle8.getSubGrid(i)
 
 # print
 # for i in [1,5,17,21,33,37,49,53]:
 #     print i, puzzle8.getSubGrid(i)
 
-for group in puzzle6.getXWingGroups():
-    print visualizer(puzzle6, group)
+for group in hiddenTripleTest.getXWingGroups():
+    print visualizer(hiddenTripleTest, group)
 
 # blankPuz.getXWingGroups()

@@ -24,24 +24,6 @@ class Sudoku():
 
         self.updateGhostsAndGroups()
 
-    def calculateDimensions(self, data, horizontalFormat):
-
-        self.gridSize = int(len(data) ** 0.5)
-
-        if (self.gridSize ** 0.5).is_integer():
-            self.subGridsX = int(self.gridSize ** 0.5)
-            self.subGridsY = self.subGridsX
-            return
-        
-        factor = factors(self.gridSize)
-
-        if horizontalFormat:
-            self.subGridsY = factor
-            self.subGridsX = self.gridSize / self.subGridsY
-        else:
-            self.subGridsX = factor
-            self.subGridsY = self.gridSize / self.subGridsX
-
     def __eq__(self, other):
         return (isinstance(other, self.__class__)
             and self.__dict__ == other.__dict__)
@@ -85,6 +67,24 @@ class Sudoku():
                 string += hPipeString
 
         return string
+
+    def calculateDimensions(self, data, horizontalFormat):
+
+        self.gridSize = int(len(data) ** 0.5)
+
+        if (self.gridSize ** 0.5).is_integer():
+            self.subGridsX = int(self.gridSize ** 0.5)
+            self.subGridsY = self.subGridsX
+            return
+        
+        factor = factors(self.gridSize)
+
+        if horizontalFormat:
+            self.subGridsY = factor
+            self.subGridsX = self.gridSize / self.subGridsY
+        else:
+            self.subGridsX = factor
+            self.subGridsY = self.gridSize / self.subGridsX
 
     def getSubGridStartLocations(self):
         subGridsX = self.subGridsX
@@ -151,6 +151,20 @@ class Sudoku():
 
         return columnGroups
 
+    def getSubGrid(self, location):
+        subGridRow = (location - 1) / (self.subGridsX * self.gridSize)
+        subGridRowOffset = subGridRow * self.subGridsX
+
+        subGridColumn = (self.getColumn(location) - 1) / self.subGridsY + 1
+
+        return subGridRowOffset + subGridColumn
+
+    def getRow(self, location):
+        return (location - 1) / self.gridSize + 1
+
+    def getColumn(self, location):
+        return (location - 1) % self.gridSize + 1
+
     def getXWingGroups(self):
         xWingGroups = []
         gridSize = self.gridSize
@@ -181,6 +195,7 @@ class Sudoku():
                                 if self.getColumn(locationOne) == self.getColumn(locationThree) and \
                                 self.getColumn(locationTwo) == self.getColumn(locationFour):
                                     xWingGroups.append([locationOne, locationTwo, locationThree, locationFour])
+        
         return xWingGroups
 
     def isValid(self):
@@ -235,20 +250,6 @@ class Sudoku():
 
         #prune empty intersection groups
         # self.intersectionGroups = filter(None, self.intersectionGroups)
-
-    def getRow(self, location):
-        return (location - 1) / self.gridSize + 1
-
-    def getColumn(self, location):
-        return (location - 1) % self.gridSize + 1
-
-    def getSubGrid(self, location):
-        subGridRow = (location - 1) / (self.gridSize * self.subGridsX)
-        subGridRowOffset = subGridRow * self.subGridsX
-
-        subGridColumn = self.getColumn(location) / self.subGridsY + 1
-
-        return subGridRowOffset + subGridColumn
 
     def nakedSingle(self):
         self.changes = False
