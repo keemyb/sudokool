@@ -127,6 +127,16 @@ string9 = "010030000\
 307000006\
 000060040"
 
+string9 = "006200000\
+000900150\
+502740060\
+308004005\
+007030000\
+000090003\
+080000000\
+000076800\
+610000900"
+
 hiddenTripleTestString = "528600049\
 136490025\
 794205630\
@@ -162,7 +172,7 @@ puzzle6 = Sudoku(string6)
 puzzle6 = Sudoku("0" * 36)
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
-#     print fromTextPuzzleSummary("easy50.txt", "========\n", 6, puzzleNo, True, True, True, True, True, True)
+#     print fromTextPuzzleSummary("easy50.txt", "========\n", 0, puzzleNo, True, True, True, True, True, True)
 
 # hiddenTripleTest.ghostValues[41] = set([2,8])
 # hiddenTripleTest.hiddenTriplet()
@@ -175,10 +185,19 @@ puzzle6 = Sudoku("0" * 36)
 # print puzzle9
 
 blankPuz = Sudoku("0" * 81)
+xWingTest = Sudoku("100000569492056108056109240009640801064010000218035604040500016905061402621000005")
+print xWingTest
+# print xWingTest
+# solver(xWingTest, 1)
+print puzzleSummary(xWingTest, 0, True, True, True)
 
-print puzzle9
-solver(puzzle9, 2)
-print puzzle9
+# for group in xWingTest.getXWingGroups():
+#     print visualizer(xWingTest, group)
+
+# print puzzle9
+# # solver(puzzle9, 0)
+# puzzle9.xWing()
+# print puzzle9
 
 # for i in xrange(1,65):
 #     print i, puzzle8.getSubGrid(i)
@@ -187,7 +206,11 @@ print puzzle9
 # for i in [1,5,17,21,33,37,49,53]:
 #     print i, puzzle8.getSubGrid(i)
 
-for group in hiddenTripleTest.getXWingGroups():
-    print visualizer(hiddenTripleTest, group)
+# for group in hiddenTripleTest.getXWingGroups():
+#     print visualizer(hiddenTripleTest, group)
 
-# blankPuz.getXWingGroups()
+# print puzzle9
+
+# for i in xrange(1, 10):
+#     print puzzle9.getColumnNeighbours(i)
+    # print puzzle9.getColumnMembers(i)

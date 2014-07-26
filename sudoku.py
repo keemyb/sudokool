@@ -165,6 +165,26 @@ class Sudoku():
     def getColumn(self, location):
         return (location - 1) % self.gridSize + 1
 
+    def getRowMembers(self, location):
+        rowMembers = self.intersectionGroups[self.gridSize + self.getRow(location) - 1]
+        return rowMembers
+
+    def getColumnMembers(self, location):
+        columnMembers = self.intersectionGroups[self.gridSize * 2 + self.getColumn(location) - 1]
+        return columnMembers
+
+    def getRowNeighbours(self, location):
+        rowNeighbours = self.getRowMembers(location)
+        if location in rowNeighbours:
+            rowNeighbours.remove(location)
+        return rowNeighbours
+
+    def getColumnNeighbours(self, location):
+        columnNeighbours = self.getColumnMembers(location)
+        if location in columnNeighbours:
+            columnNeighbours.remove(location)
+        return columnNeighbours    
+
     def getXWingGroups(self):
         xWingGroups = []
         gridSize = self.gridSize
@@ -181,6 +201,8 @@ class Sudoku():
             for locationOne in firstRow:
                 for locationTwo in firstRow:
                     if self.getSubGrid(locationOne) == self.getSubGrid(locationTwo):
+                        continue
+                    if self.getColumn(locationOne) > self.getColumn(locationTwo):
                         continue
 
                     #offset to provide only the rows that are not in the same subGrid
@@ -368,5 +390,42 @@ class Sudoku():
         return self.hiddenN(3)
 
     def xWing(self):
+        from collections import defaultdict
+        self.changes = False
+        
+        xWings = {}
 
-        pass
+        for group in self.getXWingGroups():
+
+            setsOfGhosts = [self.ghostValues[location] for location in group]
+            commonGhosts = set.intersection(*setsOfGhosts)
+
+            if len(commonGhosts) > 0:
+                # if group == [13, 17, 49, 53]:
+                #     print self.getRow(group[0]), ((commonGhosts, group[:2]))
+                
+                xWings[tuple(group)] = set([commonGhosts.pop()])
+
+        # print xWings
+
+        for group, commonGhosts in xWings.iteritems():
+            xWingRowLocations = group[0], group[2]
+            xWingColumnLocations = group[0], group[1]
+
+            xWingIntersections = [self.getRowNeighbours(location) for location in xWingRowLocations]
+            xWingIntersections += [self.getColumnNeighbours(location) for location in xWingColumnLocations]
+            xWingIntersections = [location for locationList in xWingIntersections for location in locationList]
+
+            print group, xWingIntersections
+            
+            for location in xWingIntersections:
+                if location in group:
+                    print location, group
+                    continue
+
+                if any(ghostValue in commonGhosts for ghostValue in self.ghostValues[location]):
+                    self.ghostValues[location] -= commonGhosts
+                    self.changes = True
+                    return self.changes
+
+        return self.changes
