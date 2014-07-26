@@ -8,7 +8,7 @@ class SolvingSudoku(Sudoku):
         pass
 
 def solver(puzzle, maxLevel, history = None):
-    methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin, puzzle.hiddenTwin, puzzle.nakedTriplet, puzzle.hiddenTriplet]
+    methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin, puzzle.hiddenTwin, puzzle.nakedTriplet, puzzle.hiddenTriplet, puzzle.xWing]
 
     #puzzle is complete if gridSize ^ 2 values are filled
     if reduce(add, [1 for value in puzzle.values.itervalues() if value != 0], 0) == puzzle.gridSize ** 2:
@@ -42,8 +42,8 @@ def solver(puzzle, maxLevel, history = None):
 
 def puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues, printHistory, no = None):
 
-    preSolved = puzzle
-    postSolved = deepcopy(preSolved)
+    preSolved = deepcopy(puzzle)
+    postSolved = puzzle
 
     solveReport = solver(postSolved, maxLevel)
 
