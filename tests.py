@@ -159,20 +159,20 @@ hiddenTripleTestString = "370408100\
 
 hiddenTripleTest = Sudoku(hiddenTripleTestString)
 
-string8 = "1004200006000705005008006800100000060052004006008060007000073006"
+# string8 = "1004200006000705005008006800100000060052004006008060007000073006"
 
-string6 = "020000000020054100100064200043300010"
-##string6 = "123456123456123456123456123456123456"
+# string6 = "020000000020054100100064200043300010"
+# ##string6 = "123456123456123456123456123456123456"
 
-puzzle9 = Sudoku(string9)
+# puzzle9 = Sudoku(string9)
 
-puzzle8 = Sudoku(string8)
+# puzzle8 = Sudoku(string8)
 
-puzzle6 = Sudoku(string6)
-puzzle6 = Sudoku("0" * 36)
+# puzzle6 = Sudoku(string6)
+# puzzle6 = Sudoku("0" * 36)
 
-# for puzzleNo in [6,7,42,47,48,49,50]:
-#     print fromTextPuzzleSummary("easy50.txt", "========\n", 0, puzzleNo, True, True, True, True, True, True)
+for puzzleNo in [6,7,42,47,48,49,50]:
+    print fromTextPuzzleSummary("easy50.txt", "========\n", 5, puzzleNo, True, True, True, True, True, True)
 
 # hiddenTripleTest.ghostValues[41] = set([2,8])
 # hiddenTripleTest.hiddenTriplet()
@@ -187,9 +187,11 @@ puzzle6 = Sudoku("0" * 36)
 blankPuz = Sudoku("0" * 81)
 xWingTest = Sudoku("100000569492056108056109240009640801064010000218035604040500016905061402621000005")
 print xWingTest
+xWingTest.xWing()
+print xWingTest
 # print xWingTest
 # solver(xWingTest, 1)
-print puzzleSummary(xWingTest, 0, True, True, True)
+# print puzzleSummary(xWingTest, 0, True, True, True)
 
 # for group in xWingTest.getXWingGroups():
 #     print visualizer(xWingTest, group)

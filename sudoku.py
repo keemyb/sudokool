@@ -18,11 +18,9 @@ class Sudoku():
 
         self.values = {position + 1 : int(data[position]) for position in range(self.gridSize ** 2)}
         self.ghostValues = {}
-        self.intersectionGroups = self.getSubGridGroups() + self.getRowGroups() + self.getColumnGroups()
+        self.intersectionTypes = {}
         self.setOfPossibleNumbers = frozenset(xrange(1, self.gridSize + 1))
         self.changes = False
-
-        self.updateGhostsAndGroups()
 
     def __eq__(self, other):
         return (isinstance(other, self.__class__)
@@ -113,7 +111,7 @@ class Sudoku():
 
         return columnStartLocations
 
-    def getSubGridGroups(self):
+    def generateSubGridGroups(self):
         gridSize = self.gridSize
         subGridsY = self.subGridsY
 
@@ -131,7 +129,7 @@ class Sudoku():
 
         return subGridGroups
 
-    def getRowGroups(self):
+    def generateRowGroups(self):
         gridSize = self.gridSize
 
         rowGroups = []
@@ -141,7 +139,7 @@ class Sudoku():
             
         return rowGroups
 
-    def getColumnGroups(self):
+    def generateColumnGroups(self):
         gridSize = self.gridSize
 
         columnGroups = []
@@ -150,6 +148,41 @@ class Sudoku():
             columnGroups.append([startLocation + offset * gridSize for offset in xrange(gridSize)])
 
         return columnGroups
+
+    def generateXWingGroups(self):
+        xWingGroups = []
+        gridSize = self.gridSize
+        subGridsX = self.subGridsX
+        subGridsY = self.subGridsY
+
+        # gridSize: gridSize * 2 are the indices for the row groups
+        # we use the indices from intersection groups instead of row groups,
+        # as the row groups in intersection groups will be pre-pruned.
+        for firstRow in self.intersectionTypes["row"]:
+            if len(firstRow) < 2:
+                continue
+
+            for locationOne in firstRow:
+                for locationTwo in firstRow:
+                    if self.getSubGrid(locationOne) == self.getSubGrid(locationTwo):
+                        continue
+                    if self.getColumn(locationOne) > self.getColumn(locationTwo):
+                        continue
+
+                    #offset to provide only the rows that are not in the same subGrid
+                    offset = ((self.getRow(locationOne) - 1) / subGridsX + 1) * subGridsY
+                    
+                    for secondRow in self.intersectionTypes["row"][gridSize + offset: gridSize * 2]:
+                        if len(secondRow) < 2:
+                            continue
+                        
+                        for locationThree in secondRow:
+                            for locationFour in secondRow:
+                                if self.getColumn(locationOne) == self.getColumn(locationThree) and \
+                                self.getColumn(locationTwo) == self.getColumn(locationFour):
+                                    xWingGroups.append([locationOne, locationTwo, locationThree, locationFour])
+        
+        return xWingGroups
 
     def getSubGrid(self, location):
         subGridRow = (location - 1) / (self.subGridsX * self.gridSize)
@@ -183,42 +216,7 @@ class Sudoku():
         columnNeighbours = self.getColumnMembers(location)
         if location in columnNeighbours:
             columnNeighbours.remove(location)
-        return columnNeighbours    
-
-    def getXWingGroups(self):
-        xWingGroups = []
-        gridSize = self.gridSize
-        subGridsX = self.subGridsX
-        subGridsY = self.subGridsY
-
-        # gridSize: gridSize * 2 are the indices for the row groups
-        # we use the indices from intersection groups instead of row groups,
-        # as the row groups in intersection groups will be pre-pruned.
-        for firstRow in self.intersectionGroups[gridSize : gridSize * 2]:
-            if len(firstRow) < 2:
-                continue
-
-            for locationOne in firstRow:
-                for locationTwo in firstRow:
-                    if self.getSubGrid(locationOne) == self.getSubGrid(locationTwo):
-                        continue
-                    if self.getColumn(locationOne) > self.getColumn(locationTwo):
-                        continue
-
-                    #offset to provide only the rows that are not in the same subGrid
-                    offset = ((self.getRow(locationOne) - 1) / subGridsX + 1) * subGridsY
-                    
-                    for secondRow in self.intersectionGroups[gridSize + offset: gridSize * 2]:
-                        if len(secondRow) < 2:
-                            continue
-                        
-                        for locationThree in secondRow:
-                            for locationFour in secondRow:
-                                if self.getColumn(locationOne) == self.getColumn(locationThree) and \
-                                self.getColumn(locationTwo) == self.getColumn(locationFour):
-                                    xWingGroups.append([locationOne, locationTwo, locationThree, locationFour])
-        
-        return xWingGroups
+        return columnNeighbours
 
     def isValid(self):
         for location in xrange(1, self.gridSize ** 2 + 1):
@@ -226,54 +224,99 @@ class Sudoku():
                 if self.values[location] not in self.setOfPossibleNumbers:
                     return False
 
-        intersectionGroups = self.getSubGridGroups() + self.getRowGroups() + self.getColumnGroups()
+        intersectionGroups = self.generateSubGridGroups() + self.generateRowGroups() + self.generateColumnGroups()
         for group in intersectionGroups:
 
-            values = [self.values[location] for location in group if self.values[location] != 0]
+            values = [self.values[location] for location in group if not self.isEmpty(location)]
             if len(values) != len(set(values)):
                 return False
 
         return True
+
+    def isEmpty(self, location):
+        if self.values[location] == 0:
+            return True
+        return False
 
     def updateGhostsAndGroups(self, modifiedLocations = None):
         if modifiedLocations == []:
             return
         
         locationsToRemoveFromGroups = []
+        
         #Exhaustive
         if modifiedLocations == None:
-            for group in self.intersectionGroups:
-                setOfSurroundingValues = set([self.values[value] for value in group if self.values[value] != 0])
+            for intersectionType in self.intersectionTypes:
 
-                for location in group:
-                    if self.values[location] == 0:
-                        if location in self.ghostValues:
-                            self.ghostValues[location] -= setOfSurroundingValues
+                if intersectionType not in ["subGrid", "row", "column"]:
+                    continue
+
+                for group in self.intersectionTypes[intersectionType]:
+
+                    setOfSurroundingValues = set([self.values[location] for location in group if not self.isEmpty(location)])
+
+                    for location in group:
+                        if self.isEmpty(location):
+                            if location in self.ghostValues:
+                                self.ghostValues[location] -= setOfSurroundingValues
+                            else:
+                                self.ghostValues[location] = set(self.setOfPossibleNumbers) - setOfSurroundingValues
                         else:
-                            self.ghostValues[location] = set(self.setOfPossibleNumbers) - setOfSurroundingValues
-                    else:
-                        locationsToRemoveFromGroups.append(location)
+                            locationsToRemoveFromGroups.append(location)
         
         #specific
         else:
-            for group in self.intersectionGroups:
-                setOfSurroundingValues = set([self.values[value] for value in group if self.values[value] != 0])
-                if any(location in modifiedLocations for location in group):
-                    for location in group:
-                        if self.values[location] == 0:
-                            self.ghostValues[location] -= setOfSurroundingValues
-                        else:
-                            locationsToRemoveFromGroups.append(location)
+            for intersectionType in self.intersectionTypes:
 
-        for location in locationsToRemoveFromGroups:
-            for group in self.intersectionGroups:
-                if location in group:
-                    group.remove(location)
+                if intersectionType not in ["subGrid", "row", "column"]:
+                    continue
+                
+                for group in self.intersectionTypes[intersectionType]:
+
+                    setOfSurroundingValues = set([self.values[location] for location in group if not self.isEmpty(location)])
+                    
+                    if any(location in modifiedLocations for location in group):
+                        for location in group:
+                            if self.isEmpty(location):
+                                self.ghostValues[location] -= setOfSurroundingValues
+                            else:
+                                locationsToRemoveFromGroups.append(location)
+
+        for intersectionType in self.intersectionTypes:
+
+            if intersectionType not in ["subGrid", "row", "column"]:
+                continue
+
+            for group in self.intersectionTypes[intersectionType]:
+            
+                for location in locationsToRemoveFromGroups:
+                    if location in group:
+                        group.remove(location)
 
         #prune empty intersection groups
         # self.intersectionGroups = filter(None, self.intersectionGroups)
 
+    def initialiseIntersections(self, *intersectionTypes):
+        changes = False
+
+        for intersectionType in intersectionTypes:
+
+            if intersectionType in self.intersectionTypes:
+                continue
+
+            typeName = intersectionType[0].capitalize() + intersectionType[1:]
+
+            changes = True
+
+            self.intersectionTypes[intersectionType] = eval("self.generate" + typeName + "Groups()")
+
+        if changes:
+            self.updateGhostsAndGroups()
+
+
     def nakedSingle(self):
+        self.initialiseIntersections("subGrid", "row", "column")
+
         self.changes = False
 
         modifiedLocations = []
@@ -293,25 +336,31 @@ class Sudoku():
         return self.changes
 
     def nakedN(self, n):
-        from itertools import combinations
+        self.initialiseIntersections("subGrid", "row", "column")
+
         self.changes = False
 
-        for group in self.intersectionGroups:
+        from itertools import combinations
 
-            if len(group) > n:
+        for intersectionType in self.intersectionTypes:
 
-                for combination in combinations(group, n):
+            if intersectionType not in ["subGrid", "row", "column"]:
+                continue
 
-                    if len(set([tuple(self.ghostValues[location]) for location in combination])) == n:
+            for group in [group for group in self.intersectionTypes[intersectionType] if len(group) > n]:
 
-                        nakedNghostValues = set([tuple(self.ghostValues[location]) for location in combination])
+                    for combination in combinations(group, n):
 
-                        for surroundingLocation in [location for location in group if location not in combination]:
+                        if len(set([tuple(self.ghostValues[location]) for location in combination])) == n:
 
-                            if any(ghostValue in nakedNghostValues for ghostValue in self.ghostValues[surroundingLocation]):
+                            nakedNghostValues = set([tuple(self.ghostValues[location]) for location in combination])
 
-                                self.ghostValues[surroundingLocation] -= nakedNghostValues
-                                self.changes = True
+                            for surroundingLocation in [location for location in group if location not in combination]:
+
+                                if any(ghostValue in nakedNghostValues for ghostValue in self.ghostValues[surroundingLocation]):
+
+                                    self.ghostValues[surroundingLocation] -= nakedNghostValues
+                                    self.changes = True
 
         return self.changes
 
@@ -323,63 +372,50 @@ class Sudoku():
 
         return self.nakedN(3)
 
-    def hiddenSingle(self):
-        self.changes = False
-        modifiedLocations = []
-
-        for group in self.intersectionGroups:
-            
-            for location in group:
-                setsOfSurroundingGhosts = [self.ghostValues[surroundingLocation] for surroundingLocation in group if surroundingLocation != location]
-                setOfSurroundingGhosts = set([ghostValue for ghostValues in setsOfSurroundingGhosts for ghostValue in ghostValues])
-                setOfUniqueGhosts = self.ghostValues[location] - setOfSurroundingGhosts
-                
-                if len(setOfUniqueGhosts) == 1:
-                    self.values[location] = setOfUniqueGhosts.pop()
-                    modifiedLocations.append(location)
-                    self.changes = True
-
-        if self.changes:
-            for location in modifiedLocations:
-                if location in self.ghostValues:
-                    del self.ghostValues[location]
-
-            self.updateGhostsAndGroups(modifiedLocations)
-
-        return self.changes
-
     def hiddenN(self, n):
-        from itertools import combinations
+        self.initialiseIntersections("subGrid", "row", "column")
+
         self.changes = False
+        
+        from itertools import combinations
 
-        for group in [group for group in self.intersectionGroups if len(group) > n]:
+        for intersectionType in self.intersectionTypes:
 
-            for combination in combinations(group, n):
+            if intersectionType not in ["subGrid", "row", "column"]:
+                continue
 
-                surroundingLocations = [location for location in group if location not in combination]
+            for group in [group for group in self.intersectionTypes[intersectionType] if len(group) > n]:
 
-                setsOfCombinationGhosts = [self.ghostValues[location] for location in combination]
-                setOfCombinationGhosts = set([ghostValue for ghostValueSets in setsOfCombinationGhosts for ghostValue in ghostValueSets])
-                setsOfSurroundingGhosts = [self.ghostValues[surroundingLocation] for surroundingLocation in surroundingLocations]
-                setOfSurroundingGhosts = set([ghostValue for ghostValueSets in setsOfSurroundingGhosts for ghostValue in ghostValueSets])
-                setOfUniqueGhostsToCombination = setOfCombinationGhosts - setOfSurroundingGhosts
+                for combination in combinations(group, n):
 
-                if len(setOfUniqueGhostsToCombination) == n:
+                    surroundingLocations = [location for location in group if location not in combination]
 
-                    for location in combination:
+                    setsOfCombinationGhosts = [self.ghostValues[location] for location in combination]
+                    setOfCombinationGhosts = set([ghostValue for ghostValueSets in setsOfCombinationGhosts for ghostValue in ghostValueSets])
+                    setsOfSurroundingGhosts = [self.ghostValues[surroundingLocation] for surroundingLocation in surroundingLocations]
+                    setOfSurroundingGhosts = set([ghostValue for ghostValueSets in setsOfSurroundingGhosts for ghostValue in ghostValueSets])
+                    setOfUniqueGhostsToCombination = setOfCombinationGhosts - setOfSurroundingGhosts
 
-                        if any(ghostValue in setOfSurroundingGhosts for ghostValue in self.ghostValues[location]):
+                    if len(setOfUniqueGhostsToCombination) == n:
 
-                            self.ghostValues[location] -= setOfSurroundingGhosts
-                            self.changes = True
+                        for location in combination:
 
-                    for location in surroundingLocations:
+                            if any(ghostValue in setOfSurroundingGhosts for ghostValue in self.ghostValues[location]):
 
-                        if any(ghostValue in setOfUniqueGhostsToCombination for ghostValue in self.ghostValues[location]):
+                                self.ghostValues[location] -= setOfSurroundingGhosts
+                                self.changes = True
 
-                            self.ghostValues[location] -= setOfUniqueGhostsToCombination
+                        for location in surroundingLocations:
+
+                            if any(ghostValue in setOfUniqueGhostsToCombination for ghostValue in self.ghostValues[location]):
+
+                                self.ghostValues[location] -= setOfUniqueGhostsToCombination
 
         return self.changes
+
+    def hiddenSingle(self):
+
+        return self.hiddenN(1)
 
     def hiddenTwin(self):
 
@@ -390,12 +426,15 @@ class Sudoku():
         return self.hiddenN(3)
 
     def xWing(self):
-        from collections import defaultdict
+        self.initialiseIntersections("subGrid", "row", "column", "xWing")
+
         self.changes = False
+        
+        from collections import defaultdict
         
         xWings = {}
 
-        for group in self.getXWingGroups():
+        for group in self.intersectionTypes["xWing"]:
 
             setsOfGhosts = [self.ghostValues[location] for location in group]
             commonGhosts = set.intersection(*setsOfGhosts)

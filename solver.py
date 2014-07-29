@@ -8,7 +8,7 @@ class SolvingSudoku(Sudoku):
         pass
 
 def solver(puzzle, maxLevel, history = None):
-    methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin, puzzle.hiddenTwin, puzzle.nakedTriplet, puzzle.hiddenTriplet, puzzle.xWing]
+    methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin, puzzle.hiddenTwin, puzzle.nakedTriplet, puzzle.hiddenTriplet]#, puzzle.xWing]
 
     #puzzle is complete if gridSize ^ 2 values are filled
     if reduce(add, [1 for value in puzzle.values.itervalues() if value != 0], 0) == puzzle.gridSize ** 2:
@@ -42,6 +42,7 @@ def solver(puzzle, maxLevel, history = None):
 
 def puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues, printHistory, no = None):
 
+    puzzle.initialiseIntersections("subGrid", "row", "column")
     preSolved = deepcopy(puzzle)
     postSolved = puzzle
 
@@ -55,10 +56,15 @@ def puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues, printHistory,
     else:
         no = str(no) + " "
 
-    if printPuzzle:
-        printPuzzle = "\n" + str(preSolved) + "\n" + str(postSolved) + "\n"
+    if not postSolved.isValid():
+        valid = "\n" + "Puzzle Invalid"
     else:
-        printPuzzle = ""
+        valid = "\n"
+
+    if printPuzzle:
+        printPuzzle = "\n" + str(preSolved) + valid + str(postSolved) + "\n"
+    else:
+        printPuzzle = valid
 
     changedGhostsString = ""
     if printGhostValues:
@@ -70,4 +76,4 @@ def puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues, printHistory,
     if printHistory:
         history = "\n" + str(solveReport[1])
 
-    return no + str(numberOfPreSolvedValues) + " ---> " + str(numberOfPostSolvedValues) + history + changedGhostsString + printPuzzle + "\n" * 2
+    return no + str(numberOfPreSolvedValues) + " ---> " + str(numberOfPostSolvedValues) + history + changedGhostsString + printPuzzle + "\n"
