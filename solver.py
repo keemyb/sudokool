@@ -4,7 +4,7 @@ from copy import deepcopy
 
 def solver(puzzle, maxLevel, history = None):
     methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin, puzzle.hiddenTwin, puzzle.nakedTriplet, puzzle.hiddenTriplet, puzzle.xWing]
-    # methods = [puzzle.xWing]
+    methods = [puzzle.nakedSingle, puzzle.pointingPair, puzzle.pointingTriplet]
 
     #puzzle is complete if gridSize ^ 2 values are filled
     if reduce(add, [1 for location in puzzle.values if not puzzle.isEmpty(location)], 0) == puzzle.gridSize ** 2:
@@ -38,7 +38,7 @@ def solver(puzzle, maxLevel, history = None):
 
 def puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues, printHistory, number = None):
 
-    puzzle.initialiseGhosts()
+    puzzle.initialiseIntersections()
     preSolved = deepcopy(puzzle)
     postSolved = puzzle
 

@@ -171,90 +171,47 @@ class Sudoku():
 
         return columnStartLocations
 
-    def generateCompleteSubGridGroups(self):
+    def generateSubGridGroups(self):
         gridSize = self.gridSize
         subGridsY = self.subGridsY
 
-        completeSubGridGroups = []
+        subGridGroups = []
+        offsets = []
+
+        for position in xrange(gridSize):
+            rowOffset = (position / subGridsY) * gridSize
+            columnOffset = (position % gridSize) % subGridsY
+
+            offsets.append(rowOffset + columnOffset)
 
         for startLocation in self.getSubGridStartLocations():
-            subGridGroup = []
-            
-            for position in xrange(gridSize):
-                rowOffset = ((position % gridSize) / subGridsY) * gridSize
-                columnOffset = (position % gridSize) % subGridsY
+            subGridGroup = [startLocation + offset for offset in offsets]
+            subGridGroups.append(subGridGroup)
 
-                if not self.isEmpty(startLocation + rowOffset + columnOffset):
-                    continue
+        return subGridGroups
 
-                subGridGroup.append(startLocation + rowOffset + columnOffset)
-            
-            completeSubGridGroups.append(subGridGroup)
-
-        return completeSubGridGroups
-
-    def generateCompleteRowGroups(self):
+    def generateRowGroups(self):
         gridSize = self.gridSize
 
-        completeRowGroups = []
+        rowGroups = []
 
         for startLocation in self.getRowStartLocations():
-            completeRowGroups.append([startLocation + offset for offset in xrange(gridSize) if self.isEmpty(startLocation + offset)])
+            rowGroups.append([startLocation + offset for offset in xrange(gridSize)])
             
-        return completeRowGroups
+        return rowGroups
 
-    def generateCompleteColumnGroups(self):
+    def generateColumnGroups(self):
         gridSize = self.gridSize
 
-        completeColumnGroups = []
+        columnGroups = []
 
         for startLocation in self.getColumnStartLocations():
-            completeColumnGroups.append([startLocation + offset * gridSize for offset in xrange(gridSize) if self.isEmpty(startLocation + offset * gridSize)])
+            columnGroups.append([startLocation + offset * gridSize for offset in xrange(gridSize)])
 
-        return completeColumnGroups
-
-    def generatePrunedSubGridGroups(self):
-        prunedSubGridGroups = []
-
-        for group in self.generateCompleteSubGridGroups():
-            prunedSubGridGroup = []
-            for location in group:
-                if self.isEmpty(location):
-                    prunedSubGridGroup.append(location)
-            prunedSubGridGroups.append(prunedSubGridGroup)
-
-        return prunedSubGridGroups
-
-    def generatePrunedRowGroups(self):
-        prunedRowGroups = []
-
-        for group in self.generateCompleteRowGroups():
-            prunedRowGroup = []
-            for location in group:
-                if self.isEmpty(location):
-                    prunedRowGroup.append(location)
-            prunedRowGroups.append(prunedRowGroup)
-
-        return prunedRowGroups
-
-    def generatePrunedColumnGroups(self):
-        prunedColumnGroups = []
-
-        for group in self.generateCompleteColumnGroups():
-            prunedColumnGroup = []
-            for location in group:
-                if self.isEmpty(location):
-                    prunedColumnGroup.append(location)
-            prunedColumnGroups.append(prunedColumnGroup)
-
-        return prunedColumnGroups
+        return columnGroups
 
     def generateXWingGroups(self):
         self.initialiseIntersections()
-        
-        gridSize = self.gridSize
-        subGridsX = self.subGridsX
-        subGridsY = self.subGridsY
 
         xWingGroups = []
 
@@ -300,52 +257,24 @@ class Sudoku():
         return (location - 1) % self.gridSize + 1
 
     def getSubGridNeighbours(self, location):
-        subGrid = self.getSubGrid(location)
-        maxSize = self.gridSize - 1
-        neighbours = []
-
-        for loopingLocation in xrange(1, self.gridSize ** 2 + 1):
-            if len(neighbours) > maxSize:
-                break
-            if loopingLocation == location:
-                continue
-            if subGrid == self.getSubGrid(loopingLocation):
-                neighbours.append(loopingLocation)
+        subGridGroup = self.intersectionTypes["subGrid"][self.getSubGrid(location) - 1]
+        neighbours = [neighbour for neighbour in subGridGroup if neighbour != location and self.isEmpty(neighbour)]
         
         return neighbours
 
     def getRowNeighbours(self, location):
-        row = self.getRow(location)
-        maxSize = self.gridSize - 1
-        neighbours = []
-
-        for loopingLocation in xrange(1, self.gridSize ** 2 + 1):
-            if len(neighbours) > maxSize:
-                break
-            if loopingLocation == location:
-                continue
-            if row == self.getRow(loopingLocation):
-                neighbours.append(loopingLocation)
+        rowGroup = self.intersectionTypes["row"][self.getRow(location) - 1]
+        neighbours = [neighbour for neighbour in rowGroup if neighbour != location and self.isEmpty(neighbour)]
         
         return neighbours
 
     def getColumnNeighbours(self, location):
-        column = self.getColumn(location)
-        maxSize = self.gridSize - 1
-        neighbours = []
-
-        for loopingLocation in xrange(1, self.gridSize ** 2 + 1):
-            if len(neighbours) > maxSize:
-                break
-            if loopingLocation == location:
-                continue
-            if column == self.getColumn(loopingLocation):
-                neighbours.append(loopingLocation)
+        columnGroup = self.intersectionTypes["column"][self.getColumn(location) - 1]
+        neighbours = [neighbour for neighbour in columnGroup if neighbour != location and self.isEmpty(neighbour)]
         
         return neighbours
 
     def getAllNeighbours(self, location):
-
         return set(self.getSubGridNeighbours(location) + \
             self.getRowNeighbours(location) + \
             self.getColumnNeighbours(location))
@@ -367,7 +296,7 @@ class Sudoku():
 
             typeName = intersectionType[0].capitalize() + intersectionType[1:]
 
-            self.intersectionTypes[intersectionType] = eval("self.generatePruned" + typeName + "Groups()")
+            self.intersectionTypes[intersectionType] = eval("self.generate" + typeName + "Groups()")
 
         if initialiseGhosts:
             self.initialiseGhosts()
@@ -398,7 +327,7 @@ class Sudoku():
 
             for group in self.intersectionTypes[intersectionType]:
 
-                setOfSurroundingValues = set([self.values[location] for location in group if not self.isEmpty(location)])
+                setOfSurroundingValues = set([self.values[location] for location in group])
 
                 for location in group[:]:
                     if self.isEmpty(location):
@@ -532,6 +461,64 @@ class Sudoku():
     def hiddenTriplet(self):
 
         return self.hiddenN(3)
+
+    def pointingN(self, n):
+        self.initialiseIntersections()
+
+        self.changes = False
+
+        from itertools import combinations
+        from collections import defaultdict
+        from itertools import chain
+
+        rowPointers = {}
+        columnPointers = {}
+
+        for subGrid in self.intersectionTypes["subGrid"]:
+            for combination in combinations(subGrid, n):
+                commonCandidates = set.intersection(*[self.ghostValues[location] for location in combination])
+                
+                rows = [self.getRow(location) for location in combination]
+                if all(row == rows[0] for row in rows):
+                    rowPointers[combination] = commonCandidates
+
+                columns = [self.getColumn(location) for location in combination]
+                if all(column == columns[0] for column in columns):
+                    columnPointers[combination] = commonCandidates
+
+        for combination, candidates in rowPointers.iteritems():
+            rowNeighbours = [location for location in self.getRowNeighbours(combination[0]) if location not in combination]
+            subGridNeighbours = [location for location in self.getSubGridNeighbours(combination[0]) if location not in combination]
+
+            subGridNeighbourCandidates = set(chain(*[self.ghostValues[location] for location in subGridNeighbours]))
+            
+            for candidate in candidates:
+                if candidate not in subGridNeighbourCandidates:
+                    for location in rowNeighbours:
+                        if candidate in self.ghostValues[location]:
+                            self.ghostValues[location].remove(candidate)
+                            self.changes = True
+
+        for combination, candidates in columnPointers.iteritems():
+            columnNeighbours = [location for location in self.getColumnNeighbours(combination[0]) if location not in combination]
+            subGridNeighbours = [location for location in self.getSubGridNeighbours(combination[0]) if location not in combination]
+
+            subGridNeighbourCandidates = set(chain(*[self.ghostValues[location] for location in subGridNeighbours]))
+            
+            for candidate in candidates:
+                if candidate not in subGridNeighbourCandidates:
+                    for location in columnNeighbours:
+                        if candidate in self.ghostValues[location]:
+                            self.ghostValues[location].remove(candidate)
+                            self.changes = True
+
+        return self.changes
+
+    def pointingPair(self):
+        return self.pointingN(2)
+
+    def pointingTriplet(self):
+        return self.pointingN(3)
 
     def xWing(self):
         self.initialiseIntersections("xWing")
