@@ -172,8 +172,8 @@ hiddenTripleTest = Sudoku(hiddenTripleTestString)
 # puzzle6 = Sudoku("0" * 36)
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
-for puzzleNo in xrange(1,51):
-    print fromTextPuzzleSummary("easy50.txt", "========\n", 0, puzzleNo, True, True, True, True, True, True)
+# for puzzleNo in xrange(1,51):
+#     print fromTextPuzzleSummary("easy50.txt", "========\n", 0, puzzleNo, True, True, True, True, True, True)
 
 blankPuz = Sudoku("0" * 81)
 xWingTest = Sudoku("100000569492056108056109240009640801064010000218035604040500016905061402621000005")
@@ -206,3 +206,6 @@ print puzzle16.gridSize
 print puzzle16.setOfPossibleValues
 print puzzle16.values[16]
 print puzzleSummary(puzzle16, 0, True, True, True)
+
+hard = Sudoku("4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......")
+print puzzleSummary(hard, 0, True, True, True)

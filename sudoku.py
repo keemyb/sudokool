@@ -92,15 +92,13 @@ class Sudoku():
             self.setOfPossibleValues.update(set([chr(value + 55) for value in xrange(10, self.gridSize + 1)]))
 
     def processData(self, data):
-        if self.gridSize <= 9:
-            self.values = {position + 1 : int(data[position]) for position in range(self.gridSize ** 2)}
-        else:
-            self.values = {position + 1 : data[position] for position in range(self.gridSize ** 2)}
-            for location, value in self.values.iteritems():
-                try:
-                    self.values[location] = int(value)
-                except ValueError:
-                    continue
+        self.values = {position + 1 : data[position] for position in range(self.gridSize ** 2)}
+        for location, value in self.values.iteritems():
+            try:
+                self.values[location] = int(value)
+            except ValueError:
+                if value not in self.setOfPossibleValues:
+                    self.values[location] = 0
 
     def isValid(self):
         for location in xrange(1, self.gridSize ** 2 + 1):
