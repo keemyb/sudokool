@@ -462,14 +462,13 @@ class Sudoku():
 
         return self.hiddenN(3)
 
-    def pointingN(self, n):
+    def intersectionRemoval(self, n, pointingN, boxLineReduction):
         self.initialiseIntersections()
-
         self.changes = False
 
+        from itertools import chain
         from itertools import combinations
         from collections import defaultdict
-        from itertools import chain
 
         rowPointers = {}
         columnPointers = {}
@@ -489,36 +488,60 @@ class Sudoku():
         for combination, candidates in rowPointers.iteritems():
             rowNeighbours = [location for location in self.getRowNeighbours(combination[0]) if location not in combination]
             subGridNeighbours = [location for location in self.getSubGridNeighbours(combination[0]) if location not in combination]
-
-            subGridNeighbourCandidates = set(chain(*[self.candidates[location] for location in subGridNeighbours]))
             
-            for candidate in candidates:
-                if candidate not in subGridNeighbourCandidates:
-                    for location in rowNeighbours:
-                        if candidate in self.candidates[location]:
-                            self.candidates[location].remove(candidate)
-                            self.changes = True
+            if pointingN == True:
+                subGridNeighbourCandidates = set(chain(*[self.candidates[location] for location in subGridNeighbours]))
+                for candidate in candidates:
+                    if candidate not in subGridNeighbourCandidates:
+                        for location in rowNeighbours:
+                            if candidate in self.candidates[location]:
+                                self.candidates[location].remove(candidate)
+                                self.changes = True
+
+            if boxLineReduction == True:
+                rowNeighbourCandidates = set(chain(*[self.candidates[location] for location in rowNeighbours]))
+                for candidate in candidates:
+                    if candidate not in rowNeighbourCandidates:
+                        for location in subGridNeighbours:
+                            if candidate in self.candidates[location]:
+                                self.candidates[location].remove(candidate)
+                                self.changes = True
 
         for combination, candidates in columnPointers.iteritems():
             columnNeighbours = [location for location in self.getColumnNeighbours(combination[0]) if location not in combination]
             subGridNeighbours = [location for location in self.getSubGridNeighbours(combination[0]) if location not in combination]
+                
+            if pointingN == True:
+                subGridNeighbourCandidates = set(chain(*[self.candidates[location] for location in subGridNeighbours]))
+                for candidate in candidates:
+                    if candidate not in subGridNeighbourCandidates:
+                        for location in columnNeighbours:
+                            if candidate in self.candidates[location]:
+                                self.candidates[location].remove(candidate)
+                                self.changes = True
 
-            subGridNeighbourCandidates = set(chain(*[self.candidates[location] for location in subGridNeighbours]))
-            
-            for candidate in candidates:
-                if candidate not in subGridNeighbourCandidates:
-                    for location in columnNeighbours:
-                        if candidate in self.candidates[location]:
-                            self.candidates[location].remove(candidate)
-                            self.changes = True
+            if boxLineReduction == True:
+                columnNeighbourCandidates = set(chain(*[self.candidates[location] for location in columnNeighbours]))
+                for candidate in candidates:
+                    if candidate not in columnNeighbourCandidates:
+                        for location in subGridNeighbours:
+                            if candidate in self.candidates[location]:
+                                self.candidates[location].remove(candidate)
+                                self.changes = True
 
         return self.changes
 
     def pointingPair(self):
-        return self.pointingN(2)
+        return self.intersectionRemoval(2, True, False)
 
     def pointingTriplet(self):
-        return self.pointingN(3)
+        return self.intersectionRemoval(3, True, False)
+
+    def boxLineReduction2(self):
+        return self.intersectionRemoval(2, False, True)
+
+    def boxLineReduction3(self):
+        return self.intersectionRemoval(3, False, True)
 
     def xWing(self):
         self.initialiseIntersections("xWing")

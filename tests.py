@@ -130,9 +130,21 @@ for puzzleNo in xrange(1,51):
 # puzzle16 = Sudoku(string16)
 # print puzzleSummary(puzzle16, 0, True, True, True)
 
-# puz = Sudoku("017903600000080000900000507072010430000402070064370250701000065000030000005601720")
-# puz.initialiseIntersections()
-# puz.ghostValues[67] = set([5, 7, 8])
-# print puz.ghostValues[56]
-# print puzzleSummary(puz, 0, True, True, True)
-# print puz.ghostValues[56]
+pointers = Sudoku("017903600000080000900000507072010430000402070064370250701000065000030000005601720")
+# pointers.initialiseIntersections()
+# pointers.candidates[67] = set([5, 7, 8])
+# print pointers.candidates[56]
+# print puzzleSummary(pointers, 0, True, True, True)
+# print pointers.candidates[56]
+
+blr = Sudoku("016007803090800000870001260048000300650009082039000650060900020080002936924600510")
+# blr.initialiseIntersections()
+# blr.candidates[1] = set([4, 5])
+# blr.candidates[8] = set([4, 9])
+# blr.candidates[10] = set([4, 5, 3])
+# blr.candidates[14] = set([2, 3, 4, 5, 6])
+# blr.candidates[15] = set([3, 4, 5, 6])
+# blr.candidates[22] = set([2, 3, 4, 5])
+# blr.candidates[23] = set([2, 3, 4, 5, 9])
+
+# print puzzleSummary(blr, 0, True, True, True)

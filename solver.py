@@ -3,8 +3,13 @@ from operator import add
 from copy import deepcopy
 
 def solver(puzzle, maxLevel, history = None):
-    methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin, puzzle.hiddenTwin, puzzle.pointingPair, puzzle.pointingTriplet, puzzle.nakedTriplet, puzzle.hiddenTriplet, puzzle.xWing]
+    methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin, puzzle.hiddenTwin, \
+    puzzle.pointingPair, puzzle.pointingTriplet, \
+    puzzle.boxLineReduction2, puzzle.boxLineReduction3, \
+    puzzle.nakedTriplet, puzzle.hiddenTriplet, \
+    puzzle.xWing]
     # methods = [puzzle.nakedSingle, puzzle.pointingPair, puzzle.pointingTriplet]
+    # methods = [puzzle.boxLineReduction2]
 
     #puzzle is complete if gridSize ^ 2 values are filled
     if reduce(add, [1 for location in puzzle.values if not puzzle.isEmpty(location)], 0) == puzzle.gridSize ** 2:
