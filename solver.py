@@ -2,13 +2,9 @@ from sudoku import Sudoku
 from operator import add
 from copy import deepcopy
 
-class SolvingSudoku(Sudoku):
-
-    def __init__():
-        pass
-
 def solver(puzzle, maxLevel, history = None):
-    methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin, puzzle.hiddenTwin, puzzle.nakedTriplet, puzzle.hiddenTriplet]#, puzzle.xWing]
+    methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin, puzzle.hiddenTwin, puzzle.nakedTriplet, puzzle.hiddenTriplet, puzzle.xWing]
+    # methods = [puzzle.xWing]
 
     #puzzle is complete if gridSize ^ 2 values are filled
     if reduce(add, [1 for value in puzzle.values.itervalues() if value != 0], 0) == puzzle.gridSize ** 2:
@@ -40,24 +36,24 @@ def solver(puzzle, maxLevel, history = None):
     
     return solver(puzzle, maxLevel, history)
 
-def puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues, printHistory, no = None):
+def puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues, printHistory, number = None):
 
-    puzzle.initialiseIntersections("subGrid", "row", "column")
+    puzzle.initialiseGhosts()
     preSolved = deepcopy(puzzle)
     postSolved = puzzle
 
     solveReport = solver(postSolved, maxLevel)
 
-    numberOfPreSolvedValues = reduce(add, [1 for value in preSolved.values.itervalues() if value != 0], 0)
-    numberOfPostSolvedValues = reduce(add, [1 for value in postSolved.values.itervalues() if value != 0], 0)
+    numberOfPreSolvedValues = reduce(add, [1 for location in preSolved.values if not preSolved.isEmpty(location)], 0)
+    numberOfPostSolvedValues = reduce(add, [1 for location in postSolved.values if not postSolved.isEmpty(location)], 0)
 
-    if no == None:
-        no = ""
+    if number == None:
+        number = ""
     else:
-        no = str(no) + " "
+        number = str(number) + " "
 
     if not postSolved.isValid():
-        valid = "\n" + "Puzzle Invalid"
+        valid = "\n" + "Puzzle Invalid" + "\n"
     else:
         valid = "\n"
 
@@ -76,4 +72,4 @@ def puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues, printHistory,
     if printHistory:
         history = "\n" + str(solveReport[1])
 
-    return no + str(numberOfPreSolvedValues) + " ---> " + str(numberOfPostSolvedValues) + history + changedGhostsString + printPuzzle + "\n"
+    return number + str(numberOfPreSolvedValues) + " ---> " + str(numberOfPostSolvedValues) + history + changedGhostsString + printPuzzle + "\n"
