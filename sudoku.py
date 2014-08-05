@@ -1,6 +1,17 @@
 # -*- coding: cp1252 -*-
 
 #subGridsx = amount of subgrids in X plane
+def isPrime(n):
+    from math import sqrt, ceil
+    if n <= 2:
+        return True
+    
+    for i in xrange(2, int(ceil(sqrt(n))) + 1):
+        if n % i == 0:
+            return False
+
+    return True
+
 def factors(n):
     from math import sqrt, ceil
     factors = []
@@ -67,16 +78,35 @@ class Sudoku():
         return string
 
     def calculateDimensions(self, data, horizontalFormat):
-
+        # gridSize is the (nearest) square root of the length of the data.
+        # It is the nearest square as we cannot guarantee how many values will be
+        # provided
         self.gridSize = int(len(data) ** 0.5)
 
-        if (self.gridSize ** 0.5).is_integer():
-            self.subGridsX = int(self.gridSize ** 0.5)
+        # If the amount of values provided is not a square number the puzzle will be invalid.
+        # The amount of values is compared to self.gridSize, the nearest square of the number
+        # of values provided.  
+        if len(data) != self.gridSize ** 2:
+            raise Exception("Incorrect number of values provided.")
+
+        #if the gridSize is prime subGrids will equal either rows or columns
+        #problems will ensue. 
+        if isPrime(self.gridSize):
+            raise Exception("Invalid grid Size will be generated.")
+
+        #if the gridSize is a perfect square, then the the amount of subGrids in
+        #X and Y must be the square root of the gridSize.
+        gridSizeRoot = (self.gridSize ** 0.5)
+        if gridSizeRoot.is_integer():
+            self.subGridsX = int(gridSizeRoot)
             self.subGridsY = self.subGridsX
             return
         
+        #returns highest factor less than or equal to half the gridSize. 
         factor = factors(self.gridSize)
 
+        #if the horizontalFormat is True, there will be more subGrids in the X
+        #plane than the Y
         if horizontalFormat:
             self.subGridsY = factor
             self.subGridsX = self.gridSize / self.subGridsY
