@@ -177,5 +177,32 @@ for puzzleNo in xrange(1,51):
 
 blankPuz = Sudoku("0" * 81)
 xWingTest = Sudoku("100000569492056108056109240009640801064010000218035604040500016905061402621000005")
+print xWingTest
+print xWingTest.values
+print xWingTest.setOfPossibleValues
 
-print puzzleSummary(xWingTest, 0, True, True, True)
+# print puzzleSummary(xWingTest, 0, True, True, True)
+
+string16 = "B07805E0300AD0CG\
+004007000C0FA002\
+A000000000043700\
+0050009F00000008\
+0400B8000E079300\
+00E37C0000FDB004\
+9F07005D03000080\
+500D0F3024A8C0G0\
+08000000B0000GD5\
+00D000000800F0E0\
+00A090F0067000BC\
+000C0AB0000E7240\
+7A090B1000500630\
+D0CEF070A0000800\
+0000E0A00D005000\
+0635G9C00B00E000"
+
+puzzle16 = Sudoku(string16)
+print puzzle16
+print puzzle16.gridSize
+print puzzle16.setOfPossibleValues
+print puzzle16.values[16]
+print puzzleSummary(puzzle16, 0, True, True, True)

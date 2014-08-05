@@ -7,7 +7,7 @@ def solver(puzzle, maxLevel, history = None):
     # methods = [puzzle.xWing]
 
     #puzzle is complete if gridSize ^ 2 values are filled
-    if reduce(add, [1 for value in puzzle.values.itervalues() if value != 0], 0) == puzzle.gridSize ** 2:
+    if reduce(add, [1 for location in puzzle.values if not puzzle.isEmpty(location)], 0) == puzzle.gridSize ** 2:
         return True, [entry[0] for entry in history if history != None]
 
     if maxLevel > len(methods) or maxLevel < 1:

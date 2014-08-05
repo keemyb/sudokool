@@ -15,11 +15,11 @@ class Sudoku():
         
     def __init__(self, data, horizontalFormat = True):
         self.calculateDimensions(data, horizontalFormat)
+        self.generatePossibleValues()
+        self.processData(data)
 
-        self.values = {position + 1 : int(data[position]) for position in range(self.gridSize ** 2)}
         self.ghostValues = {}
         self.intersectionTypes = {}
-        self.setOfPossibleNumbers = set(xrange(1, self.gridSize + 1))
         self.changes = False
 
     def __eq__(self, other):
@@ -53,7 +53,7 @@ class Sudoku():
             if (position - 1) % subGridsY == 0 :
                 string += vPipe + " "
 
-            if self.values[position] == 0:
+            if self.isEmpty(position):
                 string += "  "
             else:
                 string += str(self.values[position]) + " "
@@ -84,13 +84,30 @@ class Sudoku():
             self.subGridsX = factor
             self.subGridsY = self.gridSize / self.subGridsX
 
+    def generatePossibleValues(self):
+        if self.gridSize <= 9:
+            self.setOfPossibleValues = set(xrange(1, self.gridSize + 1))
+        else:
+            self.setOfPossibleValues = set(xrange(1, 10))
+            self.setOfPossibleValues.update(set([chr(value + 55) for value in xrange(10, self.gridSize + 1)]))
+
+    def processData(self, data):
+        if self.gridSize <= 9:
+            self.values = {position + 1 : int(data[position]) for position in range(self.gridSize ** 2)}
+        else:
+            self.values = {position + 1 : data[position] for position in range(self.gridSize ** 2)}
+            for location, value in self.values.iteritems():
+                try:
+                    self.values[location] = int(value)
+                except ValueError:
+                    continue
+
     def isValid(self):
         for location in xrange(1, self.gridSize ** 2 + 1):
-            if self.values[location] != 0:
-                if self.values[location] not in self.setOfPossibleNumbers:
+            if not self.isEmpty(location):
+                if self.values[location] not in self.setOfPossibleValues:
                     return False
 
-            if not self.isEmpty(location):
                 locationValue = self.values[location]
 
                 for neighbour in self.getAllNeighbours(location):
@@ -306,7 +323,7 @@ class Sudoku():
             self.getColumnNeighbours(location))
 
     def isEmpty(self, location):
-        if self.values[location] not in self.setOfPossibleNumbers:
+        if self.values[location] not in self.setOfPossibleValues:
             return True
         
         return False
@@ -345,7 +362,7 @@ class Sudoku():
 
             setOfSurroundingValues = set([self.values[neighbour] for neighbour in self.getAllNeighbours(location) if not self.isEmpty(neighbour)])
 
-            self.ghostValues[location] = self.setOfPossibleNumbers - setOfSurroundingValues
+            self.ghostValues[location] = self.setOfPossibleValues - setOfSurroundingValues
 
     def updatePuzzle(self):
         
