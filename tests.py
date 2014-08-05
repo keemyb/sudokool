@@ -102,8 +102,8 @@ hiddenTripleTestString = "370408100\
 # puzzle8 = Sudoku("1004200006000705005008006800100000060052004006008060007000073006")
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
-# for puzzleNo in xrange(1,51):
-#     print fromTextPuzzleSummary("easy50.txt", "========\n", 0, puzzleNo, True, True, True, True, True, True)
+for puzzleNo in xrange(1,51):
+    print fromTextPuzzleSummary("easy50.txt", "========\n", 0, puzzleNo, True, True, True, True, True, True)
 
 # xWingTest = Sudoku("100000569492056108056109240009640801064010000218035604040500016905061402621000005")
 # # xWingTest.generateSubGridGroups()
@@ -130,9 +130,9 @@ hiddenTripleTestString = "370408100\
 # puzzle16 = Sudoku(string16)
 # print puzzleSummary(puzzle16, 0, True, True, True)
 
-puz = Sudoku("017903600000080000900000507072010430000402070064370250701000065000030000005601720")
-puz.initialiseIntersections()
-puz.ghostValues[67] = set([5, 7, 8])
-print puz.ghostValues[56]
-print puzzleSummary(puz, 0, True, True, True)
-print puz.ghostValues[56]
+# puz = Sudoku("017903600000080000900000507072010430000402070064370250701000065000030000005601720")
+# puz.initialiseIntersections()
+# puz.ghostValues[67] = set([5, 7, 8])
+# print puz.ghostValues[56]
+# print puzzleSummary(puz, 0, True, True, True)
+# print puz.ghostValues[56]

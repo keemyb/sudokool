@@ -3,8 +3,8 @@ from operator import add
 from copy import deepcopy
 
 def solver(puzzle, maxLevel, history = None):
-    methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin, puzzle.hiddenTwin, puzzle.nakedTriplet, puzzle.hiddenTriplet, puzzle.xWing]
-    methods = [puzzle.nakedSingle, puzzle.pointingPair, puzzle.pointingTriplet]
+    methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin, puzzle.hiddenTwin, puzzle.pointingPair, puzzle.pointingTriplet, puzzle.nakedTriplet, puzzle.hiddenTriplet, puzzle.xWing]
+    # methods = [puzzle.nakedSingle, puzzle.pointingPair, puzzle.pointingTriplet]
 
     #puzzle is complete if gridSize ^ 2 values are filled
     if reduce(add, [1 for location in puzzle.values if not puzzle.isEmpty(location)], 0) == puzzle.gridSize ** 2:
@@ -36,7 +36,7 @@ def solver(puzzle, maxLevel, history = None):
     
     return solver(puzzle, maxLevel, history)
 
-def puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues, printHistory, number = None):
+def puzzleSummary(puzzle, maxLevel, printPuzzle, printCandidateValues, printHistory, number = None):
 
     puzzle.initialiseIntersections()
     preSolved = deepcopy(puzzle)
@@ -62,14 +62,14 @@ def puzzleSummary(puzzle, maxLevel, printPuzzle, printGhostValues, printHistory,
     else:
         printPuzzle = valid
 
-    changedGhostsString = ""
-    if printGhostValues:
-        for key in postSolved.ghostValues.iterkeys():
-            if postSolved.ghostValues[key] != preSolved.ghostValues[key]:
-                changedGhostsString += "\n" + str(key) + " " + str(preSolved.ghostValues[key]) + " " + str(postSolved.ghostValues[key])
+    changedCandidatesString = ""
+    if printCandidateValues:
+        for key in postSolved.candidates.iterkeys():
+            if postSolved.candidates[key] != preSolved.candidates[key]:
+                changedCandidatesString += "\n" + str(key) + " " + str(preSolved.candidates[key]) + " " + str(postSolved.candidates[key])
 
     history = ""
     if printHistory:
         history = "\n" + str(solveReport[1])
 
-    return number + str(numberOfPreSolvedValues) + " ---> " + str(numberOfPostSolvedValues) + history + changedGhostsString + printPuzzle + "\n"
+    return number + str(numberOfPreSolvedValues) + " ---> " + str(numberOfPostSolvedValues) + history + changedCandidatesString + printPuzzle + "\n"

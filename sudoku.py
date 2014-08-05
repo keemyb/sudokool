@@ -29,7 +29,7 @@ class Sudoku():
         self.generatePossibleValues()
         self.processData(data)
 
-        self.ghostValues = {}
+        self.candidates = {}
         self.intersectionTypes = {}
         self.changes = False
 
@@ -286,20 +286,20 @@ class Sudoku():
         return False
 
     def initialiseIntersections(self, *intersectionTypes):
-        initialiseGhosts = False
-        #three main intersection types needed for ghostValues to work
+        initialiseCandidates = False
+        #three main intersection types needed for candidates to work
         for intersectionType in ("subGrid", "row", "column"):
             if intersectionType in self.intersectionTypes:
                 continue
 
-            initialiseGhosts = True
+            initialiseCandidates = True
 
             typeName = intersectionType[0].capitalize() + intersectionType[1:]
 
             self.intersectionTypes[intersectionType] = eval("self.generate" + typeName + "Groups()")
 
-        if initialiseGhosts:
-            self.initialiseGhosts()
+        if initialiseCandidates:
+            self.initialiseCandidates()
 
         for intersectionType in intersectionTypes:
 
@@ -313,13 +313,13 @@ class Sudoku():
 
         self.updatePuzzle()
 
-    def initialiseGhosts(self):
+    def initialiseCandidates(self):
 
         for location in [location for location in self.values if self.isEmpty(location)]:
 
             setOfSurroundingValues = set([self.values[neighbour] for neighbour in self.getAllNeighbours(location) if not self.isEmpty(neighbour)])
 
-            self.ghostValues[location] = self.setOfPossibleValues - setOfSurroundingValues
+            self.candidates[location] = self.setOfPossibleValues - setOfSurroundingValues
 
     def updatePuzzle(self):
         
@@ -331,7 +331,7 @@ class Sudoku():
 
                 for location in group[:]:
                     if self.isEmpty(location):
-                        self.ghostValues[location] -= setOfSurroundingValues
+                        self.candidates[location] -= setOfSurroundingValues
                     else:
                         group.remove(location)
 
@@ -355,10 +355,10 @@ class Sudoku():
 
         self.changes = False
 
-        for location, ghostValues in self.ghostValues.items():
-            if len(ghostValues) == 1:
-                self.values[location] = ghostValues.pop()
-                del self.ghostValues[location]
+        for location, candidates in self.candidates.items():
+            if len(candidates) == 1:
+                self.values[location] = candidates.pop()
+                del self.candidates[location]
                 self.changes = True
 
         if self.changes:
@@ -381,15 +381,15 @@ class Sudoku():
 
                 for combination in combinations(group, n):
 
-                    if len(set([tuple(self.ghostValues[location]) for location in combination])) == n:
+                    if len(set([tuple(self.candidates[location]) for location in combination])) == n:
 
-                        nakedNghostValues = set([tuple(self.ghostValues[location]) for location in combination])
+                        nakedNcandidates = set([tuple(self.candidates[location]) for location in combination])
 
                         for surroundingLocation in [location for location in group if location not in combination]:
 
-                            if any(ghostValue in nakedNghostValues for ghostValue in self.ghostValues[surroundingLocation]):
+                            if any(candidate in nakedNcandidates for candidate in self.candidates[surroundingLocation]):
 
-                                self.ghostValues[surroundingLocation] -= nakedNghostValues
+                                self.candidates[surroundingLocation] -= nakedNcandidates
                                 self.changes = True
 
         if self.changes:
@@ -420,19 +420,19 @@ class Sudoku():
 
                     surroundingLocations = [location for location in group if location not in combination]
 
-                    setsOfCombinationGhosts = [self.ghostValues[location] for location in combination if self.isEmpty(location)]
-                    setOfCombinationGhosts = set([ghostValue for ghostValueSets in setsOfCombinationGhosts for ghostValue in ghostValueSets])
-                    setsOfSurroundingGhosts = [self.ghostValues[surroundingLocation] for surroundingLocation in surroundingLocations if self.isEmpty(surroundingLocation)]
-                    setOfSurroundingGhosts = set([ghostValue for ghostValueSets in setsOfSurroundingGhosts for ghostValue in ghostValueSets])
-                    setOfUniqueGhostsToCombination = setOfCombinationGhosts - setOfSurroundingGhosts
+                    setsOfCombinationCandidates = [self.candidates[location] for location in combination if self.isEmpty(location)]
+                    setOfCombinationCandidates = set([candidate for candidateSets in setsOfCombinationCandidates for candidate in candidateSets])
+                    setsOfSurroundingCandidates = [self.candidates[surroundingLocation] for surroundingLocation in surroundingLocations if self.isEmpty(surroundingLocation)]
+                    setOfSurroundingCandidates = set([candidate for candidateSets in setsOfSurroundingCandidates for candidate in candidateSets])
+                    setOfUniqueCandidatesToCombination = setOfCombinationCandidates - setOfSurroundingCandidates
 
-                    if len(setOfUniqueGhostsToCombination) == n:
+                    if len(setOfUniqueCandidatesToCombination) == n:
 
                         for location in combination:
 
-                            if any(ghostValue in setOfSurroundingGhosts for ghostValue in self.ghostValues[location]):
+                            if any(candidate in setOfSurroundingCandidates for candidate in self.candidates[location]):
 
-                                self.ghostValues[location] -= setOfSurroundingGhosts
+                                self.candidates[location] -= setOfSurroundingCandidates
                                 self.changes = True
 
                         for location in surroundingLocations:
@@ -440,9 +440,9 @@ class Sudoku():
                             if not self.isEmpty(location):
                                 continue
 
-                            if any(ghostValue in setOfUniqueGhostsToCombination for ghostValue in self.ghostValues[location]):
+                            if any(candidate in setOfUniqueCandidatesToCombination for candidate in self.candidates[location]):
 
-                                self.ghostValues[location] -= setOfUniqueGhostsToCombination
+                                self.candidates[location] -= setOfUniqueCandidatesToCombination
                                 self.changes = True
 
         if self.changes:
@@ -476,7 +476,7 @@ class Sudoku():
 
         for subGrid in self.intersectionTypes["subGrid"]:
             for combination in combinations(subGrid, n):
-                commonCandidates = set.intersection(*[self.ghostValues[location] for location in combination])
+                commonCandidates = set.intersection(*[self.candidates[location] for location in combination])
                 
                 rows = [self.getRow(location) for location in combination]
                 if all(row == rows[0] for row in rows):
@@ -490,26 +490,26 @@ class Sudoku():
             rowNeighbours = [location for location in self.getRowNeighbours(combination[0]) if location not in combination]
             subGridNeighbours = [location for location in self.getSubGridNeighbours(combination[0]) if location not in combination]
 
-            subGridNeighbourCandidates = set(chain(*[self.ghostValues[location] for location in subGridNeighbours]))
+            subGridNeighbourCandidates = set(chain(*[self.candidates[location] for location in subGridNeighbours]))
             
             for candidate in candidates:
                 if candidate not in subGridNeighbourCandidates:
                     for location in rowNeighbours:
-                        if candidate in self.ghostValues[location]:
-                            self.ghostValues[location].remove(candidate)
+                        if candidate in self.candidates[location]:
+                            self.candidates[location].remove(candidate)
                             self.changes = True
 
         for combination, candidates in columnPointers.iteritems():
             columnNeighbours = [location for location in self.getColumnNeighbours(combination[0]) if location not in combination]
             subGridNeighbours = [location for location in self.getSubGridNeighbours(combination[0]) if location not in combination]
 
-            subGridNeighbourCandidates = set(chain(*[self.ghostValues[location] for location in subGridNeighbours]))
+            subGridNeighbourCandidates = set(chain(*[self.candidates[location] for location in subGridNeighbours]))
             
             for candidate in candidates:
                 if candidate not in subGridNeighbourCandidates:
                     for location in columnNeighbours:
-                        if candidate in self.ghostValues[location]:
-                            self.ghostValues[location].remove(candidate)
+                        if candidate in self.candidates[location]:
+                            self.candidates[location].remove(candidate)
                             self.changes = True
 
         return self.changes
@@ -532,22 +532,22 @@ class Sudoku():
 
         for group in self.intersectionTypes["xWing"]:
 
-            commonXWingGhosts = set.intersection(*[self.ghostValues[location] for location in group])
+            commonXWingCandidates = set.intersection(*[self.candidates[location] for location in group])
 
-            if len(commonXWingGhosts) == 0:
+            if len(commonXWingCandidates) == 0:
                 continue
 
-            rowOneNeighbourGhosts = list(chain(*[self.ghostValues[location] for location in self.getRowNeighbours(group[0]) if location not in group and self.isEmpty(location)]))
-            rowTwoNeighbourGhosts = list(chain(*[self.ghostValues[location] for location in self.getRowNeighbours(group[2]) if location not in group and self.isEmpty(location)]))
-            columnOneNeighbourGhosts = list(chain(*[self.ghostValues[location] for location in self.getColumnNeighbours(group[0]) if location not in group and self.isEmpty(location)]))
-            columnTwoNeighbourGhosts = list(chain(*[self.ghostValues[location] for location in self.getColumnNeighbours(group[1]) if location not in group and self.isEmpty(location)]))
+            rowOneNeighbourCandidates = list(chain(*[self.candidates[location] for location in self.getRowNeighbours(group[0]) if location not in group and self.isEmpty(location)]))
+            rowTwoNeighbourCandidates = list(chain(*[self.candidates[location] for location in self.getRowNeighbours(group[2]) if location not in group and self.isEmpty(location)]))
+            columnOneNeighbourCandidates = list(chain(*[self.candidates[location] for location in self.getColumnNeighbours(group[0]) if location not in group and self.isEmpty(location)]))
+            columnTwoNeighbourCandidates = list(chain(*[self.candidates[location] for location in self.getColumnNeighbours(group[1]) if location not in group and self.isEmpty(location)]))
 
-            for ghost in commonXWingGhosts:
-                if (ghost not in rowOneNeighbourGhosts and ghost not in rowTwoNeighbourGhosts) or \
-                (ghost not in columnOneNeighbourGhosts and ghost not in columnTwoNeighbourGhosts):
-                    xWings[group].append(ghost)
+            for candidate in commonXWingCandidates:
+                if (candidate not in rowOneNeighbourCandidates and candidate not in rowTwoNeighbourCandidates) or \
+                (candidate not in columnOneNeighbourCandidates and candidate not in columnTwoNeighbourCandidates):
+                    xWings[group].append(candidate)
 
-        for group, ghosts in xWings.iteritems():
+        for group, candidates in xWings.iteritems():
 
             xWingNeighbours = self.getRowNeighbours(group[0]) + self.getRowNeighbours(group[2])
             xWingNeighbours += self.getColumnNeighbours(group[0]) + self.getColumnNeighbours(group[1])
@@ -555,9 +555,9 @@ class Sudoku():
             
             for location in xWingNeighbours:
 
-                for ghost in ghosts:
-                    if ghost in self.ghostValues[location]:
-                        self.ghostValues[location].remove(ghost)
+                for candidate in candidates:
+                    if candidate in self.candidates[location]:
+                        self.candidates[location].remove(candidate)
                         self.changes = True
 
         if self.changes:
