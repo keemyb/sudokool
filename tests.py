@@ -148,3 +148,5 @@ blr.candidates[22] = set([2, 3, 4, 5])
 blr.candidates[23] = set([2, 3, 4, 5, 9])
 
 print puzzleSummary(blr, 0, True, True, True)
+
+print blr.constants

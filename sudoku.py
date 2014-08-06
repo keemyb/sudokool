@@ -30,6 +30,7 @@ class Sudoku():
         self.processData(data)
 
         self.candidates = {}
+        self.userCandidates = {}
         self.intersectionTypes = {}
         self.changes = False
 
@@ -129,6 +130,8 @@ class Sudoku():
             except ValueError:
                 if value not in self.setOfPossibleValues:
                     self.values[location] = 0
+
+        self.constants = [location for location in self.values if not self.isEmpty(location)]
 
     def isValid(self):
         for location in xrange(1, self.gridSize ** 2 + 1):
