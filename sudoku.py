@@ -216,21 +216,20 @@ class Sudoku():
     def generatePointerGroups(self, n):
         from itertools import combinations
 
-        rowPointers = []
-        columnPointers = []
+        pointers = []
 
         for subGrid in self.intersectionTypes["subGrid"]:
             for combination in combinations(subGrid, n):
                 
-                rows = [self.getRow(location) for location in combination]
-                if all(row == rows[0] for row in rows):
-                    rowPointers.append(combination)
+                rowsOfCombination = [self.getRow(location) for location in combination]
+                if all(row == rowsOfCombination[0] for row in rowsOfCombination):
+                    pointers.append((combination, "row"))
 
-                columns = [self.getColumn(location) for location in combination]
-                if all(column == columns[0] for column in columns):
-                    columnPointers.append(combination)
+                columnsOfCombination = [self.getColumn(location) for location in combination]
+                if all(column == columnsOfCombination[0] for column in columnsOfCombination):
+                    pointers.append((combination, "column"))
 
-        return rowPointers, columnPointers
+        return pointers
 
     def generateXWingGroups(self):
         self.initialiseIntersections()
@@ -327,19 +326,16 @@ class Sudoku():
             if "xWing" not in self.intersectionTypes:
                 self.intersectionTypes["xWing"] = self.generateXWingGroups()
 
-        for Type in intersectionTypes:
+        for intersectionType in intersectionTypes:
             try:
                 # n variable
-                intrsctType = Type[0]
-                n = Type[1]
+                currentIntersectionType = intersectionType[0]
+                n = intersectionType[1]
             except:
                 continue
-            if intrsctType == "pointer":
-                # just check for rows, as both rows and columns are generated together
-                if ("pointer", n, "Row") not in self.intersectionTypes:
-                    Pointers = self.generatePointerGroups(n)
-                    self.intersectionTypes[("pointer", n, "Row")] = Pointers[0]
-                    self.intersectionTypes[("pointer", n, "Column")] = Pointers[1]
+            if currentIntersectionType == "pointer":
+                if ("pointer", n) not in self.intersectionTypes:
+                    self.intersectionTypes[("pointer", n)] = self.generatePointerGroups(n)
 
         self.updatePuzzle()
 
@@ -368,31 +364,23 @@ class Sudoku():
         self.updateXWingGroups()
 
     def updatePointerGroups(self):
-        for Type in self.intersectionTypes:
+        for intersectionType in self.intersectionTypes:
             try:
                 # n variable
-                intrsctType = Type[0]
-                n = Type[1]
+                currentIntersectionType = intersectionType[0]
+                n = intersectionType[1]
             except:
                 continue
-            if intrsctType == "pointer":
-                for group in self.intersectionTypes[("pointer", n, "Row")]:
-                    for location in group:
+            if currentIntersectionType == "pointer":
+                for group in self.intersectionTypes[("pointer", n)]:
+                    combination = group[0]
+                    for location in combination:
                         if self.isEmpty(location):
                             continue
-                        if location not in group:
+                        if location not in combination:
                             continue
-                        if group in self.intersectionTypes[("pointer", n, "Row")]:
-                            self.intersectionTypes[("pointer", n, "Row")].remove(group)
-
-                for group in self.intersectionTypes[("pointer", n, "Column")]:
-                    for location in group:
-                        if self.isEmpty(location):
-                            continue
-                        if location not in group:
-                            continue
-                        if group in self.intersectionTypes[("pointer", n, "Column")]:
-                            self.intersectionTypes[("pointer", n, "Column")].remove(group)
+                        if combination in self.intersectionTypes[("pointer", n)]:
+                            self.intersectionTypes[("pointer", n)].remove(group)
 
     def updateXWingGroups(self):
         if "xWing" not in self.intersectionTypes:
@@ -525,31 +513,31 @@ class Sudoku():
 
         from itertools import chain
 
-        for combination in self.intersectionTypes[("pointer", n, "Row")]:
-            rowNeighbours = [location for location in self.getRowNeighbours(combination[0]) if location not in combination]
+        for group in self.intersectionTypes[("pointer", n)]:
+            combination, pointerType = group[0], group[1]
             subGridNeighbours = [location for location in self.getSubGridNeighbours(combination[0]) if location not in combination]
             subGridNeighbourCandidates = set(chain(*[self.candidates[location] for location in subGridNeighbours]))
             commonPointerCandidates = set.intersection(*[self.candidates[location] for location in combination])
-            
-            for candidate in commonPointerCandidates:
-                if candidate not in subGridNeighbourCandidates:
-                    for location in rowNeighbours:
-                        if candidate in self.candidates[location]:
-                            self.candidates[location].remove(candidate)
-                            self.changes = True
 
-        for combination in self.intersectionTypes[("pointer", n, "Column")]:
-            columnNeighbours = [location for location in self.getColumnNeighbours(combination[0]) if location not in combination]
-            subGridNeighbours = [location for location in self.getSubGridNeighbours(combination[0]) if location not in combination]
-            subGridNeighbourCandidates = set(chain(*[self.candidates[location] for location in subGridNeighbours]))
-            commonPointerCandidates = set.intersection(*[self.candidates[location] for location in combination])
-            
-            for candidate in commonPointerCandidates:
-                if candidate not in subGridNeighbourCandidates:
-                    for location in columnNeighbours:
-                        if candidate in self.candidates[location]:
-                            self.candidates[location].remove(candidate)
-                            self.changes = True
+            if pointerType == "row":
+                rowNeighbours = [location for location in self.getRowNeighbours(combination[0]) if location not in combination]
+
+                for candidate in commonPointerCandidates:
+                    if candidate not in subGridNeighbourCandidates:
+                        for location in rowNeighbours:
+                            if candidate in self.candidates[location]:
+                                self.candidates[location].remove(candidate)
+                                self.changes = True
+
+            elif pointerType == "column":
+                columnNeighbours = [location for location in self.getColumnNeighbours(combination[0]) if location not in combination]
+
+                for candidate in commonPointerCandidates:
+                    if candidate not in subGridNeighbourCandidates:
+                        for location in columnNeighbours:
+                            if candidate in self.candidates[location]:
+                                self.candidates[location].remove(candidate)
+                                self.changes = True
 
         if self.changes:
             self.updatePuzzle()
@@ -568,31 +556,32 @@ class Sudoku():
 
         from itertools import chain
 
-        for combination in self.intersectionTypes[("pointer", n, "Row")]:
-            rowNeighbours = [location for location in self.getRowNeighbours(combination[0]) if location not in combination]
+        for group in self.intersectionTypes[("pointer", n)]:
+            combination, pointerType = group[0], group[1]
             subGridNeighbours = [location for location in self.getSubGridNeighbours(combination[0]) if location not in combination]
-            rowNeighbourCandidates = set(chain(*[self.candidates[location] for location in rowNeighbours]))
             commonPointerCandidates = set.intersection(*[self.candidates[location] for location in combination])
-            
-            for candidate in commonPointerCandidates:
-                if candidate not in rowNeighbourCandidates:
-                    for location in subGridNeighbours:
-                        if candidate in self.candidates[location]:
-                            self.candidates[location].remove(candidate)
-                            self.changes = True   
 
-        for combination in self.intersectionTypes[("pointer", n, "Column")]:
-            columnNeighbours = [location for location in self.getColumnNeighbours(combination[0]) if location not in combination]
-            subGridNeighbours = [location for location in self.getSubGridNeighbours(combination[0]) if location not in combination]
-            columnNeighbourCandidates = set(chain(*[self.candidates[location] for location in columnNeighbours]))
-            commonPointerCandidates = set.intersection(*[self.candidates[location] for location in combination])
-            
-            for candidate in commonPointerCandidates:
-                if candidate not in columnNeighbourCandidates:
-                    for location in subGridNeighbours:
-                        if candidate in self.candidates[location]:
-                            self.candidates[location].remove(candidate)
-                            self.changes = True
+            if pointerType == "row":
+                rowNeighbours = [location for location in self.getRowNeighbours(combination[0]) if location not in combination]
+                rowNeighbourCandidates = set(chain(*[self.candidates[location] for location in rowNeighbours]))
+
+                for candidate in commonPointerCandidates:
+                    if candidate not in rowNeighbourCandidates:
+                        for location in subGridNeighbours:
+                            if candidate in self.candidates[location]:
+                                self.candidates[location].remove(candidate)
+                                self.changes = True
+
+            elif pointerType == "column":
+                columnNeighbours = [location for location in self.getColumnNeighbours(combination[0]) if location not in combination]
+                columnNeighbourCandidates = set(chain(*[self.candidates[location] for location in columnNeighbours]))
+
+                for candidate in commonPointerCandidates:
+                    if candidate not in columnNeighbourCandidates:
+                        for location in subGridNeighbours:
+                            if candidate in self.candidates[location]:
+                                self.candidates[location].remove(candidate)
+                                self.changes = True
 
         if self.changes:
             self.updatePuzzle()
