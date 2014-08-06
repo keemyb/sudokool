@@ -11,6 +11,9 @@ def solver(puzzle, maxLevel, history = None):
     # methods = [puzzle.nakedSingle, puzzle.pointingPair, puzzle.pointingTriplet]
     # methods = [puzzle.boxLineReduction2]
 
+    methods = [puzzle.pointingPair, puzzle.pointingTriplet, \
+    puzzle.boxLineReduction2, puzzle.boxLineReduction3]
+
     #puzzle is complete if gridSize ^ 2 values are filled
     if reduce(add, [1 for location in puzzle.values if not puzzle.isEmpty(location)], 0) == puzzle.gridSize ** 2:
         return True, [entry[0] for entry in history if history != None]
