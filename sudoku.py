@@ -214,6 +214,8 @@ class Sudoku():
         return columnGroups
 
     def generatePointerGroups(self, n):
+        self.initialiseIntersections()
+        
         from itertools import combinations
 
         pointers = []
