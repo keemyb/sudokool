@@ -51,39 +51,44 @@ def fromTextToPuzzle(textfile, seperator, n):
     puzzle = puzzles[n - 1]
     return Sudoku(puzzle, True)
 
-def visualizer(puzzle, group):
-    gridSize = puzzle.gridSize
-    subGridsX = puzzle.subGridsX
-    subGridsY = puzzle.subGridsY
-    string = ""
-    vPipe = "="
-    hPipe = "="
-    # first line to accommodate vertical pipe and following spaces (minus one to account for last v pipe)
-    # second line for numbers (and following spaces)
-    hPipeString = hPipe * ((len(vPipe) + 1) * (subGridsX + 1) - 1) + \
-    hPipe * (gridSize * 2) + \
-    "\n"
+def visualizer(puzzle, *groups):
+    wholeString = ""
+    
+    for group in groups:
+        gridSize = puzzle.gridSize
+        subGridsX = puzzle.subGridsX
+        subGridsY = puzzle.subGridsY
+        string = ""
+        vPipe = "="
+        hPipe = "="
+        # first line to accommodate vertical pipe and following spaces (minus one to account for last v pipe)
+        # second line for numbers (and following spaces)
+        hPipeString = hPipe * ((len(vPipe) + 1) * (subGridsX + 1) - 1) + \
+        hPipe * (gridSize * 2) + \
+        "\n"
 
-    for position in xrange(1, gridSize ** 2 + 1):
+        for position in xrange(1, gridSize ** 2 + 1):
 
-        if (position - 1) % (gridSize * subGridsX) == 0:
-            string += hPipeString
+            if (position - 1) % (gridSize * subGridsX) == 0:
+                string += hPipeString
 
-        if (position - 1) % subGridsY == 0 :
-            string += vPipe + " "
+            if (position - 1) % subGridsY == 0 :
+                string += vPipe + " "
 
-        if position not in group:
-            string += "  "
-        else:
-            string += "0 "
+            if position not in group:
+                string += "  "
+            else:
+                string += "0 "
 
-        if position % gridSize == 0:
-            string += vPipe + "\n"
+            if position % gridSize == 0:
+                string += vPipe + "\n"
 
-        if position == gridSize ** 2:
-            string += hPipeString
+            if position == gridSize ** 2:
+                string += hPipeString
 
-    return string
+        wholeString += string
+
+    return wholeString
 
 hiddenTripleTestString = "370408100\
 000903704\
@@ -110,25 +115,25 @@ hiddenTripleTestString = "370408100\
 # print puzzleSummary(xWingTest, 0, True, True, True)
 # print xWingTest.values
 
-string16 = "B07805E0300AD0CG\
-004007000C0FA002\
-A000000000043700\
-0050009F00000008\
-0400B8000E079300\
-00E37C0000FDB004\
-9F07005D03000080\
-500D0F3024A8C0G0\
-08000000B0000GD5\
-00D000000800F0E0\
-00A090F0067000BC\
-000C0AB0000E7240\
-7A090B1000500630\
-D0CEF070A0000800\
-0000E0A00D005000\
-0635G9C00B00E000"
+# string16 = "B07805E0300AD0CG\
+# 004007000C0FA002\
+# A000000000043700\
+# 0050009F00000008\
+# 0400B8000E079300\
+# 00E37C0000FDB004\
+# 9F07005D03000080\
+# 500D0F3024A8C0G0\
+# 08000000B0000GD5\
+# 00D000000800F0E0\
+# 00A090F0067000BC\
+# 000C0AB0000E7240\
+# 7A090B1000500630\
+# D0CEF070A0000800\
+# 0000E0A00D005000\
+# 0635G9C00B00E000"
 
-puzzle16 = Sudoku(string16)
-print puzzleSummary(puzzle16, 0, True, True, True)
+# puzzle16 = Sudoku(string16)
+# print puzzleSummary(puzzle16, 0, True, True, True)
 
 # pointers = Sudoku("017903600000080000900000507072010430000402070064370250701000065000030000005601720")
 # pointers.initialiseIntersections()
@@ -151,14 +156,19 @@ print puzzleSummary(puzzle16, 0, True, True, True)
 
 # print blr.constants
 
-fileToRead = open("top95.txt", "r")
-number = 1
-for line in fileToRead:
-    try:
-        puzzle = Sudoku(str(line)[:81])
-        print puzzleSummary(puzzle, 0, True, True, True, number)
-    except:
-        continue
-    else:
+# fileToRead = open("top95.txt", "r")
+# number = 1
+# for line in fileToRead:
+#     try:
+#         puzzle = Sudoku(str(line)[:81])
+#         print puzzleSummary(puzzle, 0, True, True, True, number)
+#     except:
+#         continue
+#     else:
         
-        number += 1
+#         number += 1
+
+hiddenTripleTest = Sudoku(hiddenTripleTestString)
+print hiddenTripleTest
+# hiddenTripleTest.generateSwordfishGroups()
+print visualizer(hiddenTripleTest, *hiddenTripleTest.generate3SwordfishGroups())

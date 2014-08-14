@@ -284,6 +284,98 @@ class Sudoku():
 
         return xWingGroups
 
+    def generateSwordfishGroups(self):
+        self.initialiseIntersections()
+
+        return self.generate2SwordfishGroups() + self.generate3SwordfishGroups()
+
+    def generate2SwordfishGroups(self):
+
+        swordfishGroups = []
+
+        # 2 location per line swordfish
+        for firstRowIndex, firstRow in enumerate(self.intersectionTypes["row"][:-3]):
+            if len(firstRow) < 2:
+                continue
+
+            for firstRowGroup in self.getNLocationsOnRow(firstRow, 2):
+
+                for secondRowIndex, secondRow in enumerate(self.intersectionTypes["row"][firstRowIndex + 1:-2]):
+                    if len(secondRow) < 2:
+                        continue
+
+                    for secondRowGroup in self.getNLocationsOnRow(secondRow, 2):
+                        alignments = 0
+
+                        for locationOne in firstRowGroup:
+                            for locationTwo in secondRowGroup:
+                                if self.getColumn(locationOne) == self.getColumn(locationTwo):
+                                    alignments += 1
+                                    locationsInSameColumn = (locationOne, locationTwo)
+
+                        if alignments != 1:
+                            continue
+
+                        for thirdRow in self.intersectionTypes["row"][firstRowIndex + secondRowIndex + 2:]:
+                            if len(thirdRow) < 2:
+                                continue
+
+                            for thirdRowGroup in self.getNLocationsOnRow(thirdRow, 2):
+                                alignments2 = 0
+
+                                for locationOne in thirdRowGroup:
+                                    for row in (firstRowGroup, secondRowGroup):
+                                        for locationTwo in [location for location in row if location not in locationsInSameColumn]:
+                                            if self.getColumn(locationOne) == self.getColumn(locationTwo):
+                                                alignments2 += 1
+
+                                if alignments2 == 2:
+                                    swordfishGroups.append(firstRowGroup + secondRowGroup + thirdRowGroup)
+
+        return swordfishGroups
+
+    def generate3SwordfishGroups(self):
+        self.initialiseIntersections()
+
+        swordfishGroups = []
+
+        # 3 location per line swordfish
+        for firstRowIndex, firstRow in enumerate(self.intersectionTypes["row"][:-3]):
+            if len(firstRow) < 3:
+                continue
+
+            for firstRowGroup in self.getNLocationsOnRow(firstRow, 3):
+
+                for secondRowIndex, secondRow in enumerate(self.intersectionTypes["row"][firstRowIndex + 1:-2]):
+                    if len(secondRow) < 3:
+                        continue
+
+                    for secondRowGroup in self.getNLocationsOnRow(secondRow, 3):
+                        alignments = 0
+
+                        for i in xrange(3):
+                            if self.getColumn(firstRowGroup[i]) == self.getColumn(secondRowGroup[i]):
+                                    alignments += 1
+
+                        if alignments != 3:
+                            continue
+
+                        for thirdRow in self.intersectionTypes["row"][firstRowIndex + secondRowIndex + 2:]:
+                            if len(thirdRow) < 3:
+                                continue
+
+                            for thirdRowGroup in self.getNLocationsOnRow(thirdRow, 3):
+                                alignments2 = 0
+
+                                for i in xrange(3):
+                                    if self.getColumn(firstRowGroup[i]) == self.getColumn(thirdRowGroup[i]):
+                                        alignments2 += 1
+
+                                if alignments2 == 3:
+                                    swordfishGroups.append(firstRowGroup + secondRowGroup + thirdRowGroup)
+
+        return swordfishGroups
+
 
 
 
@@ -350,6 +442,11 @@ class Sudoku():
 
     def getLocations(self):
         return range(1, self.gridSize ** 2 + 1)
+
+    def getNLocationsOnRow(self, row, n):
+        from itertools import combinations
+
+        return combinations(row, n)
 
     def setLocationValue(self, location, value):
         if self.isConstant(location):
@@ -460,6 +557,10 @@ class Sudoku():
             if "xWing" not in self.intersectionTypes:
                 self.intersectionTypes["xWing"] = self.generateXWingGroups()
 
+        if "swordfish" in intersectionTypes:
+            if "swordfish" not in self.intersectionTypes:
+                self.intersectionTypes["swordfish"] = self.generateSwordfishGroups()
+
         for intersectionType in intersectionTypes:
             try:
                 # n variable
@@ -555,8 +656,6 @@ class Sudoku():
         self.initialiseIntersections()
 
         self.changes = False
-
-        modifiedLocations = []
 
         from itertools import combinations
 
