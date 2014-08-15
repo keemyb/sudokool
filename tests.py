@@ -110,43 +110,55 @@ hiddenTripleTestString = "370408100\
 # print puzzleSummary(xWingTest, 0, True, True, True)
 # print xWingTest.values
 
-# string16 = "B07805E0300AD0CG\
-# 004007000C0FA002\
-# A000000000043700\
-# 0050009F00000008\
-# 0400B8000E079300\
-# 00E37C0000FDB004\
-# 9F07005D03000080\
-# 500D0F3024A8C0G0\
-# 08000000B0000GD5\
-# 00D000000800F0E0\
-# 00A090F0067000BC\
-# 000C0AB0000E7240\
-# 7A090B1000500630\
-# D0CEF070A0000800\
-# 0000E0A00D005000\
-# 0635G9C00B00E000"
+string16 = "B07805E0300AD0CG\
+004007000C0FA002\
+A000000000043700\
+0050009F00000008\
+0400B8000E079300\
+00E37C0000FDB004\
+9F07005D03000080\
+500D0F3024A8C0G0\
+08000000B0000GD5\
+00D000000800F0E0\
+00A090F0067000BC\
+000C0AB0000E7240\
+7A090B1000500630\
+D0CEF070A0000800\
+0000E0A00D005000\
+0635G9C00B00E000"
 
-# puzzle16 = Sudoku(string16)
-# print puzzleSummary(puzzle16, 0, True, True, True)
+puzzle16 = Sudoku(string16)
+print puzzleSummary(puzzle16, 0, True, True, True)
 
-pointers = Sudoku("017903600000080000900000507072010430000402070064370250701000065000030000005601720")
-pointers.initialiseIntersections()
-pointers.candidates[67] = set([5, 7, 8])
-print pointers.candidates[56]
-print puzzleSummary(pointers, 0, True, True, True)
-print pointers.candidates[56]
+# pointers = Sudoku("017903600000080000900000507072010430000402070064370250701000065000030000005601720")
+# pointers.initialiseIntersections()
+# pointers.candidates[67] = set([5, 7, 8])
+# print pointers.candidates[56]
+# print puzzleSummary(pointers, 0, True, True, True)
+# print pointers.candidates[56]
 
-blr = Sudoku("016007803090800000870001260048000300650009082039000650060900020080002936924600510")
-blr.initialiseIntersections()
-blr.candidates[1] = set([4, 5])
-blr.candidates[8] = set([4, 9])
-blr.candidates[10] = set([4, 5, 3])
-blr.candidates[14] = set([2, 3, 4, 5, 6])
-blr.candidates[15] = set([3, 4, 5, 6])
-blr.candidates[22] = set([2, 3, 4, 5])
-blr.candidates[23] = set([2, 3, 4, 5, 9])
+# blr = Sudoku("016007803090800000870001260048000300650009082039000650060900020080002936924600510")
+# blr.initialiseIntersections()
+# blr.candidates[1] = set([4, 5])
+# blr.candidates[8] = set([4, 9])
+# blr.candidates[10] = set([4, 5, 3])
+# blr.candidates[14] = set([2, 3, 4, 5, 6])
+# blr.candidates[15] = set([3, 4, 5, 6])
+# blr.candidates[22] = set([2, 3, 4, 5])
+# blr.candidates[23] = set([2, 3, 4, 5, 9])
 
-print puzzleSummary(blr, 0, True, True, True)
+# print puzzleSummary(blr, 0, True, True, True)
 
-print blr.constants
+# print blr.constants
+
+fileToRead = open("top95.txt", "r")
+number = 1
+for line in fileToRead:
+    try:
+        puzzle = Sudoku(str(line)[:81])
+        print puzzleSummary(puzzle, 0, True, True, True, number)
+    except:
+        continue
+    else:
+        
+        number += 1

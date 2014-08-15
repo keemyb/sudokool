@@ -5,7 +5,7 @@ def isPrime(n):
     from math import sqrt, ceil
     if n <= 2:
         return True
-    
+
     for i in xrange(2, int(ceil(sqrt(n))) + 1):
         if n % i == 0:
             return False
@@ -22,8 +22,11 @@ def factors(n):
 
     return factors[-1]
 
+
+
+
 class Sudoku():
-        
+
     def __init__(self, data, horizontalFormat = True):
         self.calculateDimensions(data, horizontalFormat)
         self.generatePossibleValues()
@@ -39,8 +42,8 @@ class Sudoku():
             and self.__dict__ == other.__dict__)
 
     def __ne__(self, other):
-        return not self.__eq__(other)           
-        
+        return not self.__eq__(other)
+
     def __repr__(self):
         pass #rebuildable representation
 
@@ -86,12 +89,12 @@ class Sudoku():
 
         # If the amount of values provided is not a square number the puzzle will be invalid.
         # The amount of values is compared to self.gridSize, the nearest square of the number
-        # of values provided.  
+        # of values provided.
         if len(data) != self.gridSize ** 2:
             raise Exception("Incorrect number of values provided.")
 
         #if the gridSize is prime subGrids will equal either rows or columns
-        #problems will ensue. 
+        #problems will ensue.
         if isPrime(self.gridSize):
             raise Exception("Invalid grid Size will be generated.")
 
@@ -102,8 +105,8 @@ class Sudoku():
             self.subGridsX = int(gridSizeRoot)
             self.subGridsY = self.subGridsX
             return
-        
-        #returns highest factor less than or equal to half the gridSize. 
+
+        #returns highest factor less than or equal to half the gridSize.
         factor = factors(self.gridSize)
 
         #if the horizontalFormat is True, there will be more subGrids in the X
@@ -147,22 +150,32 @@ class Sudoku():
 
         return True
 
+    def isComplete(self):
+        from operator import add
+        if reduce(add, [1 for location in self.getLocations() if not self.isEmpty(location)], 0) == self.getGridSize() ** 2:
+            return True
+
+        return False
+
+
+
+
     def getSubGridStartLocations(self):
         subGridsX = self.subGridsX
         subGridsY = self.subGridsY
         gridSize = self.gridSize
         subGridStartLocations = []
-        
+
         for subGrid in xrange(gridSize):
             baseLocation = (subGrid / subGridsX) * (gridSize * subGridsX)
             offset = (subGrid % subGridsX) * subGridsY
             subGridStartLocations.append(baseLocation + offset + 1)
-        
+
         return subGridStartLocations
 
     def getRowStartLocations(self):
         gridSize = self.gridSize
-        
+
         rowStartLocations = [(row * gridSize + 1) for row in xrange(gridSize)]
 
         return rowStartLocations
@@ -173,6 +186,9 @@ class Sudoku():
         columnStartLocations = range(1, gridSize + 1)
 
         return columnStartLocations
+
+
+
 
     def generateSubGridGroups(self):
         gridSize = self.gridSize
@@ -200,7 +216,7 @@ class Sudoku():
 
         for startLocation in self.getRowStartLocations():
             rowGroups.append([startLocation + offset for offset in xrange(gridSize)])
-            
+
         return rowGroups
 
     def generateColumnGroups(self):
@@ -213,16 +229,19 @@ class Sudoku():
 
         return columnGroups
 
+
+
+
     def generatePointerGroups(self, n):
         self.initialiseIntersections()
-        
+
         from itertools import combinations
 
         pointers = []
 
         for subGrid in self.intersectionTypes["subGrid"]:
             for combination in combinations(subGrid, n):
-                
+
                 rowsOfCombination = [self.getRow(location) for location in combination]
                 if all(row == rowsOfCombination[0] for row in rowsOfCombination):
                     pointers.append((combination, "row"))
@@ -249,11 +268,11 @@ class Sudoku():
                 for locationTwo in firstRow:
                     if self.getColumn(locationOne) >= self.getColumn(locationTwo):
                         continue
-                    
+
                     for secondRow in self.intersectionTypes["row"][firstRowIndex + 1:]:
                         if len(secondRow) < 2:
                             continue
-                        
+
                         for locationThree in secondRow:
                             for locationFour in secondRow:
                                 if self.getSubGrid(locationOne) == self.getSubGrid(locationFour):
@@ -262,8 +281,11 @@ class Sudoku():
                                 if self.getColumn(locationOne) == self.getColumn(locationThree) and \
                                 self.getColumn(locationTwo) == self.getColumn(locationFour):
                                     xWingGroups.append(tuple((locationOne, locationTwo, locationThree, locationFour)))
-        
+
         return xWingGroups
+
+
+
 
     def getSubGrid(self, location):
         subGridRow = (location - 1) / (self.subGridsX * self.gridSize)
@@ -279,22 +301,25 @@ class Sudoku():
     def getColumn(self, location):
         return (location - 1) % self.gridSize + 1
 
+
+
+
     def getSubGridNeighbours(self, location):
         subGridGroup = self.intersectionTypes["subGrid"][self.getSubGrid(location) - 1]
         neighbours = [neighbour for neighbour in subGridGroup if neighbour != location and self.isEmpty(neighbour)]
-        
+
         return neighbours
 
     def getRowNeighbours(self, location):
         rowGroup = self.intersectionTypes["row"][self.getRow(location) - 1]
         neighbours = [neighbour for neighbour in rowGroup if neighbour != location and self.isEmpty(neighbour)]
-        
+
         return neighbours
 
     def getColumnNeighbours(self, location):
         columnGroup = self.intersectionTypes["column"][self.getColumn(location) - 1]
         neighbours = [neighbour for neighbour in columnGroup if neighbour != location and self.isEmpty(neighbour)]
-        
+
         return neighbours
 
     def getAllNeighbours(self, location):
@@ -302,11 +327,118 @@ class Sudoku():
             self.getRowNeighbours(location) + \
             self.getColumnNeighbours(location))
 
+
+
+
     def isEmpty(self, location):
         if self.values[location] not in self.setOfPossibleValues:
             return True
-        
+
         return False
+
+    def isConstant(self, location):
+        if location in self.constants:
+            return True
+
+        return False
+
+    def isValidInput(self, value):
+        if value in self.setOfPossibleValues:
+            return True
+
+        return False
+
+    def getLocations(self):
+        return range(1, self.gridSize ** 2 + 1)
+
+    def setLocationValue(self, location, value):
+        if self.isConstant(location):
+            raise Exception("location is a constant and cannot be changed")
+
+        if not self.isValidInput(value):
+            raise Exception("value is not vaild")
+
+        self.values[location] = value
+
+        if location in self.userCandidates:
+            del self.userCandidates[location]
+
+    def getLocationValue(self, location):
+        return self.values[location]
+
+    def clearLocation(self, location):
+        if self.isConstant(location):
+            raise Exception("location is a constant and cannot be changed")
+
+        self.values[location] = 0
+
+    def getSolvingCandidates(self, location):
+        return self.candidates[location]
+
+    def getUserCandidates(self, location):
+        return self.userCandidates[location]
+
+    def toggleUserCandidate(self, location, candidate):
+        if self.isConstant(location):
+            raise Exception("location is a constant and cannot be changed")
+
+        if not self.isValidInput(value):
+            raise Exception("candidate is not vaild")
+
+        if not self.isEmpty(location):
+            self.clearLocation(location)
+
+        if not self.locationHasUserCandidates(location):
+            self.userCandidates[location] = [candidate]
+            return
+
+        if candidate in self.userCandidates[location]:
+            self.userCandidates[location].remove(candidate)
+        else:
+            self.userCandidates[location].append(candidate)
+
+    def locationHasSolvingCandidates(self, location):
+        if location not in self.candidates:
+            return False
+
+        if not self.candidates[location]:
+            return False
+
+        return True
+
+    def locationHasUserCandidates(self, location):
+        if location not in self.userCandidates:
+            return False
+
+        if not self.userCandidates[location]:
+            return False
+
+        return True
+
+    def getGridSize(self):
+        return self.gridSize
+
+    def getSubGridsX(self):
+        return self.subGridsX
+
+    def getSubGridsY(self):
+        return self.subGridsY
+
+    def getSubGridLength(self):
+        return self.subGridsY
+
+    def getSubGridHeight(self):
+        return self.subGridsX
+
+    def getPossibleValues(self):
+        return sorted(self.setOfPossibleValues)
+
+    def getNumberOfFilledLocations(self):
+        from operator import add
+        return reduce(add, [1 for location in self.values if not self.isEmpty(location)], 0)
+
+
+
 
     def initialiseIntersections(self, *intersectionTypes):
         initialiseCandidates = False
@@ -349,8 +481,11 @@ class Sudoku():
 
             self.candidates[location] = self.setOfPossibleValues - setOfSurroundingValues
 
+
+
+
     def updatePuzzle(self):
-        
+
         for intersectionType in ["subGrid", "row", "column"]:
 
             for group in self.intersectionTypes[intersectionType]:
@@ -387,7 +522,7 @@ class Sudoku():
     def updateXWingGroups(self):
         if "xWing" not in self.intersectionTypes:
             return
-        
+
         for group in self.intersectionTypes["xWing"]:
             for location in group:
                 if self.isEmpty(location):
@@ -396,6 +531,9 @@ class Sudoku():
                     continue
                 if group in self.intersectionTypes["xWing"]:
                     self.intersectionTypes["xWing"].remove(group)
+
+
+
 
     def nakedSingle(self):
         self.initialiseIntersections()
@@ -452,11 +590,14 @@ class Sudoku():
 
         return self.nakedN(3)
 
+
+
+
     def hiddenN(self, n):
         self.initialiseIntersections()
 
         self.changes = False
-        
+
         from itertools import combinations
 
         for intersectionType in ["subGrid", "row", "column"]:
@@ -509,6 +650,9 @@ class Sudoku():
 
         return self.hiddenN(3)
 
+
+
+
     def pointingN(self, n):
         self.initialiseIntersections(("pointer", n))
         self.changes = False
@@ -552,6 +696,9 @@ class Sudoku():
     def pointingTriplet(self):
         return self.pointingN(3)
 
+
+
+
     def boxLineReductionN(self, n):
         self.initialiseIntersections(("pointer", n))
         self.changes = False
@@ -588,7 +735,7 @@ class Sudoku():
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes      
+        return self.changes
 
     def boxLineReduction2(self):
         return self.boxLineReductionN(2)
@@ -596,14 +743,17 @@ class Sudoku():
     def boxLineReduction3(self):
         return self.boxLineReductionN(3)
 
+
+
+
     def xWing(self):
         self.initialiseIntersections("xWing")
 
         self.changes = False
-        
+
         from collections import defaultdict
         from itertools import chain
-        
+
         xWings = defaultdict(list)
 
         for group in self.intersectionTypes["xWing"]:
@@ -628,7 +778,7 @@ class Sudoku():
             xWingNeighbours = self.getRowNeighbours(group[0]) + self.getRowNeighbours(group[2])
             xWingNeighbours += self.getColumnNeighbours(group[0]) + self.getColumnNeighbours(group[1])
             xWingNeighbours = set([neighbour for neighbour in xWingNeighbours if self.isEmpty(neighbour) and neighbour not in group])
-            
+
             for location in xWingNeighbours:
 
                 for candidate in candidates:

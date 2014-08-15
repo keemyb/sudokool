@@ -1,5 +1,4 @@
 from sudoku import Sudoku
-from operator import add
 from copy import deepcopy
 
 def solver(puzzle, maxLevel, history = None):
@@ -11,11 +10,11 @@ def solver(puzzle, maxLevel, history = None):
     # methods = [puzzle.nakedSingle, puzzle.pointingPair, puzzle.pointingTriplet]
     # methods = [puzzle.boxLineReduction2]
 
-    methods = [puzzle.pointingPair, puzzle.pointingTriplet, \
-    puzzle.boxLineReduction2, puzzle.boxLineReduction3]
+    # methods = [puzzle.pointingPair, puzzle.pointingTriplet, \
+    # puzzle.boxLineReduction2, puzzle.boxLineReduction3]
 
     #puzzle is complete if gridSize ^ 2 values are filled
-    if reduce(add, [1 for location in puzzle.values if not puzzle.isEmpty(location)], 0) == puzzle.gridSize ** 2:
+    if puzzle.isComplete():
         return True, [entry[0] for entry in history if history != None]
 
     if maxLevel > len(methods) or maxLevel < 1:
@@ -52,8 +51,8 @@ def puzzleSummary(puzzle, maxLevel, printPuzzle, printCandidateValues, printHist
 
     solveReport = solver(postSolved, maxLevel)
 
-    numberOfPreSolvedValues = reduce(add, [1 for location in preSolved.values if not preSolved.isEmpty(location)], 0)
-    numberOfPostSolvedValues = reduce(add, [1 for location in postSolved.values if not postSolved.isEmpty(location)], 0)
+    numberOfPreSolvedValues = preSolved.getNumberOfFilledLocations()
+    numberOfPostSolvedValues = postSolved.getNumberOfFilledLocations()
 
     if number == None:
         number = ""
