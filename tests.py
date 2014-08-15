@@ -171,4 +171,4 @@ hiddenTripleTestString = "370408100\
 hiddenTripleTest = Sudoku(hiddenTripleTestString)
 print hiddenTripleTest
 # hiddenTripleTest.generateSwordfishGroups()
-print visualizer(hiddenTripleTest, *hiddenTripleTest.generate3SwordfishGroups())
+print visualizer(hiddenTripleTest, *hiddenTripleTest.generateXWingGroups())

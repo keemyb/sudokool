@@ -264,23 +264,19 @@ class Sudoku():
             if len(firstRow) < 2:
                 continue
 
-            for locationOne in firstRow:
-                for locationTwo in firstRow:
-                    if self.getColumn(locationOne) >= self.getColumn(locationTwo):
-                        continue
+            for firstRowGroup in self.getNLocationsOnRow(firstRow, 2):
 
                     for secondRow in self.intersectionTypes["row"][firstRowIndex + 1:]:
                         if len(secondRow) < 2:
                             continue
 
-                        for locationThree in secondRow:
-                            for locationFour in secondRow:
-                                if self.getSubGrid(locationOne) == self.getSubGrid(locationFour):
+                        for secondRowGroup in self.getNLocationsOnRow(secondRow, 2):
+                                if self.getSubGrid(firstRowGroup[0]) == self.getSubGrid(secondRowGroup[1]):
                                     continue
 
-                                if self.getColumn(locationOne) == self.getColumn(locationThree) and \
-                                self.getColumn(locationTwo) == self.getColumn(locationFour):
-                                    xWingGroups.append(tuple((locationOne, locationTwo, locationThree, locationFour)))
+                                if self.getColumn(firstRowGroup[0]) == self.getColumn(secondRowGroup[0]) and \
+                                self.getColumn(firstRowGroup[1]) == self.getColumn(secondRowGroup[1]):
+                                    xWingGroups.append((firstRowGroup + secondRowGroup))
 
         return xWingGroups
 
