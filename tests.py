@@ -156,23 +156,17 @@ hiddenTripleTestString = "370408100\
 
 # print blr.constants
 
-# fileToRead = open("top95.txt", "r")
-# number = 1
-# for line in fileToRead:
-#     try:
-#         puzzle = Sudoku(str(line)[:81])
-#         print puzzleSummary(puzzle, 0, True, True, True, number)
-#     except:
-#         continue
-#     else:
+fileToRead = open("top95.txt", "r")
+number = 1
+for line in fileToRead:
+    try:
+        puzzle = Sudoku(str(line)[:81])
+        print puzzleSummary(puzzle, 0, True, True, True, number)
+    except:
+        continue
+    else:
         
-#         number += 1
+        number += 1
 
-# hiddenTripleTest = Sudoku("926000100537010420841000603259734816714060030368120040102000084485071360603000001")
-# print puzzleSummary(hiddenTripleTest, 0, True, True, True)
-
-puz = Sudoku("0"*81)
-
-puz.initialiseIntersections()
-
-print puz.getAllNeighbours(1)
+hiddenTripleTest = Sudoku("926000100537010420841000603259734816714060030368120040102000084485071360603000001")
+print puzzleSummary(hiddenTripleTest, 0, True, True, True)

@@ -2,10 +2,10 @@ from sudoku import Sudoku
 from copy import deepcopy
 
 def solver(puzzle, maxLevel, history = None):
-    methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin, puzzle.hiddenTwin, \
-    puzzle.pointingPair, puzzle.pointingTriplet, \
-    puzzle.boxLineReduction2, puzzle.boxLineReduction3, \
-    puzzle.nakedTriplet, puzzle.hiddenTriplet, \
+    methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin, puzzle.hiddenTwin,
+    # puzzle.pointingPair, puzzle.pointingTriplet,
+    # puzzle.boxLineReduction2, puzzle.boxLineReduction3,
+    puzzle.nakedTriplet, puzzle.hiddenTriplet,
     puzzle.xWing, puzzle.swordfish]
     # methods = [puzzle.nakedSingle, puzzle.pointingPair, puzzle.pointingTriplet]
     # methods = [puzzle.boxLineReduction2]

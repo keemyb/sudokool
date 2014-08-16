@@ -598,8 +598,9 @@ class Sudoku():
                     else:
                         group.remove(location)
 
+        self.updatePointerGroups()
         self.updateXWingGroups()
-        self.updateSwordfishGroups()
+        self.updateSwordfishGroups()        
 
     def updatePointerGroups(self):
         for intersectionType in self.intersectionTypes:
@@ -773,12 +774,12 @@ class Sudoku():
 
         for group in self.intersectionTypes[("pointer", n)]:
             combination, pointerType = group[0], group[1]
-            subGridNeighbours = [location for location in self.getSubGridNeighbours(combination[0]) if location not in combination]
+            subGridNeighbours = self.getSubGridNeighbours(combination[0], *combination)
             subGridNeighbourCandidates = set(chain(*[self.candidates[location] for location in subGridNeighbours]))
             commonPointerCandidates = set.intersection(*[self.candidates[location] for location in combination])
 
             if pointerType == "row":
-                rowNeighbours = [location for location in self.getRowNeighbours(combination[0]) if location not in combination]
+                rowNeighbours = self.getRowNeighbours(combination[0], *combination)
 
                 for candidate in commonPointerCandidates:
                     if candidate not in subGridNeighbourCandidates:
@@ -788,7 +789,7 @@ class Sudoku():
                                 self.changes = True
 
             elif pointerType == "column":
-                columnNeighbours = [location for location in self.getColumnNeighbours(combination[0]) if location not in combination]
+                columnNeighbours = self.getColumnNeighbours(combination[0], *combination)
 
                 for candidate in commonPointerCandidates:
                     if candidate not in subGridNeighbourCandidates:
@@ -819,11 +820,11 @@ class Sudoku():
 
         for group in self.intersectionTypes[("pointer", n)]:
             combination, pointerType = group[0], group[1]
-            subGridNeighbours = [location for location in self.getSubGridNeighbours(combination[0]) if location not in combination]
+            subGridNeighbours = self.getSubGridNeighbours(combination[0], *combination)
             commonPointerCandidates = set.intersection(*[self.candidates[location] for location in combination])
 
             if pointerType == "row":
-                rowNeighbours = [location for location in self.getRowNeighbours(combination[0]) if location not in combination]
+                rowNeighbours = self.getRowNeighbours(combination[0], *combination)
                 rowNeighbourCandidates = set(chain(*[self.candidates[location] for location in rowNeighbours]))
 
                 for candidate in commonPointerCandidates:
@@ -834,7 +835,7 @@ class Sudoku():
                                 self.changes = True
 
             elif pointerType == "column":
-                columnNeighbours = [location for location in self.getColumnNeighbours(combination[0]) if location not in combination]
+                columnNeighbours = self.getColumnNeighbours(combination[0], *combination)
                 columnNeighbourCandidates = set(chain(*[self.candidates[location] for location in columnNeighbours]))
 
                 for candidate in commonPointerCandidates:
@@ -875,10 +876,10 @@ class Sudoku():
             if len(commonXWingCandidates) == 0:
                 continue
 
-            rowOneNeighbourCandidates = list(chain(*[self.candidates[location] for location in self.getRowNeighbours(group[0]) if location not in group and self.isEmpty(location)]))
-            rowTwoNeighbourCandidates = list(chain(*[self.candidates[location] for location in self.getRowNeighbours(group[2]) if location not in group and self.isEmpty(location)]))
-            columnOneNeighbourCandidates = list(chain(*[self.candidates[location] for location in self.getColumnNeighbours(group[0]) if location not in group and self.isEmpty(location)]))
-            columnTwoNeighbourCandidates = list(chain(*[self.candidates[location] for location in self.getColumnNeighbours(group[1]) if location not in group and self.isEmpty(location)]))
+            rowOneNeighbourCandidates = list(chain(*[self.candidates[location] for location in self.getRowNeighbours(group[0], *group)]))
+            rowTwoNeighbourCandidates = list(chain(*[self.candidates[location] for location in self.getRowNeighbours(group[2], *group)]))
+            columnOneNeighbourCandidates = list(chain(*[self.candidates[location] for location in self.getColumnNeighbours(group[0], *group)]))
+            columnTwoNeighbourCandidates = list(chain(*[self.candidates[location] for location in self.getColumnNeighbours(group[1], *group)]))
 
             for candidate in commonXWingCandidates:
                 if (candidate not in rowOneNeighbourCandidates and candidate not in rowTwoNeighbourCandidates) or \
@@ -934,12 +935,12 @@ class Sudoku():
                 columnTwoLocation = sortedGroup[2]
                 columnThreeLocation = sortedGroup[4]
 
-            otherRowOneCandidates = set([]).union(*[self.candidates[location] for location in self.getRowNeighbours(rowOneLocation) if location not in group])
-            otherRowTwoCandidates = set([]).union(*[self.candidates[location] for location in self.getRowNeighbours(rowTwoLocation) if location not in group])
-            otherRowThreeCandidates = set([]).union(*[self.candidates[location] for location in self.getRowNeighbours(rowThreeLocation) if location not in group])
-            otherColumnOneCandidates = set([]).union(*[self.candidates[location] for location in self.getColumnNeighbours(columnOneLocation) if location not in group])
-            otherColumnTwoCandidates = set([]).union(*[self.candidates[location] for location in self.getColumnNeighbours(columnTwoLocation) if location not in group])
-            otherColumnThreeCandidates = set([]).union(*[self.candidates[location] for location in self.getColumnNeighbours(columnThreeLocation) if location not in group])
+            otherRowOneCandidates = set([]).union(*[self.candidates[location] for location in self.getRowNeighbours(rowOneLocation, *group)])
+            otherRowTwoCandidates = set([]).union(*[self.candidates[location] for location in self.getRowNeighbours(rowTwoLocation, *group)])
+            otherRowThreeCandidates = set([]).union(*[self.candidates[location] for location in self.getRowNeighbours(rowThreeLocation, *group)])
+            otherColumnOneCandidates = set([]).union(*[self.candidates[location] for location in self.getColumnNeighbours(columnOneLocation, *group)])
+            otherColumnTwoCandidates = set([]).union(*[self.candidates[location] for location in self.getColumnNeighbours(columnTwoLocation, *group)])
+            otherColumnThreeCandidates = set([]).union(*[self.candidates[location] for location in self.getColumnNeighbours(columnThreeLocation, *group)])
 
             for candidate in commonCandidates:
                 if (candidate not in otherRowOneCandidates and
@@ -962,13 +963,11 @@ class Sudoku():
 
                 if swordfishType == "row":
                     for location in locations:
-                        swordfishNeighbours += [neighbour for neighbour in self.getColumnNeighbours(location)]
+                        swordfishNeighbours += self.getColumnNeighbours(location, *group)
 
                 if swordfishType == "column":
                     for location in locations:
-                        swordfishNeighbours += [neighbour for neighbour in self.getRowNeighbours(location)]                    
-                    
-                swordfishNeighbours = [neighbour for neighbour in swordfishNeighbours if neighbour not in group]
+                        swordfishNeighbours += self.getRowNeighbours(location, *group)                  
 
                 for location in swordfishNeighbours:
 
