@@ -629,6 +629,12 @@ class Sudoku():
 
     def updatePuzzle(self):
 
+        self.updateBaseGroupCandidates()
+        self.updatePointerGroups()
+        self.updateXWingGroups()
+        self.updateSwordfishGroups()
+
+    def updateBaseGroupCandidates(self):
         for intersectionType in ["subGrid", "row", "column"]:
 
             for group in self.intersectionTypes[intersectionType]:
@@ -640,10 +646,6 @@ class Sudoku():
                         self.candidates[location] -= setOfSurroundingValues
                     else:
                         group.remove(location)
-
-        self.updatePointerGroups()
-        self.updateXWingGroups()
-        self.updateSwordfishGroups()        
 
     def updatePointerGroups(self):
         # As pointer groups uses a tuple containing the pointer name and 
