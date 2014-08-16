@@ -411,9 +411,9 @@ class Sudoku():
         return neighbours
 
     def getAllNeighbours(self, location):
-        return set(self.getSubGridNeighbours(location) + \
-            self.getRowNeighbours(location) + \
-            self.getColumnNeighbours(location))
+        return set(self.getSubGridNeighbours(location) +
+        self.getRowNeighbours(location) +
+        self.getColumnNeighbours(location))
 
 
 
@@ -596,6 +596,7 @@ class Sudoku():
                         group.remove(location)
 
         self.updateXWingGroups()
+        self.updateSwordfishGroups()
 
     def updatePointerGroups(self):
         for intersectionType in self.intersectionTypes:
@@ -628,6 +629,19 @@ class Sudoku():
                     continue
                 if group in self.intersectionTypes["xWing"]:
                     self.intersectionTypes["xWing"].remove(group)
+
+    def updateSwordfishGroups(self):
+        if "swordfish" not in self.intersectionTypes:
+            return
+
+        for group in self.intersectionTypes["swordfish"]:
+            for location in group:
+                if self.isEmpty(location):
+                    continue
+                if location not in group:
+                    continue
+                if group in self.intersectionTypes["swordfish"]:
+                    self.intersectionTypes["swordfish"].remove(group)
 
 
 
@@ -877,6 +891,84 @@ class Sudoku():
             for location in xWingNeighbours:
 
                 for candidate in candidates:
+                    if candidate in self.candidates[location]:
+                        self.candidates[location].remove(candidate)
+                        self.changes = True
+
+        if self.changes:
+            self.updatePuzzle()
+
+        return self.changes
+
+    def swordfish(self):
+        self.initialiseIntersections("swordfish")
+
+        self.changes = False
+
+        from collections import defaultdict
+
+        swordfishes = defaultdict(list)
+
+        for group in self.intersectionTypes["swordfish"]:
+
+            commonCandidates = set.intersection(*[self.candidates[location] for location in group])
+
+            if len(commonCandidates) == 0:
+                continue
+
+            rowOneLocation = group[0]
+            rowTwoLocation = group[3]
+
+            if len(group) == 9:
+                rowThreeLocation = group[6]
+                columnOneLocation = group[0]
+                columnTwoLocation = group[1]
+                columnThreeLocation = group[2]
+            else:
+                sortedGroup = sorted(group, key=self.getColumn)
+                rowThreeLocation = group[4]
+                columnOneLocation = sortedGroup[0]
+                columnTwoLocation = sortedGroup[2]
+                columnThreeLocation = sortedGroup[4]
+
+            otherRowOneCandidates = set([]).union(*[self.candidates[location] for location in self.getRowNeighbours(rowOneLocation) if location not in group])
+            otherRowTwoCandidates = set([]).union(*[self.candidates[location] for location in self.getRowNeighbours(rowTwoLocation) if location not in group])
+            otherRowThreeCandidates = set([]).union(*[self.candidates[location] for location in self.getRowNeighbours(rowThreeLocation) if location not in group])
+            otherColumnOneCandidates = set([]).union(*[self.candidates[location] for location in self.getColumnNeighbours(columnOneLocation) if location not in group])
+            otherColumnTwoCandidates = set([]).union(*[self.candidates[location] for location in self.getColumnNeighbours(columnTwoLocation) if location not in group])
+            otherColumnThreeCandidates = set([]).union(*[self.candidates[location] for location in self.getColumnNeighbours(columnThreeLocation) if location not in group])
+
+            for candidate in commonCandidates:
+                if (candidate not in otherRowOneCandidates and
+                    candidate not in otherRowTwoCandidates and
+                    candidate not in otherRowThreeCandidates):
+                    swordfishes[group].append((candidate, (columnOneLocation, columnTwoLocation, columnThreeLocation), "row"))
+                
+                elif (candidate not in otherColumnOneCandidates and
+                    candidate not in otherColumnTwoCandidates and
+                    candidate not in otherColumnThreeCandidates):
+                    swordfishes[group].append((candidate, (rowOneLocation, rowTwoLocation, rowThreeLocation), "column"))
+
+        for group, swordfishList in swordfishes.iteritems():
+            for swordfish in swordfishList:
+                candidate = swordfish[0]
+                locations = swordfish[1]
+                swordfishType = swordfish[2]
+
+                swordfishNeighbours = []
+
+                if swordfishType == "row":
+                    for location in locations:
+                        swordfishNeighbours += [neighbour for neighbour in self.getColumnNeighbours(location)]
+
+                if swordfishType == "column":
+                    for location in locations:
+                        swordfishNeighbours += [neighbour for neighbour in self.getRowNeighbours(location)]                    
+                    
+                swordfishNeighbours = [neighbour for neighbour in swordfishNeighbours if neighbour not in group]
+
+                for location in swordfishNeighbours:
+
                     if candidate in self.candidates[location]:
                         self.candidates[location].remove(candidate)
                         self.changes = True

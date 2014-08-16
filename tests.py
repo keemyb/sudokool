@@ -168,7 +168,6 @@ hiddenTripleTestString = "370408100\
         
 #         number += 1
 
-hiddenTripleTest = Sudoku(hiddenTripleTestString)
-print hiddenTripleTest
-# hiddenTripleTest.generateSwordfishGroups()
-print visualizer(hiddenTripleTest, *hiddenTripleTest.generateXWingGroups())
+hiddenTripleTest = Sudoku("926000100537010420841000603259734816714060030368120040102000084485071360603000001")
+print puzzleSummary(hiddenTripleTest, 0, True, True, True)
+
