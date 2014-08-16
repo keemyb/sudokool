@@ -680,22 +680,31 @@ class Sudoku():
 
         from itertools import combinations
 
-        for intersectionType in ["subGrid", "row", "column"]:
+        for intersectionType in self.intersectionTypes:
 
-            for group in [group for group in self.intersectionTypes[intersectionType] if len(group) > n]:
+            if intersectionType not in ["subGrid", "row", "column"]:
+                continue
+
+            for group in intersectionType:
+
+                if len(group) <= n:
+                    continue
 
                 for combination in combinations(group, n):
 
-                    if len(set([tuple(self.candidates[location]) for location in combination])) == n:
+                    nakedNcandidates = self.getSolvingCandidates(*combination)
 
-                        nakedNcandidates = set([tuple(self.candidates[location]) for location in combination])
+                    if len(nakedNcandidates) != n:
+                        continue
 
-                        for surroundingLocation in [location for location in group if location not in combination]:
+                    surroundingLocations = [location for location in group if location not in combination]
 
-                            if any(candidate in nakedNcandidates for candidate in self.candidates[surroundingLocation]):
+                    for surroundingLocation in surroundingLocations:
 
-                                self.candidates[surroundingLocation] -= nakedNcandidates
-                                self.changes = True
+                        if any(candidate in nakedNcandidates for candidate in self.candidates[surroundingLocation]):
+
+                            self.candidates[surroundingLocation] -= nakedNcandidates
+                            self.changes = True
 
         if self.changes:
             self.updatePuzzle()
