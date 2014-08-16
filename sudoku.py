@@ -680,12 +680,9 @@ class Sudoku():
 
         from itertools import combinations
 
-        for intersectionType in self.intersectionTypes:
+        for intersectionType in ["subGrid", "row", "column"]:
 
-            if intersectionType not in ["subGrid", "row", "column"]:
-                continue
-
-            for group in intersectionType:
+            for group in self.intersectionTypes[intersectionType]:
 
                 if len(group) <= n:
                     continue
@@ -731,36 +728,38 @@ class Sudoku():
 
         for intersectionType in ["subGrid", "row", "column"]:
 
-            for group in [group for group in self.intersectionTypes[intersectionType] if len(group) > n]:
+            for group in self.intersectionTypes[intersectionType]:
+
+                if len(group) <= n:
+                    continue
 
                 for combination in combinations(group, n):
 
                     surroundingLocations = [location for location in group if location not in combination]
 
-                    setsOfCombinationCandidates = [self.candidates[location] for location in combination if self.isEmpty(location)]
-                    setOfCombinationCandidates = set([candidate for candidateSets in setsOfCombinationCandidates for candidate in candidateSets])
-                    setsOfSurroundingCandidates = [self.candidates[surroundingLocation] for surroundingLocation in surroundingLocations if self.isEmpty(surroundingLocation)]
-                    setOfSurroundingCandidates = set([candidate for candidateSets in setsOfSurroundingCandidates for candidate in candidateSets])
-                    setOfUniqueCandidatesToCombination = setOfCombinationCandidates - setOfSurroundingCandidates
+                    combinationCandidates = self.getSolvingCandidates(*combination)
+                    surroundingCandidates = self.getSolvingCandidates(*surroundingLocations)
+                    uniqueCombinationCandidates = combinationCandidates - surroundingCandidates
 
-                    if len(setOfUniqueCandidatesToCombination) == n:
+                    if len(uniqueCombinationCandidates) != n:
+                        continue
 
-                        for location in combination:
+                    for location in combination:
 
-                            if any(candidate in setOfSurroundingCandidates for candidate in self.candidates[location]):
+                        if any(candidate in surroundingCandidates for candidate in self.candidates[location]):
 
-                                self.candidates[location] -= setOfSurroundingCandidates
-                                self.changes = True
+                            self.candidates[location] -= surroundingCandidates
+                            self.changes = True
 
-                        for location in surroundingLocations:
+                    for location in surroundingLocations:
 
-                            if not self.isEmpty(location):
-                                continue
+                        if not self.isEmpty(location):
+                            continue
 
-                            if any(candidate in setOfUniqueCandidatesToCombination for candidate in self.candidates[location]):
+                        if any(candidate in uniqueCombinationCandidates for candidate in self.candidates[location]):
 
-                                self.candidates[location] -= setOfUniqueCandidatesToCombination
-                                self.changes = True
+                            self.candidates[location] -= uniqueCombinationCandidates
+                            self.changes = True
 
         if self.changes:
             self.updatePuzzle()

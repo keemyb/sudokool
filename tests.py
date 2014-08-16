@@ -168,11 +168,3 @@ for puzzleNo in xrange(1,51):
 #     else:
         
 #         number += 1
-
-hiddenTripleTest = Sudoku("926000100537010420841000603259734816714060030368120040102000084485071360603000001")
-hiddenTripleTest.initialiseIntersections()
-print hiddenTripleTest
-print hiddenTripleTest.getSolvingCandidates(4)
-print hiddenTripleTest.getSolvingCandidates(4,6)
-print hiddenTripleTest.getSolvingCandidates(*[4,6])
-# print puzzleSummary(hiddenTripleTest, 0, True, True, True)
