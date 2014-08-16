@@ -791,7 +791,7 @@ class Sudoku():
             combination, pointerType = group[0], group[1]
             subGridNeighbours = self.getSubGridNeighbours(combination[0], *combination)
             subGridNeighbourCandidates = self.getSolvingCandidates(*subGridNeighbours)
-            commonPointerCandidates = set.intersection(*[self.candidates[location] for location in combination])
+            commonPointerCandidates = self.getCommonCandidates(*combination)
 
             if pointerType == "row":
                 rowNeighbours = self.getRowNeighbours(combination[0], *combination)
@@ -834,7 +834,7 @@ class Sudoku():
         for group in self.intersectionTypes[("pointer", n)]:
             combination, pointerType = group[0], group[1]
             subGridNeighbours = self.getSubGridNeighbours(combination[0], *combination)
-            commonPointerCandidates = set.intersection(*[self.candidates[location] for location in combination])
+            commonPointerCandidates = self.getCommonCandidates(*combination)
 
             if pointerType == "row":
                 rowNeighbours = self.getRowNeighbours(combination[0], *combination)
@@ -884,7 +884,7 @@ class Sudoku():
 
         for group in self.intersectionTypes["xWing"]:
 
-            commonXWingCandidates = set.intersection(*[self.candidates[location] for location in group])
+            commonXWingCandidates = self.getCommonCandidates(*group)
 
             if len(commonXWingCandidates) == 0:
                 continue
@@ -932,7 +932,7 @@ class Sudoku():
 
         for group in self.intersectionTypes["swordfish"]:
 
-            commonCandidates = set.intersection(*[self.candidates[location] for location in group])
+            commonCandidates = self.getCommonCandidates(*group)
 
             if len(commonCandidates) == 0:
                 continue
