@@ -603,22 +603,28 @@ class Sudoku():
         self.updateSwordfishGroups()        
 
     def updatePointerGroups(self):
+        # As pointer groups uses a tuple containing the pointer name and 
+        # type as the dictionary key, we must try each intersection type
+        # as it is unknown what size pointer group is initialsed.
         for intersectionType in self.intersectionTypes:
             try:
-                # n variable
                 currentIntersectionType = intersectionType[0]
                 n = intersectionType[1]
             except:
                 continue
+
             if currentIntersectionType == "pointer":
+                # For every pointer group, we must check if any location in it
+                # has been filled (making the pointer group invalid.) In this
+                # case we remove the pointer group, after checking it still
+                # exists as there is a chance it may have been deleted by a
+                # location discovered earlier in the same combination.
                 for group in self.intersectionTypes[("pointer", n)]:
                     combination = group[0]
                     for location in combination:
                         if self.isEmpty(location):
                             continue
-                        if location not in combination:
-                            continue
-                        if combination in self.intersectionTypes[("pointer", n)]:
+                        if group in self.intersectionTypes[("pointer", n)]:
                             self.intersectionTypes[("pointer", n)].remove(group)
 
     def updateXWingGroups(self):
