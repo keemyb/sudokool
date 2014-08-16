@@ -1,42 +1,4 @@
-from sudoku import Sudoku
 from copy import deepcopy
-
-def solver(puzzle, maxLevel, history = None):
-    methods = [puzzle.nakedSingle, puzzle.hiddenSingle, puzzle.nakedTwin, puzzle.hiddenTwin,
-    puzzle.pointingPair, puzzle.pointingTriplet,
-    puzzle.boxLineReduction2, puzzle.boxLineReduction3,
-    puzzle.nakedTriplet, puzzle.hiddenTriplet,
-    puzzle.xWing, puzzle.swordfish]
-
-    #puzzle is complete if gridSize ^ 2 values are filled
-    if puzzle.isComplete():
-        return True, [entry[0] for entry in history if history != None]
-
-    if maxLevel > len(methods) or maxLevel < 1:
-        maxLevel = len(methods)
-
-    #if solver is run for the first time, solve using first method
-    if history == None:
-        methods[0]()
-        history = [(0, puzzle.changes)]
-        return solver(puzzle, maxLevel, history)
-    
-    #if last attempt was successful, go back to first level
-
-    lastMethod = history[-1][0]
-    if history[-1][1] == True:
-        nextMethod = 0
-    #or if unsuccessful, increase level or exit if highest level was tried
-    else:
-        if lastMethod == maxLevel - 1:
-            return False, [entry[0] for entry in history if history != None]
-        else:
-            nextMethod = lastMethod + 1
-
-    methods[nextMethod]()
-    history.append((nextMethod, puzzle.changes))
-    
-    return solver(puzzle, maxLevel, history)
 
 def puzzleSummary(puzzle, maxLevel, printPuzzle, printCandidateValues, printHistory, number = None):
 
@@ -44,7 +6,7 @@ def puzzleSummary(puzzle, maxLevel, printPuzzle, printCandidateValues, printHist
     preSolved = deepcopy(puzzle)
     postSolved = puzzle
 
-    solveReport = solver(postSolved, maxLevel)
+    solveReport = postSolved.solve(maxLevel)
 
     numberOfPreSolvedValues = preSolved.getNumberOfFilledLocations()
     numberOfPostSolvedValues = postSolved.getNumberOfFilledLocations()

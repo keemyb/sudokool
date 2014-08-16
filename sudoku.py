@@ -539,6 +539,46 @@ class Sudoku():
 
 
 
+    def solve(self, maxLevel, history = None):
+        methods = [self.nakedSingle, self.hiddenSingle,
+            self.nakedTwin, self.hiddenTwin,
+            self.pointingPair, self.pointingTriplet,
+            self.boxLineReduction2, self.boxLineReduction3,
+            self.nakedTriplet, self.hiddenTriplet,
+            self.xWing, self.swordfish]
+
+        if self.isComplete():
+            return True, [entry[0] for entry in history if history != None]
+
+        if maxLevel > len(methods) or maxLevel < 1:
+            maxLevel = len(methods)
+
+        #if solver is run for the first time, solve using first method
+        if history == None:
+            methods[0]()
+            history = [(0, self.changes)]
+            return self.solve(maxLevel, history)
+        
+        #if last attempt was successful, go back to first level
+
+        lastMethod = history[-1][0]
+        if history[-1][1] == True:
+            nextMethod = 0
+        #or if unsuccessful, increase level or exit if highest level was tried
+        else:
+            if lastMethod == maxLevel - 1:
+                return False, [entry[0] for entry in history if history != None]
+            else:
+                nextMethod = lastMethod + 1
+
+        methods[nextMethod]()
+        history.append((nextMethod, self.changes))
+        
+        return self.solve(maxLevel, history)
+
+
+
+
     def initialiseIntersections(self, *intersectionTypes):
         initialiseCandidates = False
         #three main intersection types needed for candidates to work

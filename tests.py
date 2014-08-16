@@ -1,6 +1,5 @@
 from sudoku import Sudoku
-from solver import puzzleSummary, solver
-from math import sqrt
+from solver import puzzleSummary
 
 def fromTextPuzzleSummary(textfile, seperator, maxLevel, n, specific, showModified, showSolved, printPuzzle, printGhostValues, printHistory):
     
