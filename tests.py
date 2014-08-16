@@ -168,6 +168,11 @@ hiddenTripleTestString = "370408100\
         
 #         number += 1
 
-hiddenTripleTest = Sudoku("926000100537010420841000603259734816714060030368120040102000084485071360603000001")
-print puzzleSummary(hiddenTripleTest, 0, True, True, True)
+# hiddenTripleTest = Sudoku("926000100537010420841000603259734816714060030368120040102000084485071360603000001")
+# print puzzleSummary(hiddenTripleTest, 0, True, True, True)
 
+puz = Sudoku("0"*81)
+
+puz.initialiseIntersections()
+
+print puz.getAllNeighbours(1)

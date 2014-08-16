@@ -392,28 +392,31 @@ class Sudoku():
 
 
 
-    def getSubGridNeighbours(self, location):
+    def getSubGridNeighbours(self, location, *exclusions):
         subGridGroup = self.intersectionTypes["subGrid"][self.getSubGrid(location) - 1]
         neighbours = [neighbour for neighbour in subGridGroup if neighbour != location and self.isEmpty(neighbour)]
+        neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
 
         return neighbours
 
-    def getRowNeighbours(self, location):
+    def getRowNeighbours(self, location, *exclusions):
         rowGroup = self.intersectionTypes["row"][self.getRow(location) - 1]
         neighbours = [neighbour for neighbour in rowGroup if neighbour != location and self.isEmpty(neighbour)]
+        neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
 
         return neighbours
 
-    def getColumnNeighbours(self, location):
+    def getColumnNeighbours(self, location, *exclusions):
         columnGroup = self.intersectionTypes["column"][self.getColumn(location) - 1]
         neighbours = [neighbour for neighbour in columnGroup if neighbour != location and self.isEmpty(neighbour)]
+        neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
 
         return neighbours
 
-    def getAllNeighbours(self, location):
-        return set(self.getSubGridNeighbours(location) +
-        self.getRowNeighbours(location) +
-        self.getColumnNeighbours(location))
+    def getAllNeighbours(self, location, *exclusions):
+        return set(self.getSubGridNeighbours(location, *exclusions) +
+        self.getRowNeighbours(location, *exclusions) +
+        self.getColumnNeighbours(location, *exclusions))
 
 
 
