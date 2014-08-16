@@ -950,12 +950,12 @@ class Sudoku():
                 columnTwoLocation = sortedGroup[2]
                 columnThreeLocation = sortedGroup[4]
 
-            otherRowOneCandidates = set([]).union(*[self.candidates[location] for location in self.getRowNeighbours(rowOneLocation, *group)])
-            otherRowTwoCandidates = set([]).union(*[self.candidates[location] for location in self.getRowNeighbours(rowTwoLocation, *group)])
-            otherRowThreeCandidates = set([]).union(*[self.candidates[location] for location in self.getRowNeighbours(rowThreeLocation, *group)])
-            otherColumnOneCandidates = set([]).union(*[self.candidates[location] for location in self.getColumnNeighbours(columnOneLocation, *group)])
-            otherColumnTwoCandidates = set([]).union(*[self.candidates[location] for location in self.getColumnNeighbours(columnTwoLocation, *group)])
-            otherColumnThreeCandidates = set([]).union(*[self.candidates[location] for location in self.getColumnNeighbours(columnThreeLocation, *group)])
+            otherRowOneCandidates = self.getSolvingCandidates(*self.getRowNeighbours(rowOneLocation, *group))
+            otherRowTwoCandidates = self.getSolvingCandidates(*self.getRowNeighbours(rowTwoLocation, *group))
+            otherRowThreeCandidates = self.getSolvingCandidates(*self.getRowNeighbours(rowThreeLocation, *group))
+            otherColumnOneCandidates = self.getSolvingCandidates(*self.getColumnNeighbours(columnOneLocation, *group))
+            otherColumnTwoCandidates = self.getSolvingCandidates(*self.getColumnNeighbours(columnTwoLocation, *group))
+            otherColumnThreeCandidates = self.getSolvingCandidates(*self.getColumnNeighbours(columnThreeLocation, *group))
 
             for candidate in commonCandidates:
                 if (candidate not in otherRowOneCandidates and
