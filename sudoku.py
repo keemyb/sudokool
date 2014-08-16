@@ -468,8 +468,9 @@ class Sudoku():
 
         self.values[location] = 0
 
-    def getSolvingCandidates(self, location):
-        return self.candidates[location]
+    def getSolvingCandidates(self, *locations):
+        candidates = set([]).union(*[self.candidates[location] for location in locations])
+        return candidates
 
     def getUserCandidates(self, location):
         return self.userCandidates[location]

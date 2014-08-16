@@ -107,9 +107,9 @@ hiddenTripleTestString = "370408100\
 # puzzle8 = Sudoku("1004200006000705005008006800100000060052004006008060007000073006")
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
-for puzzleNo in [7]:
+# for puzzleNo in [7]:
 # for puzzleNo in xrange(1,51):
-    print fromTextPuzzleSummary("easy50.txt", "========\n", 0, puzzleNo, True, True, True, True, True, True)
+    # print fromTextPuzzleSummary("easy50.txt", "========\n", 0, puzzleNo, True, True, True, True, True, True)
 
 # xWingTest = Sudoku("100000569492056108056109240009640801064010000218035604040500016905061402621000005")
 # # xWingTest.generateSubGridGroups()
@@ -169,5 +169,10 @@ for puzzleNo in [7]:
         
 #         number += 1
 
-# hiddenTripleTest = Sudoku("926000100537010420841000603259734816714060030368120040102000084485071360603000001")
+hiddenTripleTest = Sudoku("926000100537010420841000603259734816714060030368120040102000084485071360603000001")
+hiddenTripleTest.initialiseIntersections()
+print hiddenTripleTest
+print hiddenTripleTest.getSolvingCandidates(4)
+print hiddenTripleTest.getSolvingCandidates(4,6)
+print hiddenTripleTest.getSolvingCandidates(*[4,6])
 # print puzzleSummary(hiddenTripleTest, 0, True, True, True)
