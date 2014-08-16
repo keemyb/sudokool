@@ -785,12 +785,10 @@ class Sudoku():
         self.initialiseIntersections(("pointer", n))
         self.changes = False
 
-        from itertools import chain
-
         for group in self.intersectionTypes[("pointer", n)]:
             combination, pointerType = group[0], group[1]
             subGridNeighbours = self.getSubGridNeighbours(combination[0], *combination)
-            subGridNeighbourCandidates = set(chain(*[self.candidates[location] for location in subGridNeighbours]))
+            subGridNeighbourCandidates = self.getSolvingCandidates(*subGridNeighbours)
             commonPointerCandidates = set.intersection(*[self.candidates[location] for location in combination])
 
             if pointerType == "row":
@@ -831,8 +829,6 @@ class Sudoku():
         self.initialiseIntersections(("pointer", n))
         self.changes = False
 
-        from itertools import chain
-
         for group in self.intersectionTypes[("pointer", n)]:
             combination, pointerType = group[0], group[1]
             subGridNeighbours = self.getSubGridNeighbours(combination[0], *combination)
@@ -840,7 +836,7 @@ class Sudoku():
 
             if pointerType == "row":
                 rowNeighbours = self.getRowNeighbours(combination[0], *combination)
-                rowNeighbourCandidates = set(chain(*[self.candidates[location] for location in rowNeighbours]))
+                rowNeighbourCandidates = self.getSolvingCandidates(*rowNeighbours)
 
                 for candidate in commonPointerCandidates:
                     if candidate not in rowNeighbourCandidates:
@@ -851,7 +847,7 @@ class Sudoku():
 
             elif pointerType == "column":
                 columnNeighbours = self.getColumnNeighbours(combination[0], *combination)
-                columnNeighbourCandidates = set(chain(*[self.candidates[location] for location in columnNeighbours]))
+                columnNeighbourCandidates = self.getSolvingCandidates(*columnNeighbours)
 
                 for candidate in commonPointerCandidates:
                     if candidate not in columnNeighbourCandidates:
