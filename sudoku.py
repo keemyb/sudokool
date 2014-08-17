@@ -931,17 +931,14 @@ class Sudoku():
             if len(commonXWingCandidates) == 0:
                 continue
 
-            rowOneNeighbourCandidates = self.getSolvingCandidates(*self.getRowNeighbours(group[0], *group))
-            rowTwoNeighbourCandidates = self.getSolvingCandidates(*self.getRowNeighbours(group[2], *group))
-            columnOneNeighbourCandidates = self.getSolvingCandidates(*self.getColumnNeighbours(group[0], *group))
-            columnTwoNeighbourCandidates = self.getSolvingCandidates(*self.getColumnNeighbours(group[1], *group))
+            rowCandidates = (self.getSolvingCandidates(*self.getRowNeighbours(group[0], *group)) |
+                self.getSolvingCandidates(*self.getRowNeighbours(group[2], *group)))
+            columnCandidates = (self.getSolvingCandidates(*self.getColumnNeighbours(group[0], *group)) |
+                self.getSolvingCandidates(*self.getColumnNeighbours(group[1], *group)))
 
             for candidate in commonXWingCandidates:
-                if ((candidate not in rowOneNeighbourCandidates and
-                    candidate not in rowTwoNeighbourCandidates)
-                    or
-                    (candidate not in columnOneNeighbourCandidates and
-                    candidate not in columnTwoNeighbourCandidates)):
+                if (candidate not in rowCandidates or
+                    candidate not in columnCandidates):
                     xWings[group].append(candidate)
 
         for group, candidates in xWings.iteritems():
