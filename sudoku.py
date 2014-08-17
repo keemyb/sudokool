@@ -481,7 +481,7 @@ class Sudoku():
         if self.isConstant(location):
             raise Exception("location is a constant and cannot be changed")
 
-        if not self.isValidInput(value):
+        if not self.isValidInput(candidate):
             raise Exception("candidate is not vaild")
 
         if not self.isEmpty(location):
