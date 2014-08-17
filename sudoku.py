@@ -579,7 +579,7 @@ class Sudoku():
 
 
 
-    def initialiseIntersections(self, *intersectionTypes):
+    def initialiseIntersections(self, *requiredIntersections):
         initialiseCandidates = False
         #three main intersection types needed for candidates to work
         for intersectionType in ("subGrid", "row", "column"):
@@ -595,15 +595,15 @@ class Sudoku():
         if initialiseCandidates:
             self.initialiseCandidates()
 
-        if "xWing" in intersectionTypes:
+        if "xWing" in requiredIntersections:
             if "xWing" not in self.intersectionTypes:
                 self.intersectionTypes["xWing"] = self.generateXWingGroups()
 
-        if "swordfish" in intersectionTypes:
+        if "swordfish" in requiredIntersections:
             if "swordfish" not in self.intersectionTypes:
                 self.intersectionTypes["swordfish"] = self.generateSwordfishGroups()
 
-        for intersectionType in intersectionTypes:
+        for intersectionType in requiredIntersections:
             try:
                 # n variable
                 currentIntersectionType = intersectionType[0]
