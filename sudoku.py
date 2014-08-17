@@ -372,6 +372,24 @@ class Sudoku():
 
         return swordfishGroups
 
+    def generateConjugatePairs(self):
+        self.initialiseIntersections()
+
+        conjugatePairs = []
+
+        for location in self.getEmptyLocations():
+            locationCandidates = self.candidates[location]
+            if len(locationCandidates) != 2:
+                continue
+            for neighbouringLocation in self.getAllNeighbours(location):
+                neighbouringLocationCandidates = self.candidates[neighbouringLocation]
+                if sorted(locationCandidates) != sorted(neighbouringLocationCandidates):
+                    continue
+                if sorted((location, neighbouringLocation)) not in conjugatePairs:
+                    conjugatePairs.append(sorted((location, neighbouringLocation)))
+
+        return conjugatePairs
+
 
 
 
@@ -441,6 +459,9 @@ class Sudoku():
 
     def getLocations(self):
         return range(1, self.gridSize ** 2 + 1)
+
+    def getEmptyLocations(self):
+        return self.candidates.keys()
 
     def getNLocationsOnRow(self, row, n):
         from itertools import combinations
@@ -558,7 +579,7 @@ class Sudoku():
             methods[0]()
             history = [(0, self.changes)]
             return self.solve(maxLevel, history)
-        
+
         #if last attempt was successful, go back to first level
 
         lastMethod = history[-1][0]
@@ -573,7 +594,7 @@ class Sudoku():
 
         methods[nextMethod]()
         history.append((nextMethod, self.changes))
-        
+
         return self.solve(maxLevel, history)
 
 
@@ -602,6 +623,10 @@ class Sudoku():
         if "swordfish" in requiredIntersections:
             if "swordfish" not in self.intersectionTypes:
                 self.intersectionTypes["swordfish"] = self.generateSwordfishGroups()
+
+        if "conjugatePairs" in requiredIntersections:
+            if "conjugatePairs" not in self.intersectionTypes:
+                self.intersectionTypes["conjugatePairs"] = self.generateConjugatePairs()
 
         for intersectionType in requiredIntersections:
             try:
@@ -633,6 +658,7 @@ class Sudoku():
         self.updatePointerGroups()
         self.updateXWingGroups()
         self.updateSwordfishGroups()
+        self.updateConjugatePairs()
 
     def updateBaseGroupCandidates(self):
         for intersectionType in ["subGrid", "row", "column"]:
@@ -648,7 +674,7 @@ class Sudoku():
                         group.remove(location)
 
     def updatePointerGroups(self):
-        # As pointer groups uses a tuple containing the pointer name and 
+        # As pointer groups uses a tuple containing the pointer name and
         # type as the dictionary key, we must try each intersection type
         # as it is unknown what size pointer group is initialsed.
         for intersectionType in self.intersectionTypes:
@@ -697,6 +723,19 @@ class Sudoku():
                     continue
                 if group in self.intersectionTypes["swordfish"]:
                     self.intersectionTypes["swordfish"].remove(group)
+
+    def updateConjugatePairs(self):
+        if "conjugatePairs" not in self.intersectionTypes:
+            return
+
+        for group in self.intersectionTypes["conjugatePairs"]:
+            for location in group:
+                if self.isEmpty(location):
+                    continue
+                if location not in group:
+                    continue
+                if group in self.intersectionTypes["conjugatePairs"]:
+                    self.intersectionTypes["conjugatePairs"].remove(group)
 
 
 
@@ -1003,7 +1042,7 @@ class Sudoku():
                     candidate not in otherRowTwoCandidates and
                     candidate not in otherRowThreeCandidates):
                     swordfishes[group].append((candidate, (columnOneLocation, columnTwoLocation, columnThreeLocation), "row"))
-                
+
                 elif (candidate not in otherColumnOneCandidates and
                     candidate not in otherColumnTwoCandidates and
                     candidate not in otherColumnThreeCandidates):
@@ -1023,7 +1062,7 @@ class Sudoku():
 
                 if swordfishType == "column":
                     for location in locations:
-                        swordfishNeighbours += self.getRowNeighbours(location, *group)                  
+                        swordfishNeighbours += self.getRowNeighbours(location, *group)
 
                 for location in swordfishNeighbours:
 

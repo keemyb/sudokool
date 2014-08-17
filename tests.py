@@ -99,21 +99,17 @@ hiddenTripleTestString = "370408100\
 509600400\
 004200931"
 
-# hiddenTripleTest = Sudoku(hiddenTripleTestString)
-# hiddenTripleTest.hiddenTriplet()
-# print hiddenTripleTest.intersectionTypes
 
-# puzzle8 = Sudoku("1004200006000705005008006800100000060052004006008060007000073006")
+conjugatePairString = "635492187928761543174800692000207000200500008000906020852679314090120870701308209"
+conjugatePairPuzzle = Sudoku(conjugatePairString)
+conjugatePairPuzzle.initialiseIntersections()
+print conjugatePairPuzzle.candidates[69]
+print conjugatePairPuzzle.candidates[77]
+print visualizer(conjugatePairPuzzle, *conjugatePairPuzzle.generateConjugatePairs())
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
-# for puzzleNo in [7]:
-for puzzleNo in xrange(1,51):
-    print fromTextPuzzleSummary("easy50.txt", "========\n", 0, puzzleNo, True, True, True, True, True, True)
-
-# xWingTest = Sudoku("100000569492056108056109240009640801064010000218035604040500016905061402621000005")
-# # xWingTest.generateSubGridGroups()
-# print puzzleSummary(xWingTest, 0, True, True, True)
-# print xWingTest.values
+# for puzzleNo in xrange(1,51):
+#     print fromTextPuzzleSummary("easy50.txt", "========\n", 0, puzzleNo, True, True, True, True, True, True)
 
 # string16 = "B07805E0300AD0CG\
 # 004007000C0FA002\
@@ -135,34 +131,13 @@ for puzzleNo in xrange(1,51):
 # puzzle16 = Sudoku(string16)
 # print puzzleSummary(puzzle16, 0, True, True, True)
 
-# pointers = Sudoku("017903600000080000900000507072010430000402070064370250701000065000030000005601720")
-# pointers.initialiseIntersections()
-# pointers.candidates[67] = set([5, 7, 8])
-# print pointers.candidates[56]
-# print puzzleSummary(pointers, 0, True, True, True)
-# print pointers.candidates[56]
-
-# blr = Sudoku("016007803090800000870001260048000300650009082039000650060900020080002936924600510")
-# blr.initialiseIntersections()
-# blr.candidates[1] = set([4, 5])
-# blr.candidates[8] = set([4, 9])
-# blr.candidates[10] = set([4, 5, 3])
-# blr.candidates[14] = set([2, 3, 4, 5, 6])
-# blr.candidates[15] = set([3, 4, 5, 6])
-# blr.candidates[22] = set([2, 3, 4, 5])
-# blr.candidates[23] = set([2, 3, 4, 5, 9])
-
-# print puzzleSummary(blr, 0, True, True, True)
-
-# print blr.constants
-
-fileToRead = open("top95.txt", "r")
-number = 1
-for line in fileToRead:
-    try:
-        puzzle = Sudoku(str(line)[:81])
-        print puzzleSummary(puzzle, 0, True, True, True, number)
-    except:
-        continue
-    else:
-        number += 1
+# fileToRead = open("top95.txt", "r")
+# number = 1
+# for line in fileToRead:
+#     try:
+#         puzzle = Sudoku(str(line)[:81])
+#         print puzzleSummary(puzzle, 0, True, True, True, number)
+#     except:
+#         continue
+#     else:
+#         number += 1
