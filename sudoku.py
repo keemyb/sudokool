@@ -378,15 +378,30 @@ class Sudoku():
         conjugatePairs = []
 
         for location in self.getEmptyLocations():
-            locationCandidates = self.candidates[location]
-            if len(locationCandidates) != 2:
-                continue
-            for neighbouringLocation in self.getAllNeighbours(location):
-                neighbouringLocationCandidates = self.candidates[neighbouringLocation]
-                if sorted(locationCandidates) != sorted(neighbouringLocationCandidates):
-                    continue
-                if sorted((location, neighbouringLocation)) not in conjugatePairs:
-                    conjugatePairs.append(sorted((location, neighbouringLocation)))
+
+            locationCandidates = self.getSolvingCandidates(location)
+
+            for candidate in locationCandidates:
+
+                for method in (self.getRowNeighbours,
+                    self.getColumnNeighbours,
+                    self.getSubGridNeighbours):
+
+                    candidateCount = 1
+                    prospectiveLocation = None
+                    
+                    for neighbour in method(location):
+                        neighbourCandidates = self.getSolvingCandidates(neighbour)
+
+                        if candidate in neighbourCandidates:
+                            candidateCount += 1
+                            prospectiveLocation = neighbour
+
+                    if candidateCount != 2:
+                        continue
+
+                    if sorted((location, prospectiveLocation)) not in conjugatePairs:
+                        conjugatePairs.append(sorted((location, prospectiveLocation)))
 
         return conjugatePairs
 
