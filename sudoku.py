@@ -400,8 +400,10 @@ class Sudoku():
                     if candidateCount != 2:
                         continue
 
-                    if sorted(((location, prospectiveLocation), candidate)) not in conjugatePairs:
-                        conjugatePairs.append(sorted(((location, prospectiveLocation), candidate)))
+                    group = (sorted((location, prospectiveLocation)), candidate)
+
+                    if group not in conjugatePairs:
+                        conjugatePairs.append(group)
                         break
 
         return conjugatePairs
@@ -1090,3 +1092,48 @@ class Sudoku():
             self.updatePuzzle()
 
         return self.changes
+
+    def simpleColouring(self):
+
+        self.initialiseIntersections("conjugatePairs")
+
+        self.changes = False
+
+        chainGroup = []
+
+        for group in self.intersectionTypes["conjugatePairs"]:
+
+            pair, candidate = group[0], group[1]
+            chain = pair[:]
+            visitedLocations = pair[:]
+
+            for i in xrange(len(self.getEmptyLocations())):
+
+                lastLink = chain[-1]
+                lastLinkNeighbours = self.getAllNeighbours(lastLink, *visitedLocations)
+
+                for prospectiveGroup in self.intersectionTypes["conjugatePairs"]:
+
+                    prospectiveLink = prospectiveGroup[0]
+                    prospectiveCandidate = prospectiveGroup[1]
+
+                    if prospectiveCandidate != candidate:
+                        continue
+
+                    if any(location in visitedLocations for location in prospectiveLink):
+                        continue
+
+                    visitedLocations += prospectiveLink
+
+                    if prospectiveLink[0] in lastLinkNeighbours:
+                        chain += prospectiveLink
+                    elif prospectiveLink[1] in lastLinkNeighbours:                        
+                        chain += prospectiveLink[1], prospectiveLink[0]
+
+                    break
+
+            if len(chain) > 2:
+                chainGroup.append((chain, candidate))
+
+        for group in chainGroup:
+            print group[0], group[1]

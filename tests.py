@@ -110,11 +110,11 @@ conjugatePairPuzzle.candidates[46] = set([1, 9])
 conjugatePairPuzzle.candidates[54] = set([1, 9])
 conjugatePairPuzzle.candidates[60] = set([1, 4])
 conjugatePairPuzzle.candidates[78] = set([1, 4])
-for group in conjugatePairPuzzle.generateConjugatePairs():
-    pair, candidate = group[0], group[1]
-    print candidate, pair
+# for group in conjugatePairPuzzle.generateConjugatePairs():
+#     pair, candidate = group[0], group[1]
+#     print candidate, pair
 # print visualizer(conjugatePairPuzzle, *conjugatePairPuzzle.simpleColouring())
-# print conjugatePairPuzzle.simpleColouring()
+print conjugatePairPuzzle.simpleColouring()
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
 # for puzzleNo in xrange(1,51):
