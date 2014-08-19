@@ -400,8 +400,9 @@ class Sudoku():
                     if candidateCount != 2:
                         continue
 
-                    if sorted((location, prospectiveLocation)) not in conjugatePairs:
-                        conjugatePairs.append(sorted((location, prospectiveLocation)))
+                    if sorted(((location, prospectiveLocation), candidate)) not in conjugatePairs:
+                        conjugatePairs.append(sorted(((location, prospectiveLocation), candidate)))
+                        break
 
         return conjugatePairs
 
@@ -744,13 +745,13 @@ class Sudoku():
             return
 
         for group in self.intersectionTypes["conjugatePairs"]:
-            for location in group:
+            pair = group[0]
+            for location in pair:
                 if self.isEmpty(location):
-                    continue
-                if location not in group:
                     continue
                 if group in self.intersectionTypes["conjugatePairs"]:
                     self.intersectionTypes["conjugatePairs"].remove(group)
+                    break
 
 
 
