@@ -1137,3 +1137,22 @@ class Sudoku():
 
         for group in chainGroup:
             print group[0], group[1]
+
+    def prospectiveChange(self, candidatesToRemove=None, valuesToAdd=None):
+        from copy import deepcopy
+
+        prospectivePuzzle = deepcopy(self)
+
+        if candidatesToRemove is not None:
+            for location, candidates in candidatesToRemove.iteritems():
+                prospectivePuzzle.candidates[location] -= set([candidates])
+
+        if valuesToAdd is not None:
+            for location, value in valuesToAdd.iteritems():
+                del prospectivePuzzle.candidates[location]
+                prospectivePuzzle.values[location] = value
+
+        prospectivePuzzle.solve(0)
+
+        return prospectivePuzzle.isValid()
+

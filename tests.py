@@ -103,18 +103,16 @@ hiddenTripleTestString = "370408100\
 conjugatePairString = "007083600039706800826419753640190387080367000073048060390870026764900138208630970"
 conjugatePairPuzzle = Sudoku(conjugatePairString)
 conjugatePairPuzzle.initialiseIntersections()
-# for location in conjugatePairPuzzle.getEmptyLocations():
-#     print location, conjugatePairPuzzle.getSolvingCandidates(location)
+
 conjugatePairPuzzle.candidates[45] = set([1, 4, 5, 9])
 conjugatePairPuzzle.candidates[46] = set([1, 9])
 conjugatePairPuzzle.candidates[54] = set([1, 9])
 conjugatePairPuzzle.candidates[60] = set([1, 4])
 conjugatePairPuzzle.candidates[78] = set([1, 4])
-# for group in conjugatePairPuzzle.generateConjugatePairs():
-#     pair, candidate = group[0], group[1]
-#     print candidate, pair
-# print visualizer(conjugatePairPuzzle, *conjugatePairPuzzle.simpleColouring())
+
 print conjugatePairPuzzle.simpleColouring()
+
+print conjugatePairPuzzle.prospectiveChange()
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
 # for puzzleNo in xrange(1,51):
