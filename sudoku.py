@@ -1128,7 +1128,6 @@ class Sudoku():
             for i in xrange(len(self.getEmptyLocations())):
 
                 lastLink = chain[-1]
-                lastLinkNeighbours = self.getAllNeighbours(lastLink, *visitedLocations)
 
                 for prospectiveGroup in self.intersectionTypes["conjugatePairs"]:
 
@@ -1143,9 +1142,9 @@ class Sudoku():
 
                     visitedLocations += prospectiveLink
 
-                    if prospectiveLink[0] in lastLinkNeighbours:
+                    if len(self.getAlignment(prospectiveLink[0], lastLink)) > 0:
                         chain += prospectiveLink
-                    elif prospectiveLink[1] in lastLinkNeighbours:                        
+                    elif len(self.getAlignment(prospectiveLink[1], lastLink)) > 0:                        
                         chain += prospectiveLink[1], prospectiveLink[0]
 
                     break
