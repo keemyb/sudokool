@@ -431,6 +431,17 @@ class Sudoku():
     def getColumn(self, location):
         return (location - 1) % self.gridSize + 1
 
+    def getAlignment(self, *locations):
+        locationMethods = (self.getRow, self.getColumn, self.getSubGrid)
+        intersectionTypes = ("row", "column", "subGrid")
+        intersection = []
+        
+        for methodNumber, method in enumerate(locationMethods):
+            if all(method(locations[0]) == method(location) for location in locations):
+                intersection.append(intersectionTypes[methodNumber])
+
+        return intersection
+
 
 
 

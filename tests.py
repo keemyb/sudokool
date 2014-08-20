@@ -110,9 +110,7 @@ conjugatePairPuzzle.candidates[54] = set([1, 9])
 conjugatePairPuzzle.candidates[60] = set([1, 4])
 conjugatePairPuzzle.candidates[78] = set([1, 4])
 
-print conjugatePairPuzzle.simpleColouring()
-
-print conjugatePairPuzzle.prospectiveChange()
+print puzzleSummary(conjugatePairPuzzle, 0, True, True, True)
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
 # for puzzleNo in xrange(1,51):
