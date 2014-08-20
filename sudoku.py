@@ -35,6 +35,7 @@ class Sudoku():
         self.candidates = {}
         self.userCandidates = {}
         self.intersectionTypes = {}
+        self.solveMode = False
         self.changes = False
 
     def __eq__(self, other):
@@ -138,6 +139,11 @@ class Sudoku():
 
     def isValid(self):
         for location in xrange(1, self.gridSize ** 2 + 1):
+            if self.solveMode:
+                if self.isEmpty(location):
+                    if len(self.getSolvingCandidates(location)) == 0:
+                        return False
+
             if not self.isEmpty(location):
                 if self.values[location] not in self.setOfPossibleValues:
                     return False
@@ -619,6 +625,7 @@ class Sudoku():
 
 
     def initialiseIntersections(self, *requiredIntersections):
+        self.solveMode = True
         initialiseCandidates = False
         #three main intersection types needed for candidates to work
         for intersectionType in ("subGrid", "row", "column"):
@@ -1155,4 +1162,3 @@ class Sudoku():
         prospectivePuzzle.solve(0)
 
         return prospectivePuzzle.isValid()
-
