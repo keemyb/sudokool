@@ -1172,3 +1172,13 @@ class Sudoku():
         prospectivePuzzle.solve(0)
 
         return prospectivePuzzle.isValid()
+
+    def applyProspectiveChange(self, candidatesToRemove=None, valuesToAdd=None):
+        if candidatesToRemove is not None:
+            for location, candidates in candidatesToRemove.iteritems():
+                self.candidates[location] -= set([candidates])
+
+        if valuesToAdd is not None:
+            for location, value in valuesToAdd.iteritems():
+                del self.candidates[location]
+                self.values[location] = value
