@@ -277,11 +277,11 @@ class Sudoku():
                             continue
 
                         for secondRowGroup in self.getNLocationsOnRow(secondRow, 2):
-                                if self.getSubGrid(firstRowGroup[0]) == self.getSubGrid(secondRowGroup[1]):
+                                if "subGrid" in self.getAlignment(firstRowGroup[0], secondRowGroup[1]):
                                     continue
 
-                                if self.getColumn(firstRowGroup[0]) == self.getColumn(secondRowGroup[0]) and \
-                                self.getColumn(firstRowGroup[1]) == self.getColumn(secondRowGroup[1]):
+                                if "column" in self.getAlignment(firstRowGroup[0], secondRowGroup[0]) and \
+                                "column" in self.getAlignment(firstRowGroup[1], secondRowGroup[1]):
                                     xWingGroups.append((firstRowGroup + secondRowGroup))
 
         return xWingGroups
@@ -311,7 +311,7 @@ class Sudoku():
 
                         for locationOne in firstRowGroup:
                             for locationTwo in secondRowGroup:
-                                if self.getColumn(locationOne) == self.getColumn(locationTwo):
+                                if "column" in self.getAlignment(locationOne, locationTwo):
                                     alignments += 1
                                     locationsInSameColumn = (locationOne, locationTwo)
 
@@ -328,7 +328,7 @@ class Sudoku():
                                 for locationOne in thirdRowGroup:
                                     for row in (firstRowGroup, secondRowGroup):
                                         for locationTwo in [location for location in row if location not in locationsInSameColumn]:
-                                            if self.getColumn(locationOne) == self.getColumn(locationTwo):
+                                            if "column" in self.getAlignment(locationOne, locationTwo):
                                                 alignments2 += 1
 
                                 if alignments2 == 2:
@@ -356,7 +356,7 @@ class Sudoku():
                         alignments = 0
 
                         for i in xrange(3):
-                            if self.getColumn(firstRowGroup[i]) == self.getColumn(secondRowGroup[i]):
+                            if "column" in self.getAlignment(firstRowGroup[i], secondRowGroup[i]):
                                     alignments += 1
 
                         if alignments != 3:
@@ -370,7 +370,7 @@ class Sudoku():
                                 alignments2 = 0
 
                                 for i in xrange(3):
-                                    if self.getColumn(firstRowGroup[i]) == self.getColumn(thirdRowGroup[i]):
+                                    if "column" in self.getAlignment(firstRowGroup[i], thirdRowGroup[i]):
                                         alignments2 += 1
 
                                 if alignments2 == 3:
