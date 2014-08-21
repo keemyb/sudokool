@@ -248,12 +248,9 @@ class Sudoku():
         for subGrid in self.intersectionTypes["subGrid"]:
             for combination in combinations(subGrid, n):
 
-                rowsOfCombination = [self.getRow(location) for location in combination]
-                if all(row == rowsOfCombination[0] for row in rowsOfCombination):
+                if "row" in self.getAlignment(*combination):
                     pointers.append((combination, "row"))
-
-                columnsOfCombination = [self.getColumn(location) for location in combination]
-                if all(column == columnsOfCombination[0] for column in columnsOfCombination):
+                elif "column" in self.getAlignment(*combination):
                     pointers.append((combination, "column"))
 
         return pointers
