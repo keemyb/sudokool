@@ -138,7 +138,18 @@ class Sudoku():
         self.constants = [location for location in self.values if not self.isEmpty(location)]
 
     def isValid(self):
+        self.initialiseIntersections()
+
         for location in xrange(1, self.gridSize ** 2 + 1):
+
+            if location in xrange(1, self.gridSize ** 2 + 1, self.gridSize):
+                for group in self.staticGroups.itervalues():
+                    if location not in group:
+                        continue
+                    values = [self.getValue(location) for location in group if not self.isEmpty(location)]
+                    if list(set(values)) != values:
+                        return False
+
             if self.solveMode:
                 if self.isEmpty(location):
                     if len(self.getSolvingCandidates(location)) == 0:
@@ -147,12 +158,6 @@ class Sudoku():
             if not self.isEmpty(location):
                 if self.values[location] not in self.setOfPossibleValues:
                     return False
-
-                locationValue = self.values[location]
-
-                for neighbour in self.getAllNeighbours(location):
-                    if self.values[neighbour] == locationValue:
-                        return False
 
         return True
 
