@@ -728,7 +728,7 @@ class Sudoku():
 
         for location in [location for location in self.values if self.isEmpty(location)]:
 
-            setOfSurroundingValues = set([self.values[neighbour] for neighbour in self.getAllNeighbours(location) if not self.isEmpty(neighbour)])
+            setOfSurroundingValues = set([self.values[neighbour] for neighbour in self.getBaseNeighbours(location) if not self.isEmpty(neighbour)])
 
             self.candidates[location] = self.setOfPossibleValues - setOfSurroundingValues
 
