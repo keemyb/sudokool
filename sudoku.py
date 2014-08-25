@@ -34,9 +34,21 @@ class Sudoku():
 
         self.candidates = {}
         self.userCandidates = {}
-        self.intersectionTypes = {}
+
         self.solveMode = False
         self.changes = False
+
+        self.intersectionTypes = {}
+
+        self.units = ["row", "column", "subGrid"]
+        
+        self.staticGroups = {"row": self.generateRowGroups(),
+            "column": self.generateColumnGroups(),
+            "subGrid": self.generateSubGridGroups()}
+
+        self.neighbourMethods = {"row": self.getRowNeighbours,
+            "column": self.getColumnNeighbours,
+            "subGrid": self.getSubGridNeighbours}
 
     def __eq__(self, other):
         return (isinstance(other, self.__class__)

@@ -110,7 +110,14 @@ conjugatePairPuzzle.candidates[54] = set([1, 9])
 conjugatePairPuzzle.candidates[60] = set([1, 4])
 conjugatePairPuzzle.candidates[78] = set([1, 4])
 
+print conjugatePairPuzzle
+# print conjugatePairPuzzle.getAllSubGridNeighbours(1)
 print puzzleSummary(conjugatePairPuzzle, 0, True, True, True)
+# print conjugatePairPuzzle.getSubGridNeighbours(1, True)
+# print conjugatePairPuzzle
+
+# okay, the only way to get out of this is to use static lists as well as dynamic ones (that we have now)
+# static will obvs never change. This is bad
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
 # for puzzleNo in xrange(1,51):
@@ -146,3 +153,4 @@ print puzzleSummary(conjugatePairPuzzle, 0, True, True, True)
 #         continue
 #     else:
 #         number += 1
+
