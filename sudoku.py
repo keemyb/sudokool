@@ -550,7 +550,7 @@ class Sudoku():
 
         return combinations(row, n)
 
-    def setLocationValue(self, location, value):
+    def setValue(self, location, value):
         if self.isConstant(location):
             raise Exception("location is a constant and cannot be changed")
 
@@ -562,7 +562,7 @@ class Sudoku():
         if location in self.userCandidates:
             del self.userCandidates[location]
 
-    def getLocationValue(self, location):
+    def getValue(self, location):
         return self.values[location]
 
     def clearLocation(self, location):
