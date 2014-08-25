@@ -50,6 +50,10 @@ class Sudoku():
             "column": self.getColumnNeighbours,
             "subGrid": self.getSubGridNeighbours}
 
+        self.allNeighbourMethods = {"row": self.getAllRowNeighbours,
+            "column": self.getAllColumnNeighbours,
+            "subGrid": self.getAllSubGridNeighbours}
+
     def __eq__(self, other):
         return (isinstance(other, self.__class__)
             and self.__dict__ == other.__dict__)
@@ -480,10 +484,39 @@ class Sudoku():
 
         return neighbours
 
-    def getAllNeighbours(self, location, *exclusions):
+    def getBaseNeighbours(self, location, *exclusions):
         return set(self.getSubGridNeighbours(location, *exclusions) +
         self.getRowNeighbours(location, *exclusions) +
         self.getColumnNeighbours(location, *exclusions))
+
+
+
+
+    def getAllSubGridNeighbours(self, location, *exclusions):
+        subGridGroup = self.staticGroups["subGrid"][self.getSubGrid(location) - 1]
+        neighbours = [neighbour for neighbour in subGridGroup if neighbour != location]
+        neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
+
+        return neighbours
+
+    def getAllRowNeighbours(self, location, *exclusions):
+        rowGroup = self.staticGroups["row"][self.getRow(location) - 1]
+        neighbours = [neighbour for neighbour in rowGroup if neighbour != location]
+        neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
+
+        return neighbours
+
+    def getAllColumnNeighbours(self, location, *exclusions):
+        columnGroup = self.staticGroups["column"][self.getColumn(location) - 1]
+        neighbours = [neighbour for neighbour in columnGroup if neighbour != location]
+        neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
+
+        return neighbours
+
+    def getAllBaseNeighbours(self, location, *exclusions):
+        return set(self.getAllSubGridNeighbours(location, *exclusions) +
+        self.getAllRowNeighbours(location, *exclusions) +
+        self.getAllColumnNeighbours(location, *exclusions))
 
 
 
