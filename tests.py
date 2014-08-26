@@ -100,24 +100,40 @@ hiddenTripleTestString = "370408100\
 004200931"
 
 
-conjugatePairString = "007083600039706800826419753640190387080367000073048060390870026764900138208630970"
+conjugatePairString = "007003600039000800020010050040100300000367000003008060090070020004000130008600900"
 conjugatePairPuzzle = Sudoku(conjugatePairString)
 conjugatePairPuzzle.initialiseIntersections()
 
+conjugatePairPuzzle.candidates[1] = set([1, 4, 5])
+conjugatePairPuzzle.candidates[2] = set([1, 5])
+conjugatePairPuzzle.candidates[4] = set([2, 5])
+conjugatePairPuzzle.candidates[8] = set([1, 4, 9])
+conjugatePairPuzzle.candidates[9] = set([1, 2, 4, 9])
+conjugatePairPuzzle.candidates[10] = set([1, 4, 5])
+conjugatePairPuzzle.candidates[14] = set([2, 5])
+conjugatePairPuzzle.candidates[17] = set([1, 4])
+conjugatePairPuzzle.candidates[18] = set([1, 2, 4])
+conjugatePairPuzzle.candidates[30] = set([2, 5])
+conjugatePairPuzzle.candidates[33] = set([2, 5])
+conjugatePairPuzzle.candidates[37] = set([1, 5, 9])
+conjugatePairPuzzle.candidates[39] = set([1, 2])
+conjugatePairPuzzle.candidates[43] = set([2, 4, 5])
+conjugatePairPuzzle.candidates[44] = set([1, 4, 9])
 conjugatePairPuzzle.candidates[45] = set([1, 4, 5, 9])
 conjugatePairPuzzle.candidates[46] = set([1, 9])
+conjugatePairPuzzle.candidates[49] = set([2, 5])
+conjugatePairPuzzle.candidates[52] = set([2, 5])
 conjugatePairPuzzle.candidates[54] = set([1, 9])
+conjugatePairPuzzle.candidates[57] = set([1, 5])
 conjugatePairPuzzle.candidates[60] = set([1, 4])
+conjugatePairPuzzle.candidates[61] = set([4, 5])
+conjugatePairPuzzle.candidates[68] = set([2, 5])
+conjugatePairPuzzle.candidates[69] = set([2, 5])
+conjugatePairPuzzle.candidates[74] = set([1, 5])
 conjugatePairPuzzle.candidates[78] = set([1, 4])
+conjugatePairPuzzle.candidates[81] = set([4, 5])
 
-print conjugatePairPuzzle
-# print conjugatePairPuzzle.getAllSubGridNeighbours(1)
 print puzzleSummary(conjugatePairPuzzle, 0, True, True, True)
-# print conjugatePairPuzzle.getSubGridNeighbours(1, True)
-# print conjugatePairPuzzle
-
-# okay, the only way to get out of this is to use static lists as well as dynamic ones (that we have now)
-# static will obvs never change. This is bad
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
 # for puzzleNo in xrange(1,51):

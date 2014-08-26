@@ -41,7 +41,7 @@ class Sudoku():
         self.intersectionTypes = {}
 
         self.units = ["row", "column", "subGrid"]
-        
+
         self.staticGroups = {"row": self.generateRowGroups(),
             "column": self.generateColumnGroups(),
             "subGrid": self.generateSubGridGroups()}
@@ -413,7 +413,7 @@ class Sudoku():
 
                     candidateCount = 1
                     prospectiveLocation = None
-                    
+
                     for neighbour in method(location):
                         neighbourCandidates = self.getSolvingCandidates(neighbour)
 
@@ -453,7 +453,7 @@ class Sudoku():
         locationMethods = (self.getRow, self.getColumn, self.getSubGrid)
         intersectionTypes = ("row", "column", "subGrid")
         intersection = []
-        
+
         for methodNumber, method in enumerate(locationMethods):
             if all(method(locations[0]) == method(location) for location in locations):
                 intersection.append(intersectionTypes[methodNumber])
@@ -1191,8 +1191,8 @@ class Sudoku():
 
                     if len(self.getAlignment(prospectiveLink[0], lastLink)) > 0:
                         chain += prospectiveLink
-                    elif len(self.getAlignment(prospectiveLink[1], lastLink)) > 0:                        
-                        chain += prospectiveLink[1], prospectiveLink[0]
+                    elif len(self.getAlignment(prospectiveLink[1], lastLink)) > 0:
+                        chain += prospectiveLink[::-1]
 
                     break
 
@@ -1200,7 +1200,68 @@ class Sudoku():
                 chainGroup.append((chain, candidate))
 
         for group in chainGroup:
-            print group[0], group[1]
+            print chain
+            chain, candidate = group[0], group[1]
+            colourOne, colourTwo = chain[::2], chain[1::2]
+
+            self.simpleColourCase1(chain, colourOne, colourTwo, candidate)
+
+            self.simpleColourCase2(chain, colourOne, colourTwo, candidate)
+
+            self.simpleColourCase4(chain, colourOne, colourTwo, candidate)
+
+        if self.changes:
+            self.updatePuzzle()
+
+        return self.changes
+
+    def simpleColourCase1(self, chain, colourOne, colourTwo, candidate):
+
+        for colour in (colourOne, colourTwo):
+            if not self.validChain(chain):
+                break
+
+            candidatesToRemove = {location: candidate for location in colour}
+
+            if not self.prospectiveChange(candidatesToRemove):
+                continue
+            self.changes = True
+            self.applyProspectiveChange(candidatesToRemove)
+
+    def simpleColourCase2(self, chain, colourOne, colourTwo, candidate):
+        from itertools import combinations
+
+        for colour in (colourOne, colourTwo):
+            if not self.validChain(chain):
+                break
+
+            for pair in combinations(colour, 2):
+                if len(self.getAlignment(*pair)) > 0:
+                    self.changes = True
+                    for location in pair:
+                        self.candidates[location] -= set([candidate])
+
+    def simpleColourCase4(self, chain, colourOne, colourTwo, candidate):
+        from itertools import combinations
+
+        for pair in combinations(chain, 2):
+            if not self.validChain(chain):
+                break
+
+            for alignment in self.getAlignment(*pair):
+                if ((pair[0] in colourOne and pair[1] in colourTwo) or
+                    (pair[1] in colourOne and pair[0] in colourTwo)):
+                    for location in self.neighbourMethods[alignment](pair[0], *pair):
+                        if candidate in self.candidates[location]:
+                            self.candidates[location] -= set([candidate])
+                            self.changes = True
+
+    def validChain(self, chain):
+        for location in chain:
+            if len(self.getSolvingCandidates(location)) == 1:
+                return False
+        return True
+
 
     def prospectiveChange(self, candidatesToRemove=None, valuesToAdd=None):
         from copy import deepcopy
@@ -1216,7 +1277,7 @@ class Sudoku():
                 del prospectivePuzzle.candidates[location]
                 prospectivePuzzle.values[location] = value
 
-        prospectivePuzzle.solve(0)
+        prospectivePuzzle.solve(4)
 
         return prospectivePuzzle.isValid()
 
