@@ -432,6 +432,46 @@ class Sudoku():
 
         return conjugatePairs
 
+    def generateChains(self):
+        self.initialiseIntersections("conjugatePairs")
+
+        chains = []
+
+        for pairGroup in self.intersectionTypes["conjugatePairs"]:
+
+            pair, candidate = pairGroup[0], pairGroup[1]
+            chain = pair[:]
+            visitedLocations = pair[:]
+
+            for i in xrange(len(self.getEmptyLocations())):
+
+                lastLink = chain[-1]
+
+                for prospectivePairGroup in self.intersectionTypes["conjugatePairs"]:
+
+                    prospectiveLink = prospectivePairGroup[0]
+                    prospectiveCandidate = prospectivePairGroup[1]
+
+                    if prospectiveCandidate != candidate:
+                        continue
+
+                    if any(location in visitedLocations for location in prospectiveLink):
+                        continue
+
+                    visitedLocations += prospectiveLink
+
+                    if len(self.getAlignment(prospectiveLink[0], lastLink)) > 0:
+                        chain += prospectiveLink
+                    elif len(self.getAlignment(prospectiveLink[1], lastLink)) > 0:
+                        chain += prospectiveLink[::-1]
+
+                    break
+
+            if len(chain) > 2:
+                chains.append((chain, candidate))
+
+        return chains
+
 
 
 
@@ -710,6 +750,10 @@ class Sudoku():
         if "conjugatePairs" in requiredIntersections:
             if "conjugatePairs" not in self.intersectionTypes:
                 self.intersectionTypes["conjugatePairs"] = self.generateConjugatePairs()
+
+        if "chains" in requiredIntersections:
+            if "chains" not in self.intersectionTypes:
+                self.intersectionTypes["chains"] = self.generateChains()
 
         for intersectionType in requiredIntersections:
             try:
@@ -1160,48 +1204,12 @@ class Sudoku():
 
     def simpleColouring(self):
 
-        self.initialiseIntersections("conjugatePairs")
+        self.initialiseIntersections("chains")
 
         self.changes = False
 
-        chainGroup = []
-
-        for group in self.intersectionTypes["conjugatePairs"]:
-
-            pair, candidate = group[0], group[1]
-            chain = pair[:]
-            visitedLocations = pair[:]
-
-            for i in xrange(len(self.getEmptyLocations())):
-
-                lastLink = chain[-1]
-
-                for prospectiveGroup in self.intersectionTypes["conjugatePairs"]:
-
-                    prospectiveLink = prospectiveGroup[0]
-                    prospectiveCandidate = prospectiveGroup[1]
-
-                    if prospectiveCandidate != candidate:
-                        continue
-
-                    if any(location in visitedLocations for location in prospectiveLink):
-                        continue
-
-                    visitedLocations += prospectiveLink
-
-                    if len(self.getAlignment(prospectiveLink[0], lastLink)) > 0:
-                        chain += prospectiveLink
-                    elif len(self.getAlignment(prospectiveLink[1], lastLink)) > 0:
-                        chain += prospectiveLink[::-1]
-
-                    break
-
-            if len(chain) > 2:
-                chainGroup.append((chain, candidate))
-
-        for group in chainGroup:
-            print chain
-            chain, candidate = group[0], group[1]
+        for chainGroup in self.intersectionTypes["chains"]:
+            chain, candidate = chainGroup[0], chainGroup[1]
             colourOne, colourTwo = chain[::2], chain[1::2]
 
             self.simpleColourCase1(chain, colourOne, colourTwo, candidate)

@@ -133,7 +133,12 @@ conjugatePairPuzzle.candidates[74] = set([1, 5])
 conjugatePairPuzzle.candidates[78] = set([1, 4])
 conjugatePairPuzzle.candidates[81] = set([4, 5])
 
-print puzzleSummary(conjugatePairPuzzle, 0, True, True, True)
+print conjugatePairPuzzle.generateConjugatePairs()
+
+# for chainGroup in conjugatePairPuzzle.generateChains():
+#     print visualizer(conjugatePairPuzzle, chainGroup[0]), chainGroup[1]
+
+# print puzzleSummary(conjugatePairPuzzle, 0, True, True, True)
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
 # for puzzleNo in xrange(1,51):
