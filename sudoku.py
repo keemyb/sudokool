@@ -407,9 +407,7 @@ class Sudoku():
 
             for candidate in locationCandidates:
 
-                for method in (self.getRowNeighbours,
-                    self.getColumnNeighbours,
-                    self.getSubGridNeighbours):
+                for method in self.neighbourMethods.itervalues():
 
                     candidateCount = 1
                     prospectiveLocation = None
@@ -428,7 +426,6 @@ class Sudoku():
 
                     if group not in conjugatePairs:
                         conjugatePairs.append(group)
-                        break
 
         return conjugatePairs
 
