@@ -160,11 +160,12 @@ class Sudoku():
 
             if location in xrange(1, self.gridSize ** 2 + 1, self.gridSize + 1):
                 for group in self.staticGroups.itervalues():
-                    if location not in group:
-                        continue
-                    values = [self.getValue(location) for location in group if not self.isEmpty(location)]
-                    if list(set(values)) != values:
-                        return False
+                    for unit in group:
+                        if location not in unit:
+                            continue
+                        values = [self.getValue(location) for location in unit if not self.isEmpty(location)]
+                        if list(set(values)) != values:
+                            return False
 
             if self.solveMode:
                 if self.isEmpty(location):
