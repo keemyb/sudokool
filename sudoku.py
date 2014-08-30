@@ -786,6 +786,7 @@ class Sudoku():
         self.updateXWingGroups()
         self.updateSwordfishGroups()
         self.updateConjugatePairs()
+        self.updateChains()
 
     def updateBaseGroupCandidates(self):
         for intersectionType in ["subGrid", "row", "column"]:
@@ -863,6 +864,29 @@ class Sudoku():
                 if group in self.intersectionTypes["conjugatePairs"]:
                     self.intersectionTypes["conjugatePairs"].remove(group)
                     break
+
+    def updateChains(self):
+        if "chains" not in self.intersectionTypes:
+            return
+
+        for chainGroup in self.intersectionTypes["chains"]:
+            if not self.validChain(chainGroup):
+                if chainGroup in self.intersectionTypes["conjugatePairs"]:
+                    self.intersectionTypes["conjugatePairs"].remove(chainGroup)
+
+    def validChain(self, chainGroup):
+        chain, candidate = chainGroup[0], chainGroup[1]
+        if (chain, candidate) not in self.intersectionTypes["chains"]:
+            return False
+        
+        for location in chain:
+            if not self.isEmpty(location):
+                return False
+            if len(self.getSolvingCandidates(location)) <= 1:
+                return False
+            if candidate not in self.candidates[location]:
+                return False
+        return True
 
 
 
