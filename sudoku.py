@@ -684,11 +684,12 @@ class Sudoku():
 
     def solve(self, maxLevel, history = None):
         methods = [self.nakedSingle, self.hiddenSingle,
-            self.nakedTwin, self.hiddenTwin,
-            self.pointingPair, self.pointingTriplet,
-            self.boxLineReduction2, self.boxLineReduction3,
-            self.nakedTriplet, self.hiddenTriplet,
-            self.xWing, self.swordfish]
+                   self.nakedTwin, self.hiddenTwin,
+                   self.pointingPair, self.pointingTriplet,
+                   self.boxLineReduction2, self.boxLineReduction3,
+                   self.nakedTriplet, self.hiddenTriplet,
+                   self.xWing, self.swordfish,
+                   self.simpleColouring]
 
         if self.isComplete():
             return True, [entry[0] for entry in history if history != None]
@@ -1236,48 +1237,70 @@ class Sudoku():
             chain, candidate = chainGroup[0], chainGroup[1]
             colourOne, colourTwo = chain[::2], chain[1::2]
 
-            self.simpleColourCase1(chain, colourOne, colourTwo, candidate)
+            self.chainOnOff(chain, colourOne, colourTwo, candidate)
 
             self.simpleColourCase2(chain, colourOne, colourTwo, candidate)
 
             self.simpleColourCase4(chain, colourOne, colourTwo, candidate)
+
+            self.simpleColourCase5(chain, colourOne, colourTwo, candidate)
 
         if self.changes:
             self.updatePuzzle()
 
         return self.changes
 
-    def simpleColourCase1(self, chain, colourOne, colourTwo, candidate):
+    def chainOnOff(self, chain, colourOne, colourTwo, candidate):
+        """Tests to see if one colour being ON is valid, if it is invalid
+           the other colour must be the solution."""
 
         for colour in (colourOne, colourTwo):
-            if not self.validChain(chain):
+            if not self.validChain((chain, candidate)):
                 break
 
             candidatesToRemove = {location: candidate for location in colour}
 
             if not self.prospectiveChange(candidatesToRemove):
-                continue
-            self.changes = True
-            self.applyProspectiveChange(candidatesToRemove)
+                for correctColour in (colourOne, colourTwo):
+                    if colour != correctColour:
+                        candidatesToRemove = {location: candidate for location in correctColour}
+                        self.applyProspectiveChange(candidatesToRemove)
+                        self.changes = True
 
     def simpleColourCase2(self, chain, colourOne, colourTwo, candidate):
+        """If two locations are in the same colour and unit, this colour must
+           be OFF, and the other colour must be ON.""" 
         from itertools import combinations
 
         for colour in (colourOne, colourTwo):
-            if not self.validChain(chain):
+            if not self.validChain((chain, candidate)):
                 break
 
             for pair in combinations(colour, 2):
-                if len(self.getAlignment(*pair)) > 0:
-                    self.changes = True
-                    for location in pair:
-                        self.candidates[location] -= set([candidate])
+                
+                if not self.getAlignment(*pair):
+                    continue
+                
+                if colour == colourOne:
+                    correctColour = colourTwo
+                else:
+                    correctColour = colourOne
+                
+                valuesToAdd = {location: candidate for location in correctColour}
+                self.applyProspectiveChange(None, valuesToAdd)
+                self.changes = True
+                break
+
+
 
     def simpleColourCase4(self, chain, colourOne, colourTwo, candidate):
+        """If two locations are in the same unit and have different colours,
+           all other locations in the unit must have that candidate removed,
+           as one colour must be OFF, and the other colour must be ON.""" 
         from itertools import combinations
 
         for pair in combinations(chain, 2):
-            if not self.validChain(chain):
+            if not self.validChain((chain, candidate)):
                 break
 
             for alignment in self.getAlignment(*pair):
@@ -1288,11 +1311,34 @@ class Sudoku():
                             self.candidates[location] -= set([candidate])
                             self.changes = True
 
-    def validChain(self, chain):
-        for location in chain:
-            if len(self.getSolvingCandidates(location)) == 1:
-                return False
-        return True
+    def simpleColourCase5(self, chain, colourOne, colourTwo, candidate):
+        """If a location can see two locations in a chain that have different
+           colours, this location must have that candidate removed,
+           as one colour must be OFF, and the other colour must be ON.""" 
+        from itertools import combinations
+
+        for location in self.getEmptyLocations():
+            if location in chain:
+                continue
+
+            if candidate not in self.getSolvingCandidates(location):
+                continue
+
+            for pair in combinations(chain, 2):
+                if not self.validChain((chain, candidate)):
+                    break
+
+                if not (((pair[0] in colourOne and pair[1] in colourTwo) or
+                        (pair[1] in colourOne and pair[0] in colourTwo))):
+                    continue
+
+                alignsWithFirstElement = self.getAlignment(pair[0], location)
+                alignsWithSecondElement = self.getAlignment(pair[1], location)
+                if alignsWithFirstElement and alignsWithSecondElement:
+                    self.candidates[location] -= set([candidate])
+                    self.changes = True
+
+
 
 
     def prospectiveChange(self, candidatesToRemove=None, valuesToAdd=None):
