@@ -164,7 +164,7 @@ class Sudoku():
                         if location not in unit:
                             continue
                         values = [self.getValue(location) for location in unit if not self.isEmpty(location)]
-                        if list(set(values)) != values:
+                        if sorted(list(set(values))) != sorted(values):
                             return False
 
             if self.solveMode:
