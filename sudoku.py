@@ -1309,6 +1309,7 @@ class Sudoku():
                 del prospectivePuzzle.candidates[location]
                 prospectivePuzzle.values[location] = value
 
+        prospectivePuzzle.updatePuzzle()
         prospectivePuzzle.solve(4)
 
         return prospectivePuzzle.isValid()
@@ -1322,3 +1323,5 @@ class Sudoku():
             for location, value in valuesToAdd.iteritems():
                 del self.candidates[location]
                 self.values[location] = value
+
+        self.updatePuzzle()
