@@ -435,35 +435,35 @@ class Sudoku():
 
         chains = []
 
-        for pairGroup in self.intersectionTypes["conjugatePairs"]:
+        for initialPairGroup in self.intersectionTypes["conjugatePairs"]:
 
-            pair, candidate = pairGroup[0], pairGroup[1]
+            pair, candidate = initialPairGroup[0], initialPairGroup[1]
             chain = pair[:]
-            visitedLocations = pair[:]
 
-            for i in xrange(len(self.getEmptyLocations())):
+            lastChain = None
+            while lastChain != chain:
 
                 lastLink = chain[-1]
+                lastChain = chain[:]
 
                 for prospectivePairGroup in self.intersectionTypes["conjugatePairs"]:
 
-                    prospectiveLink = prospectivePairGroup[0]
+                    prospectivePair = prospectivePairGroup[0]
                     prospectiveCandidate = prospectivePairGroup[1]
 
                     if prospectiveCandidate != candidate:
                         continue
 
-                    if any(location in visitedLocations for location in prospectiveLink):
+                    if all(location in chain for location in prospectivePair):
                         continue
 
-                    visitedLocations += prospectiveLink
-
-                    if len(self.getAlignment(prospectiveLink[0], lastLink)) > 0:
-                        chain += prospectiveLink
-                    elif len(self.getAlignment(prospectiveLink[1], lastLink)) > 0:
-                        chain += prospectiveLink[::-1]
-
-                    break
+                    if any(location == lastLink for location in prospectivePair):
+                        if prospectivePair[0] in chain:
+                            chain.append(prospectivePair[1])
+                            break
+                        else:
+                            chain.append(prospectivePair[0])
+                            break
 
             if len(chain) > 2:
                 chains.append((chain, candidate))
