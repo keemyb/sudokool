@@ -424,9 +424,11 @@ class Sudoku():
                         continue
 
                     group = (sorted((location, prospectiveLocation)), candidate)
+                    reversedGroup = ([group[0][1], group[0][0]], candidate)
 
                     if group not in conjugatePairs:
                         conjugatePairs.append(group)
+                        conjugatePairs.append(reversedGroup)
 
         return conjugatePairs
 
