@@ -263,12 +263,10 @@ class Sudoku():
     def generatePointerGroups(self, n):
         self.initialiseIntersections()
 
-        from itertools import combinations
-
         pointers = []
 
         for subGrid in self.intersectionTypes["subGrid"]:
-            for combination in combinations(subGrid, n):
+            for combination in self.getNLocations(subGrid, n):
 
                 if "row" in self.getAlignment(*combination):
                     pointers.append((combination, "row"))
@@ -289,13 +287,13 @@ class Sudoku():
             if len(firstRow) < 2:
                 continue
 
-            for firstRowGroup in self.getNLocationsOnRow(firstRow, 2):
+            for firstRowGroup in self.getNLocations(firstRow, 2):
 
                     for secondRow in self.intersectionTypes["row"][firstRowIndex + 1:]:
                         if len(secondRow) < 2:
                             continue
 
-                        for secondRowGroup in self.getNLocationsOnRow(secondRow, 2):
+                        for secondRowGroup in self.getNLocations(secondRow, 2):
                                 if "subGrid" in self.getAlignment(firstRowGroup[0], secondRowGroup[1]):
                                     continue
 
@@ -319,13 +317,13 @@ class Sudoku():
             if len(firstRow) < 2:
                 continue
 
-            for firstRowGroup in self.getNLocationsOnRow(firstRow, 2):
+            for firstRowGroup in self.getNLocations(firstRow, 2):
 
                 for secondRowIndex, secondRow in enumerate(self.intersectionTypes["row"][firstRowIndex + 1:-2]):
                     if len(secondRow) < 2:
                         continue
 
-                    for secondRowGroup in self.getNLocationsOnRow(secondRow, 2):
+                    for secondRowGroup in self.getNLocations(secondRow, 2):
                         alignments = 0
 
                         for locationOne in firstRowGroup:
@@ -341,7 +339,7 @@ class Sudoku():
                             if len(thirdRow) < 2:
                                 continue
 
-                            for thirdRowGroup in self.getNLocationsOnRow(thirdRow, 2):
+                            for thirdRowGroup in self.getNLocations(thirdRow, 2):
                                 alignments2 = 0
 
                                 for locationOne in thirdRowGroup:
@@ -365,13 +363,13 @@ class Sudoku():
             if len(firstRow) < 3:
                 continue
 
-            for firstRowGroup in self.getNLocationsOnRow(firstRow, 3):
+            for firstRowGroup in self.getNLocations(firstRow, 3):
 
                 for secondRowIndex, secondRow in enumerate(self.intersectionTypes["row"][firstRowIndex + 1:-2]):
                     if len(secondRow) < 3:
                         continue
 
-                    for secondRowGroup in self.getNLocationsOnRow(secondRow, 3):
+                    for secondRowGroup in self.getNLocations(secondRow, 3):
                         alignments = 0
 
                         for i in xrange(3):
@@ -385,7 +383,7 @@ class Sudoku():
                             if len(thirdRow) < 3:
                                 continue
 
-                            for thirdRowGroup in self.getNLocationsOnRow(thirdRow, 3):
+                            for thirdRowGroup in self.getNLocations(thirdRow, 3):
                                 alignments2 = 0
 
                                 for i in xrange(3):
@@ -585,10 +583,10 @@ class Sudoku():
     def getEmptyLocations(self):
         return self.candidates.keys()
 
-    def getNLocationsOnRow(self, row, n):
+    def getNLocations(self, unit, n):
         from itertools import combinations
 
-        return combinations(row, n)
+        return combinations(unit, n)
 
     def setValue(self, location, value):
         if self.isConstant(location):
@@ -879,7 +877,7 @@ class Sudoku():
         chain, candidate = chainGroup[0], chainGroup[1]
         if (chain, candidate) not in self.intersectionTypes["chains"]:
             return False
-        
+
         for location in chain:
             if not self.isEmpty(location):
                 return False
@@ -913,8 +911,6 @@ class Sudoku():
 
         self.changes = False
 
-        from itertools import combinations
-
         for intersectionType in ["subGrid", "row", "column"]:
 
             for group in self.intersectionTypes[intersectionType]:
@@ -922,7 +918,7 @@ class Sudoku():
                 if len(group) <= n:
                     continue
 
-                for combination in combinations(group, n):
+                for combination in self.getNLocations(group, n):
 
                     nakedNcandidates = self.getSolvingCandidates(*combination)
 
@@ -959,8 +955,6 @@ class Sudoku():
 
         self.changes = False
 
-        from itertools import combinations
-
         for intersectionType in ["subGrid", "row", "column"]:
 
             for group in self.intersectionTypes[intersectionType]:
@@ -968,7 +962,7 @@ class Sudoku():
                 if len(group) <= n:
                     continue
 
-                for combination in combinations(group, n):
+                for combination in self.getNLocations(group, n):
 
                     surroundingLocations = [location for location in group if location not in combination]
 
@@ -1151,6 +1145,9 @@ class Sudoku():
 
         return self.changes
 
+
+
+
     def swordfish(self):
         self.initialiseIntersections("swordfish")
 
@@ -1269,37 +1266,33 @@ class Sudoku():
 
     def simpleColourCase2(self, chain, colourOne, colourTwo, candidate):
         """If two locations are in the same colour and unit, this colour must
-           be OFF, and the other colour must be ON.""" 
-        from itertools import combinations
+           be OFF, and the other colour must be ON."""
 
         for colour in (colourOne, colourTwo):
             if not self.validChain((chain, candidate)):
                 break
 
-            for pair in combinations(colour, 2):
-                
+            for pair in self.getNLocations(colour, 2):
+
                 if not self.getAlignment(*pair):
                     continue
-                
+
                 if colour == colourOne:
                     correctColour = colourTwo
                 else:
                     correctColour = colourOne
-                
+
                 valuesToAdd = {location: candidate for location in correctColour}
                 self.applyProspectiveChange(None, valuesToAdd)
                 self.changes = True
                 break
 
-
-
     def simpleColourCase4(self, chain, colourOne, colourTwo, candidate):
         """If two locations are in the same unit and have different colours,
            all other locations in the unit must have that candidate removed,
-           as one colour must be OFF, and the other colour must be ON.""" 
-        from itertools import combinations
+           as one colour must be OFF, and the other colour must be ON."""
 
-        for pair in combinations(chain, 2):
+        for pair in self.getNLocations(chain, 2):
             if not self.validChain((chain, candidate)):
                 break
 
@@ -1314,8 +1307,7 @@ class Sudoku():
     def simpleColourCase5(self, chain, colourOne, colourTwo, candidate):
         """If a location can see two locations in a chain that have different
            colours, this location must have that candidate removed,
-           as one colour must be OFF, and the other colour must be ON.""" 
-        from itertools import combinations
+           as one colour must be OFF, and the other colour must be ON."""
 
         for location in self.getEmptyLocations():
             if location in chain:
@@ -1324,7 +1316,7 @@ class Sudoku():
             if candidate not in self.getSolvingCandidates(location):
                 continue
 
-            for pair in combinations(chain, 2):
+            for pair in self.getNLocations(chain, 2):
                 if not self.validChain((chain, candidate)):
                     break
 
