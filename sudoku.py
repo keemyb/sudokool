@@ -422,11 +422,9 @@ class Sudoku():
                         continue
 
                     group = (sorted((location, prospectiveLocation)), candidate)
-                    reversedGroup = ([group[0][1], group[0][0]], candidate)
 
                     if group not in conjugatePairs:
                         conjugatePairs.append(group)
-                        conjugatePairs.append(reversedGroup)
 
         return conjugatePairs
 
@@ -437,38 +435,49 @@ class Sudoku():
 
         for initialPairGroup in self.intersectionTypes["conjugatePairs"]:
 
-            pair, candidate = initialPairGroup[0], initialPairGroup[1]
-            chain = pair[:]
+            candidate = initialPairGroup[1]
 
-            lastChain = None
-            while lastChain != chain:
+            reversedInitialPairGroup = ([initialPairGroup[0][1], initialPairGroup[0][0]], candidate)
 
-                lastLink = chain[-1]
-                lastChain = chain[:]
+            for pairGroup in (initialPairGroup, reversedInitialPairGroup):
 
-                for prospectivePairGroup in self.intersectionTypes["conjugatePairs"]:
+                chain = self.chainBuilder(pairGroup)
 
-                    prospectivePair = prospectivePairGroup[0]
-                    prospectiveCandidate = prospectivePairGroup[1]
-
-                    if prospectiveCandidate != candidate:
-                        continue
-
-                    if all(location in chain for location in prospectivePair):
-                        continue
-
-                    if any(location == lastLink for location in prospectivePair):
-                        if prospectivePair[0] in chain:
-                            chain.append(prospectivePair[1])
-                            break
-                        else:
-                            chain.append(prospectivePair[0])
-                            break
-
-            if len(chain) > 2:
-                chains.append((chain, candidate))
+                if len(chain) > 2:
+                    chains.append((chain, candidate))
 
         return chains
+
+    def chainBuilder(self, initialPairGroup):
+        pair, candidate = initialPairGroup[0], initialPairGroup[1]
+        chain = pair[:]
+
+        lastChain = None
+        while lastChain != chain:
+
+            lastLink = chain[-1]
+            lastChain = chain[:]
+
+            for prospectivePairGroup in self.intersectionTypes["conjugatePairs"]:
+
+                prospectivePair = prospectivePairGroup[0]
+                prospectiveCandidate = prospectivePairGroup[1]
+
+                if prospectiveCandidate != candidate:
+                    continue
+
+                if all(location in chain for location in prospectivePair):
+                    continue
+
+                if any(location == lastLink for location in prospectivePair):
+                    if prospectivePair[0] in chain:
+                        chain.append(prospectivePair[1])
+                        break
+                    else:
+                        chain.append(prospectivePair[0])
+                        break
+
+        return chain
 
 
 
