@@ -1,6 +1,5 @@
 from sudoku import Sudoku
-from solver import puzzleSummary, solver
-from math import sqrt
+from puzzleSummary import puzzleSummary
 
 def fromTextPuzzleSummary(textfile, seperator, maxLevel, n, specific, showModified, showSolved, printPuzzle, printGhostValues, printHistory):
     
@@ -90,30 +89,15 @@ def visualizer(puzzle, *groups):
 
     return wholeString
 
-hiddenTripleTestString = "370408100\
-000903704\
-940100083\
-420000005\
-000504000\
-800000046\
-010049000\
-509600400\
-004200931"
+conjugatePairPuzzle = Sudoku("007003600039000800020010050040100300000367000003008060090070020004000130008600900")
+conjugatePairPuzzle = Sudoku("007083600039706800826419753640190387080367000073048060390870026764900138208630970")
+conjugatePairPuzzle = Sudoku("008502103350001208021030050563240701482107530179053002030025810807310025215084300")
 
-# hiddenTripleTest = Sudoku(hiddenTripleTestString)
-# hiddenTripleTest.hiddenTriplet()
-# print hiddenTripleTest.intersectionTypes
-
-# puzzle8 = Sudoku("1004200006000705005008006800100000060052004006008060007000073006")
+print puzzleSummary(conjugatePairPuzzle, 0, True, True, True)
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
 # for puzzleNo in xrange(1,51):
 #     print fromTextPuzzleSummary("easy50.txt", "========\n", 0, puzzleNo, True, True, True, True, True, True)
-
-# xWingTest = Sudoku("100000569492056108056109240009640801064010000218035604040500016905061402621000005")
-# # xWingTest.generateSubGridGroups()
-# print puzzleSummary(xWingTest, 0, True, True, True)
-# print xWingTest.values
 
 # string16 = "B07805E0300AD0CG\
 # 004007000C0FA002\
@@ -135,27 +119,6 @@ hiddenTripleTestString = "370408100\
 # puzzle16 = Sudoku(string16)
 # print puzzleSummary(puzzle16, 0, True, True, True)
 
-# pointers = Sudoku("017903600000080000900000507072010430000402070064370250701000065000030000005601720")
-# pointers.initialiseIntersections()
-# pointers.candidates[67] = set([5, 7, 8])
-# print pointers.candidates[56]
-# print puzzleSummary(pointers, 0, True, True, True)
-# print pointers.candidates[56]
-
-# blr = Sudoku("016007803090800000870001260048000300650009082039000650060900020080002936924600510")
-# blr.initialiseIntersections()
-# blr.candidates[1] = set([4, 5])
-# blr.candidates[8] = set([4, 9])
-# blr.candidates[10] = set([4, 5, 3])
-# blr.candidates[14] = set([2, 3, 4, 5, 6])
-# blr.candidates[15] = set([3, 4, 5, 6])
-# blr.candidates[22] = set([2, 3, 4, 5])
-# blr.candidates[23] = set([2, 3, 4, 5, 9])
-
-# print puzzleSummary(blr, 0, True, True, True)
-
-# print blr.constants
-
 # fileToRead = open("top95.txt", "r")
 # number = 1
 # for line in fileToRead:
@@ -165,10 +128,5 @@ hiddenTripleTestString = "370408100\
 #     except:
 #         continue
 #     else:
-        
 #         number += 1
 
-hiddenTripleTest = Sudoku(hiddenTripleTestString)
-print hiddenTripleTest
-# hiddenTripleTest.generateSwordfishGroups()
-print visualizer(hiddenTripleTest, *hiddenTripleTest.generate3SwordfishGroups())
