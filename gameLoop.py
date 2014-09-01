@@ -1,41 +1,70 @@
-from sudoku import Sudoku
+import kivy
+kivy.require('1.8.0') # replace with your current kivy version !
 
-def play(puzzle):
-		print puzzle
-		counter = 0
-		while sum([1 for value in puzzle.values.itervalues() if value != 0]) < (puzzle.gridSize ** 2):
-			if counter > 5:
-				return
-			
-			try:
-				location = int(raw_input("What location do you want to modify? "))
-				if puzzle.values[location] != 0:
-					continue
-			except:
-				counter += 1
-				print "Invalid location"
-				continue
-			else:
-				counter = 0
-			
-			try:
-				value = int(raw_input("What value do you want to place in location " + str(location) + "? "))
-			except:
-				counter += 1
-				print "Invalid value"
-				continue
-			else:
-				counter = 0
-			
-			if value in puzzle.setOfPossibleNumbers:
-				puzzle.values[location] = value
-				print puzzle
-				print
+from kivy.app import App
+from sudoku import Sudoku
+from kivy.uix.label import Label
+from kivy.uix.button import Button
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.boxlayout import BoxLayout
+
+class screen(BoxLayout):
+
+	def __init__(self, horizontalFormat = True, **kwargs):
+		super(screen, self).__init__(**kwargs)
 		
-		if puzzle.isValid:
-			print "Puzzle Completed"
+		if horizontalFormat:
+			self.orientation = "horizontal"
 		else:
-			print "Invalid Puzzle"
+			self.orientation = "vertical"
+		self.add_widget(puzzle())
+		self.add_widget(inputs())
+
+class puzzle(GridLayout):
+	
+	def __init__(self, **kwargs):
+		super(puzzle, self).__init__(**kwargs)	
+		
+		self.cols = sudoku.getGridSize()
+		
+		for location in sudoku.getLocations():
+			if sudoku.isEmpty(location):
+				self.add_widget(candidates(location))
+			else:
+				value = str(sudoku.getLocationValue(location))
+				self.add_widget(Label(text = value, font_size = 40))
+
+class candidates(GridLayout):
+	
+	def __init__(self, location, userCandidates = False, **kwargs):
+		super(candidates, self).__init__(**kwargs)
+		
+		self.cols = sudoku.getSubGridsX()
+		
+		if userCandidates:
+			if sudoku.locationHasUserCandidates(location):
+				for candidate in sudoku.getUserCandidates(location):
+					self.add_widget(Label(text = str(candidate)))
+		else:
+			if sudoku.locationHasSolvingCandidates(location):
+				for candidate in sudoku.getSolvingCandidates(location):
+					self.add_widget(Label(text = str(candidate)))			
+		
+class inputs(GridLayout):
+	
+	def __init__(self, **kwargs):
+		super(inputs, self).__init__(**kwargs)	
+		
+		self.cols = sudoku.getSubGridsX()
+		
+		for value in sudoku.getPossibleValues():
+			self.add_widget(Button(text = str(value)))
+
+class SudokuApp(App):
+
+	def build(self):
+		return screen(False)
+
 string9 = "003020600\
 900305001\
 001806400\
@@ -45,14 +74,27 @@ string9 = "003020600\
 002609500\
 800203009\
 005010300"
+sudoku = Sudoku(string9)
 
-puzzle9 = Sudoku(string9)
-puzzle9.nakedSingle()
-puzzle9.hiddenSingle()
-puzzle9.nakedSingle()
-puzzle9.hiddenSingle()
-puzzle9.nakedSingle()
-puzzle9.hiddenSingle()
+# string16 = "B07805E0300AD0CG\
+# 004007000C0FA002\
+# A000000000043700\
+# 0050009F00000008\
+# 0400B8000E079300\
+# 00E37C0000FDB004\
+# 9F07005D03000080\
+# 500D0F3024A8C0G0\
+# 08000000B0000GD5\
+# 00D000000800F0E0\
+# 00A090F0067000BC\
+# 000C0AB0000E7240\
+# 7A090B1000500630\
+# D0CEF070A0000800\
+# 0000E0A00D005000\
+# 0635G9C00B00E000"
 
+# sudoku = Sudoku(string16)
+sudoku.initialiseIntersections()
 
-play(puzzle9)
+if __name__ == '__main__':
+	SudokuApp().run()
