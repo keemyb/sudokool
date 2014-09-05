@@ -1289,13 +1289,20 @@ class Sudoku():
             chain, candidate = chainGroup[0], chainGroup[1]
             colourOne, colourTwo = chain[::2], chain[1::2]
 
-            log.append(self.chainOnOff(chain, colourOne, colourTwo, candidate))
+            logStrings = ("Simple Colouring - Chain ON OFF: ",
+                          "Simple Colouring - Case 2: "
+                          "Simple Colouring - Case 4: "
+                          "Simple Colouring - Case 5: ")
 
-            log.append(self.simpleColourCase2(chain, colourOne, colourTwo, candidate))
+            simpleColouringMethods = (self.chainOnOff,
+                                      self.simpleColourCase2,
+                                      self.simpleColourCase4,
+                                      self.simpleColourCase5)
 
-            log.append(self.simpleColourCase4(chain, colourOne, colourTwo, candidate))
-
-            log.append(self.simpleColourCase5(chain, colourOne, colourTwo, candidate))
+            for index, method in enumerate(simpleColouringMethods):
+                result = method(chain, colourOne, colourTwo, candidate)
+                if result:
+                    log.append(logStrings[index] + str(result))
 
         if self.changes:
             self.updatePuzzle()
@@ -1305,6 +1312,8 @@ class Sudoku():
     def chainOnOff(self, chain, colourOne, colourTwo, candidate):
         """Tests to see if one colour being ON is valid, if it is invalid
            the other colour must be the solution."""
+
+        successString = "%s has been removed from locations %s, as it is part of an invalid colour"
 
         for testColour in (colourOne, colourTwo):
             if not self.validChain((chain, candidate)):
@@ -1322,10 +1331,13 @@ class Sudoku():
                     candidatesToRemove = {location: candidate for location in correctColour}
                     self.applyProspectiveChange(candidatesToRemove)
                     self.changes = True
+                    return successString % (candidate, [location for location in correctColour])
 
     def simpleColourCase2(self, chain, colourOne, colourTwo, candidate):
         """If two locations are in the same colour and unit, this colour must
            be OFF, and the other colour must be ON."""
+
+        successString = "locations %s have been set to %s, as it shares a unit with a chain where two colours are the same"
 
         for colour in (colourOne, colourTwo):
             if not self.validChain((chain, candidate)):
@@ -1344,12 +1356,16 @@ class Sudoku():
                 valuesToAdd = {location: candidate for location in correctColour}
                 self.applyProspectiveChange(None, valuesToAdd)
                 self.changes = True
-                break
+                return successString % ([location for location in correctColour], candidate)
 
     def simpleColourCase4(self, chain, colourOne, colourTwo, candidate):
         """If two locations are in the same unit and have different colours,
            all other locations in the unit must have that candidate removed,
            as one colour must be OFF, and the other colour must be ON."""
+
+        log = []
+
+        successString = "%s has been removed from %s, as these locations are in the same unit as one of two locations that must be ON"
 
         for pair in self.getNLocations(chain, 2):
             if not self.validChain((chain, candidate)):
@@ -1362,11 +1378,18 @@ class Sudoku():
                         if candidate in self.candidates[location]:
                             self.candidates[location] -= set([candidate])
                             self.changes = True
+                            log.append(successString % (candidate, location))
+
+        return log
 
     def simpleColourCase5(self, chain, colourOne, colourTwo, candidate):
         """If a location can see two locations in a chain that have different
            colours, this location must have that candidate removed,
            as one colour must be OFF, and the other colour must be ON."""
+
+        successString = """%s has been removed from %s, as this location can "see" both %s, locations of different colours"""
+
+        log = []
 
         for location in self.getEmptyLocations():
             if location in chain:
@@ -1388,6 +1411,9 @@ class Sudoku():
                 if alignsWithFirstElement and alignsWithSecondElement:
                     self.candidates[location] -= set([candidate])
                     self.changes = True
+                    log.append(successString % candidate, location, pair)
+
+        return log
 
 
 
