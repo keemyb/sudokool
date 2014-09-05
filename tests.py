@@ -95,10 +95,10 @@ conjugatePairPuzzle = Sudoku("00850210335000120802103005056324070148210753017905
 
 # print puzzleSummary(conjugatePairPuzzle, 0, True, True, True)
 
-# for puzzleNo in [6,7,42,47,48,49,50]:
+for puzzleNo in [6,7,42,47,48,49,50]:
 # for puzzleNo in xrange(5,11):
 # for puzzleNo in xrange(1,51):
-#     print fromTextPuzzleSummary("easy50.txt", "========\n", 0, puzzleNo, True, True, True, True, True, True)
+    print fromTextPuzzleSummary("easy50.txt", "========\n", 0, puzzleNo, True, True, True, True, True, True)
 
 # string16 = "B07805E0300AD0CG\
 # 004007000C0FA002\
@@ -135,4 +135,4 @@ conjugatePairPuzzle = Sudoku("00850210335000120802103005056324070148210753017905
 summary = Sudoku("017903600000080000900000507072010430000402070064370250701000065000030000005601720")
 summary.initialiseIntersections()
 
-print puzzleSummary(summary, 0, True, True, True, verbose=True)
+# print puzzleSummary(summary, 0, True, True, True, verbose=True)

@@ -66,36 +66,53 @@ class Sudoku():
         pass
 
     def __str__(self):
-        gridSize = self.gridSize
-        subGridsX = self.subGridsX
-        subGridsY = self.subGridsY
         string = ""
         vPipe = "="
         hPipe = "="
         # first line to accommodate vertical pipe and following spaces (minus one to account for last v pipe)
         # second line for numbers (and following spaces)
-        hPipeString = (hPipe * ((len(vPipe) + 1) * (subGridsX + 1) - 1) +
-                       hPipe * (gridSize * 2) +
+        horizontalDivider = (hPipe * ((len(vPipe) + 1) * (self.subGridsX + 1) - 1) +
+                       hPipe * (self.gridSize * 2) +
                        "\n")
 
-        for position in xrange(1, gridSize ** 2 + 1):
+        def isFirstLocationOnLine(location):
+            if (location - 1) % (self.gridSize * self.subGridsX) == 0:
+                return True
+            return False
 
-            if (position - 1) % (gridSize * subGridsX) == 0:
-                string += hPipeString
+        def isFirstLocationInRowInSubGrid(location):
+            if (location - 1) % self.subGridsY == 0:
+                return True
+            return False
 
-            if (position - 1) % subGridsY == 0 :
+        def isLastLocationInRow(location):
+            if location % self.gridSize == 0:
+                return True
+            return False
+
+        def isLastLocation(location):
+            if location == self.gridSize ** 2:
+                return True
+            return False
+
+        for location in self.getLocations():
+
+            if isFirstLocationOnLine(location):
+                string += horizontalDivider
+
+            if isFirstLocationInRowInSubGrid(location):
                 string += vPipe + " "
 
-            if self.isEmpty(position):
+            if self.isEmpty(location):
                 string += "  "
             else:
-                string += str(self.values[position]) + " "
+                string += str(self.getValue(location)) + " "
 
-            if position % gridSize == 0:
+            if isLastLocationInRow(location):
                 string += vPipe + "\n"
 
-            if position == gridSize ** 2:
-                string += hPipeString
+            if isLastLocation(location):
+                string += horizontalDivider
 
         return string
 
