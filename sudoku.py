@@ -687,8 +687,7 @@ class Sudoku():
         return sorted(self.setOfPossibleValues)
 
     def getNumberOfFilledLocations(self):
-        from operator import add
-        return reduce(add, [1 for location in self.values if not self.isEmpty(location)], 0)
+        return (self.gridSize ** 2) - len(self.getEmptyLocations())
 
 
 
