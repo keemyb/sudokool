@@ -441,7 +441,7 @@ class Sudoku():
 
             candidate = initialPairGroup[1]
 
-            reversedInitialPairGroup = ([initialPairGroup[0][1], initialPairGroup[0][0]], candidate)
+            reversedInitialPairGroup = (initialPairGroup[0][::-1], candidate)
 
             for pairGroup in (initialPairGroup, reversedInitialPairGroup):
 
