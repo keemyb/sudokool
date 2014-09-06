@@ -47,6 +47,10 @@ class Sudoku():
                              "column": self.generateColumnGroups(),
                              "subGrid": self.generateSubGridGroups()}
 
+        self.generationMethods = {"row": self.generateRowGroups,
+                                  "column": self.generateColumnGroups,
+                                  "subGrid": self.generateSubGridGroups}
+
         self.neighbourMethods = {"row": self.getRowNeighbours,
                                  "column": self.getColumnNeighbours,
                                  "subGrid": self.getSubGridNeighbours}
