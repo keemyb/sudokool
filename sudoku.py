@@ -27,7 +27,7 @@ def factors(n):
 
 class Sudoku():
 
-    def __init__(self, data, horizontalFormat = True):
+    def __init__(self, data, horizontalFormat=True):
         self.calculateDimensions(data, horizontalFormat)
         self.generatePossibleValues()
         self.processData(data)
@@ -696,7 +696,7 @@ class Sudoku():
 
 
 
-    def solve(self, maxLevel, history = None):
+    def solve(self, maxLevel, history=None):
         methods = [self.nakedSingle, self.hiddenSingle,
                    self.nakedTwin, self.hiddenTwin,
                    self.pointingPair, self.pointingTriplet,
@@ -712,7 +712,7 @@ class Sudoku():
             maxLevel = len(methods)
 
         #if solver is run for the first time, solve using first method
-        if history == None:
+        if history is None:
             log = methods[0]()[1]
             history = [(0, self.changes, log)]
             return self.solve(maxLevel, history)
