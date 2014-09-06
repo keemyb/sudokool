@@ -38,10 +38,10 @@ class Sudoku():
         self.solveMode = False
         self.changes = False
 
-        self.intersectionTypes = {}
-
         self.multiples = ("Single", "Pair", "Triplet", "Quadruplet")
         self.units = ["row", "column", "subGrid"]
+
+        self.intersectionTypes = {}
 
         self.staticGroups = {"row": self.generateRowGroups(),
                              "column": self.generateColumnGroups(),
