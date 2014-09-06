@@ -742,15 +742,13 @@ class Sudoku():
         self.solveMode = True
         initialiseCandidates = False
         #three main intersection types needed for candidates to work
-        for intersectionType in ("subGrid", "row", "column"):
+        for intersectionType in self.units:
             if intersectionType in self.intersectionTypes:
                 continue
 
             initialiseCandidates = True
 
-            typeName = intersectionType[0].capitalize() + intersectionType[1:]
-
-            self.intersectionTypes[intersectionType] = eval("self.generate" + typeName + "Groups()")
+            self.intersectionTypes[intersectionType] = self.generationMethods[intersectionType]()
 
         if initialiseCandidates:
             self.initialiseCandidates()
