@@ -198,14 +198,10 @@ class Sudoku():
         return True
 
     def isComplete(self):
-        from operator import add
-        numberOfLocations = self.getGridSize() ** 2
-        # could use len(self.getEmptyLocations) OR sum(list comprehension, 1 for location)
-        numberOfFilledLocations = reduce(add, [1 for location in self.getLocations() if not self.isEmpty(location)], 0)
-        if numberOfFilledLocations == numberOfLocations:
-            return True
-
-        return False
+        numberOfFilledLocations = len(self.getEmptyLocations())
+        if numberOfFilledLocations:
+            return False
+        return True
 
 
 
