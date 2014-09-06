@@ -787,11 +787,13 @@ class Sudoku():
 
     def initialiseCandidates(self):
 
-        for location in [location for location in self.values if self.isEmpty(location)]:
+        for location in self.getEmptyLocations()
 
-            setOfSurroundingValues = set([self.values[neighbour] for neighbour in self.getBaseNeighbours(location) if not self.isEmpty(neighbour)])
+            neighbours = [neighbour for neighbour in self.getAllBaseNeighbours(location) if not self.isEmpty(neighbour)]
 
-            self.candidates[location] = self.setOfPossibleValues - setOfSurroundingValues
+            surroundingValues = self.getValues(*neighbours)
+            
+            self.candidates[location] = self.setOfPossibleValues - surroundingValues
 
 
 
