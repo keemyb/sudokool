@@ -163,7 +163,7 @@ class Sudoku():
             self.setOfPossibleValues.update(alphabeticalValues)
 
     def processData(self, data):
-        self.values = {position + 1 : data[position] for position in range(self.gridSize ** 2)}
+        self.values = {position + 1 : data[position] for position in xrange(self.gridSize ** 2)}
         for location, value in self.values.iteritems():
             try:
                 self.values[location] = int(value)
