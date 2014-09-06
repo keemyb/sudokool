@@ -187,11 +187,9 @@ class Sudoku():
                         if sorted(list(set(values))) != sorted(values):
                             return False
 
-            # should be a regular criterion, should initialise intersections to check this
-            if self.solveMode:
-                if self.isEmpty(location):
-                    if len(self.getSolvingCandidates(location)) == 0:
-                        return False
+            if self.isEmpty(location):
+                if len(self.getSolvingCandidates(location)) == 0:
+                    return False
 
             if not self.isEmpty(location):
                 if self.values[location] not in self.setOfPossibleValues:
