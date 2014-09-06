@@ -207,29 +207,22 @@ class Sudoku():
 
 
     def getSubGridStartLocations(self):
-        subGridsX = self.subGridsX
-        subGridsY = self.subGridsY
-        gridSize = self.gridSize
         subGridStartLocations = []
 
-        for subGrid in xrange(gridSize):
-            baseLocation = (subGrid / subGridsX) * (gridSize * subGridsX)
-            offset = (subGrid % subGridsX) * subGridsY
+        for subGrid in xrange(self.gridSize):
+            baseLocation = (subGrid / self.subGridsX) * (self.gridSize * self.subGridsX)
+            offset = (subGrid % self.subGridsX) * self.subGridsY
             subGridStartLocations.append(baseLocation + offset + 1)
 
         return subGridStartLocations
 
     def getRowStartLocations(self):
-        gridSize = self.gridSize
-
-        rowStartLocations = [(row * gridSize + 1) for row in xrange(gridSize)]
+        rowStartLocations = [(row * self.gridSize + 1) for row in xrange(self.gridSize)]
 
         return rowStartLocations
 
     def getColumnStartLocations(self):
-        gridSize = self.gridSize
-
-        columnStartLocations = range(1, gridSize + 1)
+        columnStartLocations = range(1, self.gridSize + 1)
 
         return columnStartLocations
 
@@ -237,15 +230,12 @@ class Sudoku():
 
 
     def generateSubGridGroups(self):
-        gridSize = self.gridSize
-        subGridsY = self.subGridsY
-
         subGridGroups = []
         offsets = []
 
-        for position in xrange(gridSize):
-            rowOffset = (position / subGridsY) * gridSize
-            columnOffset = (position % gridSize) % subGridsY
+        for position in xrange(self.gridSize):
+            rowOffset = (position / self.subGridsY) * self.gridSize
+            columnOffset = (position % self.gridSize) % self.subGridsY
 
             offsets.append(rowOffset + columnOffset)
 
@@ -256,22 +246,18 @@ class Sudoku():
         return subGridGroups
 
     def generateRowGroups(self):
-        gridSize = self.gridSize
-
         rowGroups = []
 
         for startLocation in self.getRowStartLocations():
-            rowGroups.append([startLocation + offset for offset in xrange(gridSize)])
+            rowGroups.append([startLocation + offset for offset in xrange(self.gridSize)])
 
         return rowGroups
 
     def generateColumnGroups(self):
-        gridSize = self.gridSize
-
         columnGroups = []
 
         for startLocation in self.getColumnStartLocations():
-            columnGroups.append([startLocation + offset * gridSize for offset in xrange(gridSize)])
+            columnGroups.append([startLocation + offset * self.gridSize for offset in xrange(self.gridSize)])
 
         return columnGroups
 
