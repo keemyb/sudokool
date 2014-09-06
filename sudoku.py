@@ -620,6 +620,9 @@ class Sudoku():
     def getValue(self, location):
         return self.values[location]
 
+    def getValues(self, *locations):
+        return set([]).union(*[self.values[location] for location in locations])
+
     def clearLocation(self, location):
         if self.isConstant(location):
             raise Exception("location is a constant and cannot be changed")
