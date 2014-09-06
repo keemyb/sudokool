@@ -159,7 +159,8 @@ class Sudoku():
             self.setOfPossibleValues = set(xrange(1, self.gridSize + 1))
         else:
             self.setOfPossibleValues = set(xrange(1, 10))
-            self.setOfPossibleValues.update(set([chr(value + 55) for value in xrange(10, self.gridSize + 1)]))
+            alphabeticalValues = set([chr(num + 55) for num in xrange(10, self.gridSize + 1)])
+            self.setOfPossibleValues.update(alphabeticalValues)
 
     def processData(self, data):
         self.values = {position + 1 : data[position] for position in range(self.gridSize ** 2)}
