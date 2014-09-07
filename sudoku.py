@@ -621,7 +621,7 @@ class Sudoku():
         return self.values[location]
 
     def getValues(self, *locations):
-        return set([]).union(*[self.values[location] for location in locations])
+        return set([self.values[location] for location in locations])
 
     def clearLocation(self, location):
         if self.isConstant(location):
@@ -787,7 +787,10 @@ class Sudoku():
 
     def initialiseCandidates(self):
 
-        for location in self.getEmptyLocations()
+        for location in xrange(1, self.gridSize ** 2 + 1):
+
+            if not self.isEmpty(location):
+                continue
 
             neighbours = [neighbour for neighbour in self.getAllBaseNeighbours(location) if not self.isEmpty(neighbour)]
 
@@ -812,11 +815,11 @@ class Sudoku():
 
             for group in self.intersectionTypes[intersectionType]:
 
-                setOfSurroundingValues = set([self.values[location] for location in group])
+                surroundingValues = self.getValues(*group)
 
                 for location in group[:]:
                     if self.isEmpty(location):
-                        self.candidates[location] -= setOfSurroundingValues
+                        self.candidates[location] -= surroundingValues
                     else:
                         group.remove(location)
 
