@@ -786,6 +786,7 @@ class Sudoku():
                    self.boxLineReduction2, self.boxLineReduction3,
                    self.nakedTriplet, self.hiddenTriplet,
                    self.xWing, self.swordfish,
+                   self.yWing,
                    self.simpleColouring]
 
         if self.isComplete():
@@ -1529,6 +1530,39 @@ class Sudoku():
                     log.append(successString % candidate, location, pair)
 
         return log
+
+
+
+
+    def yWing(self):
+        self.initialiseIntersections("yWing")
+
+        self.changes = False
+
+        log = []
+        successString = "Y-Wing: %s has been removed from %s, as it can be seen by %s, part of a Y-Wing"
+
+        for yWingGroup in self.intersectionTypes["yWing"]:
+            yWingLocations = yWingGroup[0]
+            yWingCandidate = yWingGroup[1]
+            firstArm = yWingLocations[1]
+            secondArm = yWingLocations[2]
+
+            firstArmNeighbours = self.getBaseNeighbours(firstArm)
+            secondArmNeighbours = self.getBaseNeighbours(secondArm)
+
+            commonNeighbours = ((set(firstArmNeighbours) &
+                                set(secondArmNeighbours)) -
+                                set(yWingLocations))
+
+            for location in commonNeighbours:
+                locationCandidates = self.getSolvingCandidates(location)
+                if yWingCandidate in locationCandidates:
+                    self.candidates[location] -= set([yWingCandidate])
+                    self.changes = True
+                    log.append(successString % (yWingCandidate, location, (firstArm, secondArm)))
+
+        return self.changes, log
 
 
 
