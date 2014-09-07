@@ -600,6 +600,9 @@ class Sudoku():
         return range(1, self.gridSize ** 2 + 1)
 
     def getEmptyLocations(self):
+        if not self.hasCandidates:
+            self.initialiseCandidates()
+
         return self.candidates.keys()
 
     def getNLocations(self, unit, n):
