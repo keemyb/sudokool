@@ -37,6 +37,8 @@ class Sudoku():
 
         self.solveMode = False
         self.changes = False
+        self.hasCandidates = False
+        self.hasIntersections = False
 
         self.multiples = ("Single", "Pair", "Triplet", "Quadruplet")
         self.units = ["row", "column", "subGrid"]
@@ -598,6 +600,9 @@ class Sudoku():
         return range(1, self.gridSize ** 2 + 1)
 
     def getEmptyLocations(self):
+        if not self.hasCandidates:
+            self.initialiseCandidates()
+
         return self.candidates.keys()
 
     def getNLocations(self, unit, n):
@@ -743,17 +748,16 @@ class Sudoku():
 
     def initialiseIntersections(self, *requiredIntersections):
         self.solveMode = True
-        initialiseCandidates = False
         #three main intersection types needed for candidates to work
         for intersectionType in self.units:
             if intersectionType in self.intersectionTypes:
                 continue
 
-            initialiseCandidates = True
-
             self.intersectionTypes[intersectionType] = self.generationMethods[intersectionType]()
 
-        if initialiseCandidates:
+        self.hasIntersections = True
+
+        if not self.hasCandidates:
             self.initialiseCandidates()
 
         if "xWing" in requiredIntersections:
@@ -787,6 +791,9 @@ class Sudoku():
 
     def initialiseCandidates(self):
 
+        if not self.hasIntersections:
+            self.initialiseIntersections()
+
         for location in xrange(1, self.gridSize ** 2 + 1):
 
             if not self.isEmpty(location):
@@ -797,6 +804,8 @@ class Sudoku():
             surroundingValues = self.getValues(*neighbours)
             
             self.candidates[location] = self.setOfPossibleValues - surroundingValues
+
+        self.hasCandidates = True
 
 
 
