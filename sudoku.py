@@ -851,6 +851,10 @@ class Sudoku():
             if "chains" not in self.intersectionTypes:
                 self.intersectionTypes["chains"] = self.generateChains()
 
+        if "yWing" in requiredIntersections:
+            if "yWing" not in self.intersectionTypes:
+                self.intersectionTypes["yWing"] = self.generateYWingGroups()
+
         for intersectionType in requiredIntersections:
             try:
                 # n variable
@@ -877,7 +881,7 @@ class Sudoku():
             neighbours = [neighbour for neighbour in self.getAllBaseNeighbours(location) if not self.isEmpty(neighbour)]
 
             surroundingValues = self.getValues(*neighbours)
-            
+
             self.candidates[location] = self.setOfPossibleValues - surroundingValues
 
         self.hasCandidates = True
@@ -893,6 +897,7 @@ class Sudoku():
         self.updateSwordfishGroups()
         self.updateConjugatePairs()
         self.updateChains()
+        self.updateYWingGroups()
 
     def updateBaseGroupCandidates(self):
         for intersectionType in ["subGrid", "row", "column"]:
@@ -993,6 +998,21 @@ class Sudoku():
             if candidate not in self.candidates[location]:
                 return False
         return True
+
+    def updateYWingGroups(self):
+        if "yWing" not in self.intersectionTypes:
+            return
+
+        for yWingGroup in self.intersectionTypes["yWing"]:
+            yWingLocations = yWingGroup[0]
+            for location in yWingLocations:
+                if self.isEmpty(location):
+                    continue
+                if len(self.getSolvingCandidates(location)) != 2:
+                    continue
+                if yWingGroup in self.intersectionTypes["yWing"]:
+                    self.intersectionTypes["yWing"].remove(yWingGroup)
+                    break
 
 
 
@@ -1369,6 +1389,9 @@ class Sudoku():
 
         return self.changes, log
 
+
+
+
     def simpleColouring(self):
 
         self.initialiseIntersections("chains")
@@ -1417,7 +1440,7 @@ class Sudoku():
             # checks out we haven't learnt anything new.
             if self.prospectiveChange(candidatesToRemove):
                 continue
-            
+
             for correctColour in (colourOne, colourTwo):
                 if testColour != correctColour:
                     candidatesToRemove = {location: candidate for location in correctColour}
