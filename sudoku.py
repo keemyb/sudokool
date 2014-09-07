@@ -788,6 +788,9 @@ class Sudoku():
 
     def initialiseCandidates(self):
 
+        if not self.hasIntersections:
+            self.initialiseIntersections()
+
         for location in xrange(1, self.gridSize ** 2 + 1):
 
             if not self.isEmpty(location):
