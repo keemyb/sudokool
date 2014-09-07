@@ -489,6 +489,81 @@ class Sudoku():
 
         return chain
 
+    def generateYWingGroups(self):
+        yWings = []
+
+        for firstPair in self.getNLocations(self.getEmptyLocations(), 2):
+            yWingResult = self.yWingPairValid(firstPair)
+            if not yWingResult:
+                continue
+
+            firstAlignment = yWingResult[0]
+            firstCommonCandidates = yWingResult[1]
+
+            for secondPair in self.getNLocations(self.getEmptyLocations(), 2):
+                if secondPair == firstPair:
+                    continue
+
+                if not any(location in firstPair for location in secondPair):
+                    continue
+
+                yWingResult = self.yWingPairValid(secondPair)
+                if not yWingResult:
+                    continue
+
+                secondAlignment = yWingResult[0]
+                secondCommonCandidates = yWingResult[1]
+
+                if secondAlignment == firstAlignment:
+                    continue
+
+                if secondCommonCandidates == firstCommonCandidates:
+                    continue
+
+                pivot = set(firstPair) & set(secondPair)
+
+                yWingLocations = [(set(firstPair) - pivot).pop(),
+                         (set(secondPair) - pivot).pop()]
+                yWingLocations.insert(0, pivot.pop())
+
+                yWingCandidate = self.getCommonCandidates(*yWingLocations[1:])
+
+                if not yWingCandidate:
+                    continue
+
+                yWing = ([yWingLocations[0]] + sorted(yWingLocations[1:]),
+                         yWingCandidate.pop())
+
+                if yWing in yWings:
+                    continue
+
+                yWings.append(yWing)
+
+        return yWings
+
+    def yWingPairValid(self, pair):
+        alignment = self.getAlignment(*pair)
+        if not alignment:
+            return False
+
+        commonCandidates = self.getCommonCandidates(*pair)
+        if not commonCandidates:
+            return False
+
+        firstLocationCandidates = self.getSolvingCandidates(pair[0])
+        secondLocationCandidates = self.getSolvingCandidates(pair[1])
+
+        if firstLocationCandidates == secondLocationCandidates:
+            return False
+
+        if len(firstLocationCandidates) != 2:
+            return False
+
+        if len(secondLocationCandidates) != 2:
+            return False
+
+        return alignment, commonCandidates, firstLocationCandidates, secondLocationCandidates
+
 
 
 
