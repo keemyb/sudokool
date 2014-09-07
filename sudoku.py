@@ -1527,7 +1527,7 @@ class Sudoku():
                 if alignsWithFirstElement and alignsWithSecondElement:
                     self.candidates[location] -= set([candidate])
                     self.changes = True
-                    log.append(successString % candidate, location, pair)
+                    log.append(successString % (candidate, location, pair))
 
         return log
 
