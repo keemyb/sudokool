@@ -787,7 +787,7 @@ class Sudoku():
 
     def initialiseCandidates(self):
 
-        for location in self.getEmptyLocations()
+        for location in self.getEmptyLocations():
 
             neighbours = [neighbour for neighbour in self.getAllBaseNeighbours(location) if not self.isEmpty(neighbour)]
 
