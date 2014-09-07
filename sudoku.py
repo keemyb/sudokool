@@ -1006,7 +1006,7 @@ class Sudoku():
         for yWingGroup in self.intersectionTypes["yWing"]:
             yWingLocations = yWingGroup[0]
             for location in yWingLocations:
-                if self.isEmpty(location):
+                if not self.isEmpty(location):
                     continue
                 if len(self.getSolvingCandidates(location)) != 2:
                     continue
