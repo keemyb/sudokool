@@ -489,6 +489,81 @@ class Sudoku():
 
         return chain
 
+    def generateYWingGroups(self):
+        yWings = []
+
+        for firstPair in self.getNLocations(self.getEmptyLocations(), 2):
+            yWingResult = self.yWingPairValid(firstPair)
+            if not yWingResult:
+                continue
+
+            firstAlignment = yWingResult[0]
+            firstCommonCandidates = yWingResult[1]
+
+            for secondPair in self.getNLocations(self.getEmptyLocations(), 2):
+                if secondPair == firstPair:
+                    continue
+
+                if not any(location in firstPair for location in secondPair):
+                    continue
+
+                yWingResult = self.yWingPairValid(secondPair)
+                if not yWingResult:
+                    continue
+
+                secondAlignment = yWingResult[0]
+                secondCommonCandidates = yWingResult[1]
+
+                if secondAlignment == firstAlignment:
+                    continue
+
+                if secondCommonCandidates == firstCommonCandidates:
+                    continue
+
+                pivot = set(firstPair) & set(secondPair)
+
+                yWingLocations = [(set(firstPair) - pivot).pop(),
+                         (set(secondPair) - pivot).pop()]
+                yWingLocations.insert(0, pivot.pop())
+
+                yWingCandidate = self.getCommonCandidates(*yWingLocations[1:])
+
+                if not yWingCandidate:
+                    continue
+
+                yWing = ([yWingLocations[0]] + sorted(yWingLocations[1:]),
+                         yWingCandidate.pop())
+
+                if yWing in yWings:
+                    continue
+
+                yWings.append(yWing)
+
+        return yWings
+
+    def yWingPairValid(self, pair):
+        alignment = self.getAlignment(*pair)
+        if not alignment:
+            return False
+
+        commonCandidates = self.getCommonCandidates(*pair)
+        if not commonCandidates:
+            return False
+
+        firstLocationCandidates = self.getSolvingCandidates(pair[0])
+        secondLocationCandidates = self.getSolvingCandidates(pair[1])
+
+        if firstLocationCandidates == secondLocationCandidates:
+            return False
+
+        if len(firstLocationCandidates) != 2:
+            return False
+
+        if len(secondLocationCandidates) != 2:
+            return False
+
+        return alignment, commonCandidates, firstLocationCandidates, secondLocationCandidates
+
 
 
 
@@ -711,6 +786,7 @@ class Sudoku():
                    self.boxLineReduction2, self.boxLineReduction3,
                    self.nakedTriplet, self.hiddenTriplet,
                    self.xWing, self.swordfish,
+                   self.yWing,
                    self.simpleColouring]
 
         if self.isComplete():
@@ -776,6 +852,10 @@ class Sudoku():
             if "chains" not in self.intersectionTypes:
                 self.intersectionTypes["chains"] = self.generateChains()
 
+        if "yWing" in requiredIntersections:
+            if "yWing" not in self.intersectionTypes:
+                self.intersectionTypes["yWing"] = self.generateYWingGroups()
+
         for intersectionType in requiredIntersections:
             try:
                 # n variable
@@ -802,7 +882,7 @@ class Sudoku():
             neighbours = [neighbour for neighbour in self.getAllBaseNeighbours(location) if not self.isEmpty(neighbour)]
 
             surroundingValues = self.getValues(*neighbours)
-            
+
             self.candidates[location] = self.setOfPossibleValues - surroundingValues
 
         self.hasCandidates = True
@@ -818,6 +898,7 @@ class Sudoku():
         self.updateSwordfishGroups()
         self.updateConjugatePairs()
         self.updateChains()
+        self.updateYWingGroups()
 
     def updateBaseGroupCandidates(self):
         for intersectionType in ["subGrid", "row", "column"]:
@@ -918,6 +999,21 @@ class Sudoku():
             if candidate not in self.candidates[location]:
                 return False
         return True
+
+    def updateYWingGroups(self):
+        if "yWing" not in self.intersectionTypes:
+            return
+
+        for yWingGroup in self.intersectionTypes["yWing"]:
+            yWingLocations = yWingGroup[0]
+            for location in yWingLocations:
+                if not self.isEmpty(location):
+                    continue
+                if len(self.getSolvingCandidates(location)) != 2:
+                    continue
+                if yWingGroup in self.intersectionTypes["yWing"]:
+                    self.intersectionTypes["yWing"].remove(yWingGroup)
+                    break
 
 
 
@@ -1294,6 +1390,9 @@ class Sudoku():
 
         return self.changes, log
 
+
+
+
     def simpleColouring(self):
 
         self.initialiseIntersections("chains")
@@ -1342,7 +1441,7 @@ class Sudoku():
             # checks out we haven't learnt anything new.
             if self.prospectiveChange(candidatesToRemove):
                 continue
-            
+
             for correctColour in (colourOne, colourTwo):
                 if testColour != correctColour:
                     candidatesToRemove = {location: candidate for location in correctColour}
@@ -1431,6 +1530,39 @@ class Sudoku():
                     log.append(successString % candidate, location, pair)
 
         return log
+
+
+
+
+    def yWing(self):
+        self.initialiseIntersections("yWing")
+
+        self.changes = False
+
+        log = []
+        successString = "Y-Wing: %s has been removed from %s, as it can be seen by %s, part of a Y-Wing"
+
+        for yWingGroup in self.intersectionTypes["yWing"]:
+            yWingLocations = yWingGroup[0]
+            yWingCandidate = yWingGroup[1]
+            firstArm = yWingLocations[1]
+            secondArm = yWingLocations[2]
+
+            firstArmNeighbours = self.getBaseNeighbours(firstArm)
+            secondArmNeighbours = self.getBaseNeighbours(secondArm)
+
+            commonNeighbours = ((set(firstArmNeighbours) &
+                                set(secondArmNeighbours)) -
+                                set(yWingLocations))
+
+            for location in commonNeighbours:
+                locationCandidates = self.getSolvingCandidates(location)
+                if yWingCandidate in locationCandidates:
+                    self.candidates[location] -= set([yWingCandidate])
+                    self.changes = True
+                    log.append(successString % (yWingCandidate, location, (firstArm, secondArm)))
+
+        return self.changes, log
 
 
 

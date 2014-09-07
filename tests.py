@@ -89,16 +89,20 @@ def visualizer(puzzle, *groups):
 
     return wholeString
 
-conjugatePairPuzzle = Sudoku("007003600039000800020010050040100300000367000003008060090070020004000130008600900")
-conjugatePairPuzzle = Sudoku("007083600039706800826419753640190387080367000073048060390870026764900138208630970")
-conjugatePairPuzzle = Sudoku("008502103350001208021030050563240701482107530179053002030025810807310025215084300")
+yWing = Sudoku("900240000050690231020050090090700320002935607070002900069020073510079062207086009")
+# print yWing
+print puzzleSummary(yWing, 0, True, True, True)
+# print yWing.generateYWingGroups()
+# yWing.solve(0)
+# print yWing
+
 
 # print puzzleSummary(conjugatePairPuzzle, 0, True, True, True)
 
-for puzzleNo in [6,7,42,47,48,49,50]:
+# for puzzleNo in [6,7,42,47,48,49,50]:
 # for puzzleNo in xrange(5,11):
 # for puzzleNo in xrange(1,51):
-    print fromTextPuzzleSummary("easy50.txt", "========\n", 0, puzzleNo, True, True, True, True, True, True)
+    # print fromTextPuzzleSummary("easy50.txt", "========\n", 0, puzzleNo, True, True, True, True, True, True)
 
 # string16 = "B07805E0300AD0CG\
 # 004007000C0FA002\
@@ -130,9 +134,3 @@ for puzzleNo in [6,7,42,47,48,49,50]:
 #         continue
 #     else:
 #         number += 1
-
-
-summary = Sudoku("017903600000080000900000507072010430000402070064370250701000065000030000005601720")
-summary.initialiseIntersections()
-
-# print puzzleSummary(summary, 0, True, True, True, verbose=True)
