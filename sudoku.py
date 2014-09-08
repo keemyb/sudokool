@@ -1029,11 +1029,11 @@ class Sudoku():
         for location, candidates in self.candidates.items():
             if len(candidates) == 1:
                 candidate = candidates.pop()
-                
+
                 self.values[location] = candidate
                 del self.candidates[location]
                 self.changes = True
-                
+
                 log.append(successString % (str(location), str(candidate)))
 
         if self.changes:
@@ -1072,7 +1072,7 @@ class Sudoku():
                         if any(candidate in nakedNcandidates for candidate in self.candidates[surroundingLocation]):
 
                             removedCandidates = [candidate for candidate in self.candidates[surroundingLocation] if candidate in nakedNcandidates]
-                            
+
                             self.candidates[surroundingLocation] -= nakedNcandidates
                             self.changes = True
 
@@ -1130,7 +1130,7 @@ class Sudoku():
                             removedCandidates = [candidate for candidate in self.candidates[location] if candidate in surroundingCandidates]
 
                             self.candidates[location] -= surroundingCandidates
-                            
+
                             if n == 1:
                                 self.setValue(location, uniqueCombinationCandidates.pop())
 
@@ -1172,10 +1172,10 @@ class Sudoku():
 
         for pointerGroup in self.intersectionTypes[("pointer", n)]:
             combination, pointerType = pointerGroup[0], pointerGroup[1]
-            
+
             subGridNeighbours = self.getSubGridNeighbours(combination[0], *combination)
             subGridNeighbourCandidates = self.getSolvingCandidates(*subGridNeighbours)
-            
+
             commonPointerCandidates = self.getCommonCandidates(*combination)
             uniquePointerCandidates = set([candidate for candidate in commonPointerCandidates if candidate not in subGridNeighbourCandidates])
 
@@ -1220,7 +1220,7 @@ class Sudoku():
 
         for pointerGroup in self.intersectionTypes[("pointer", n)]:
             combination, pointerType = pointerGroup[0], pointerGroup[1]
-            
+
             linearNeighbours = self.neighbourMethods[pointerType](combination[0], *combination)
             linearNeighbourCandidates = self.getSolvingCandidates(*linearNeighbours)
 
