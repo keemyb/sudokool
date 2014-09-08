@@ -841,25 +841,14 @@ class Sudoku():
         if not self.hasCandidates:
             self.initialiseCandidates()
 
-        if "xWing" in requiredIntersections:
-            if "xWing" not in self.intersectionTypes:
-                self.intersectionTypes["xWing"] = self.generateXWingGroups()
-            
-        if "swordfish" in requiredIntersections:
-            if "swordfish" not in self.intersectionTypes:
-                self.intersectionTypes["swordfish"] = self.generateSwordfishGroups()
+        for intersectionType in requiredIntersections:
+            if intersectionType in self.intersectionTypes:
+                continue
 
-        if "conjugatePairs" in requiredIntersections:
-            if "conjugatePairs" not in self.intersectionTypes:
-                self.intersectionTypes["conjugatePairs"] = self.generateConjugatePairs()
+            if intersectionType not in self.generationMethods:
+                continue
 
-        if "chains" in requiredIntersections:
-            if "chains" not in self.intersectionTypes:
-                self.intersectionTypes["chains"] = self.generateChains()
-
-        if "yWing" in requiredIntersections:
-            if "yWing" not in self.intersectionTypes:
-                self.intersectionTypes["yWing"] = self.generateYWingGroups()
+            self.intersectionTypes[intersectionType] = self.generationMethods[intersectionType]()
 
         for intersectionType in requiredIntersections:
             try:
