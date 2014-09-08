@@ -51,7 +51,12 @@ class Sudoku():
 
         self.generationMethods = {"row": self.generateRowGroups,
                                   "column": self.generateColumnGroups,
-                                  "subGrid": self.generateSubGridGroups}
+                                  "subGrid": self.generateSubGridGroups,
+                                  "xWing": self.generateXWingGroups,
+                                  "swordfish": self.generateSwordfishGroups,
+                                  "conjugatePairs": self.generateConjugatePairs,
+                                  "chains": self.generateChains,
+                                  "yWing": self.generateYWingGroups,}
 
         self.neighbourMethods = {"row": self.getRowNeighbours,
                                  "column": self.getColumnNeighbours,
@@ -839,7 +844,7 @@ class Sudoku():
         if "xWing" in requiredIntersections:
             if "xWing" not in self.intersectionTypes:
                 self.intersectionTypes["xWing"] = self.generateXWingGroups()
-
+            
         if "swordfish" in requiredIntersections:
             if "swordfish" not in self.intersectionTypes:
                 self.intersectionTypes["swordfish"] = self.generateSwordfishGroups()
