@@ -933,6 +933,9 @@ class Sudoku():
 
         return False
 
+    def possibleValues(self):
+        return sorted(self.setOfPossibleValues)
+
     def locations(self):
         return range(1, self.gridSize ** 2 + 1)
 
@@ -1034,9 +1037,6 @@ class Sudoku():
 
     def subGridHeight(self):
         return self.subGridsX
-
-    def possibleValues(self):
-        return sorted(self.setOfPossibleValues)
 
 
 
