@@ -41,7 +41,7 @@ class Sudoku():
         self.hasIntersections = False
 
         self.multiples = ("Single", "Pair", "Triplet", "Quadruplet")
-        self.units = ["row", "column", "subGrid"]
+        self.units = ("row", "column", "subGrid")
 
         self.intersectionTypes = {}
 
