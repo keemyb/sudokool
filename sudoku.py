@@ -184,6 +184,9 @@ class Sudoku():
 
         self.constants = [location for location in self.values if not self.isEmpty(location)]
 
+
+
+
     def isValid(self):
         self.initialiseIntersections()
 
@@ -214,6 +217,137 @@ class Sudoku():
             return False
         return True
 
+    def solve(self, maxLevel, history=None):
+        methods = [self.nakedSingle, self.hiddenSingle,
+                   self.nakedTwin, self.hiddenTwin,
+                   self.pointingPair, self.pointingTriplet,
+                   self.boxLineReduction2, self.boxLineReduction3,
+                   self.nakedTriplet, self.hiddenTriplet,
+                   self.xWing, self.swordfish,
+                   self.yWing,
+                   self.simpleColouring]
+
+        if self.isComplete():
+            return [(entry[0], entry[2]) for entry in history if history is not None]
+
+        if maxLevel > len(methods) or maxLevel < 1:
+            maxLevel = len(methods)
+
+        #if solver is run for the first time, solve using first method
+        if history is None:
+            log = methods[0]()[1]
+            history = [(0, self.changes, log)]
+            return self.solve(maxLevel, history)
+
+        #if last attempt was successful, go back to first level
+        lastMethod = history[-1][0]
+        lastMethodSuccess = history[-1][1]
+        if lastMethodSuccess:
+            nextMethod = 0
+        #or if unsuccessful, increase level or exit if highest level was tried
+        else:
+            moreMethods = (maxLevel - lastMethod) - 1
+            if moreMethods:
+                nextMethod = lastMethod + 1
+            else:
+                return [(entry[0], entry[2]) for entry in history if history is not None]
+
+        log = methods[nextMethod]()[1]
+        history.append((nextMethod, self.changes, log))
+
+        return self.solve(maxLevel, history)
+
+
+    
+
+    def prospectiveChange(self, candidatesToRemove=None, valuesToAdd=None):
+        from copy import deepcopy
+
+        prospectivePuzzle = deepcopy(self)
+
+        if candidatesToRemove is not None:
+            for location, candidates in candidatesToRemove.iteritems():
+                prospectivePuzzle.candidates[location] -= set([candidates])
+
+        if valuesToAdd is not None:
+            for location, value in valuesToAdd.iteritems():
+                del prospectivePuzzle.candidates[location]
+                prospectivePuzzle.values[location] = value
+
+        prospectivePuzzle.updatePuzzle()
+        prospectivePuzzle.solve(4)
+
+        return prospectivePuzzle.isValid()
+
+    def applyProspectiveChange(self, candidatesToRemove=None, valuesToAdd=None):
+        if candidatesToRemove is not None:
+            for location, candidates in candidatesToRemove.iteritems():
+                self.candidates[location] -= set([candidates])
+
+        if valuesToAdd is not None:
+            for location, value in valuesToAdd.iteritems():
+                del self.candidates[location]
+                self.values[location] = value
+
+        self.updatePuzzle()
+
+
+
+    
+    def initialiseIntersections(self, *requiredIntersections):
+        self.solveMode = True
+        #three main intersection types needed for candidates to work
+        for intersectionType in self.units:
+            if intersectionType in self.intersectionTypes:
+                continue
+
+            self.intersectionTypes[intersectionType] = self.generationMethods[intersectionType]()
+
+        self.hasIntersections = True
+
+        if not self.hasCandidates:
+            self.initialiseCandidates()
+
+        for intersectionType in requiredIntersections:
+            if intersectionType in self.intersectionTypes:
+                continue
+
+            if intersectionType not in self.generationMethods:
+                continue
+
+            self.intersectionTypes[intersectionType] = self.generationMethods[intersectionType]()
+
+        for intersectionType in requiredIntersections:
+            try:
+                # n variable
+                currentIntersectionType = intersectionType[0]
+                n = intersectionType[1]
+            except:
+                continue
+            if currentIntersectionType == "pointer":
+                if ("pointer", n) not in self.intersectionTypes:
+                    self.intersectionTypes[("pointer", n)] = self.generatePointerGroups(n)
+
+        self.updatePuzzle()
+
+    def initialiseCandidates(self):
+
+        if not self.hasIntersections:
+            self.initialiseIntersections()
+
+        for location in xrange(1, self.gridSize ** 2 + 1):
+
+            if not self.isEmpty(location):
+                continue
+
+            neighbours = [neighbour for neighbour in self.getAllBaseNeighbours(location) if not self.isEmpty(neighbour)]
+
+            surroundingValues = self.getValues(*neighbours)
+
+            self.candidates[location] = self.setOfPossibleValues - surroundingValues
+
+        self.hasCandidates = True
+
 
 
 
@@ -236,9 +370,6 @@ class Sudoku():
         columnStartLocations = range(1, self.gridSize + 1)
 
         return columnStartLocations
-
-
-
 
     def generateSubGridGroups(self):
         subGridGroups = []
@@ -271,6 +402,90 @@ class Sudoku():
             columnGroups.append([startLocation + offset * self.gridSize for offset in xrange(self.gridSize)])
 
         return columnGroups
+
+
+
+
+
+    def getSubGrid(self, location):
+        subGridRow = (location - 1) / (self.subGridsX * self.gridSize)
+        subGridRowOffset = subGridRow * self.subGridsX
+
+        subGridColumn = (self.getColumn(location) - 1) / self.subGridsY + 1
+
+        return subGridRowOffset + subGridColumn
+
+    def getRow(self, location):
+        return (location - 1) / self.gridSize + 1
+
+    def getColumn(self, location):
+        return (location - 1) % self.gridSize + 1
+
+    def getAlignment(self, *locations):
+        locationMethods = (self.getRow, self.getColumn, self.getSubGrid)
+        intersectionTypes = ("row", "column", "subGrid")
+        intersection = []
+
+        for methodNumber, method in enumerate(locationMethods):
+            if all(method(locations[0]) == method(location) for location in locations):
+                intersection.append(intersectionTypes[methodNumber])
+
+        return intersection
+
+
+
+
+    def getSubGridNeighbours(self, location, *exclusions):
+        subGridGroup = self.intersectionTypes["subGrid"][self.getSubGrid(location) - 1]
+        neighbours = [neighbour for neighbour in subGridGroup if neighbour != location and self.isEmpty(neighbour)]
+        neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
+
+        return neighbours
+
+    def getRowNeighbours(self, location, *exclusions):
+        rowGroup = self.intersectionTypes["row"][self.getRow(location) - 1]
+        neighbours = [neighbour for neighbour in rowGroup if neighbour != location and self.isEmpty(neighbour)]
+        neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
+
+        return neighbours
+
+    def getColumnNeighbours(self, location, *exclusions):
+        columnGroup = self.intersectionTypes["column"][self.getColumn(location) - 1]
+        neighbours = [neighbour for neighbour in columnGroup if neighbour != location and self.isEmpty(neighbour)]
+        neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
+
+        return neighbours
+
+    def getBaseNeighbours(self, location, *exclusions):
+        return set(self.getSubGridNeighbours(location, *exclusions) +
+                   self.getRowNeighbours(location, *exclusions) +
+                   self.getColumnNeighbours(location, *exclusions))
+
+    def getAllSubGridNeighbours(self, location, *exclusions):
+        subGridGroup = self.staticGroups["subGrid"][self.getSubGrid(location) - 1]
+        neighbours = [neighbour for neighbour in subGridGroup if neighbour != location]
+        neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
+
+        return neighbours
+
+    def getAllRowNeighbours(self, location, *exclusions):
+        rowGroup = self.staticGroups["row"][self.getRow(location) - 1]
+        neighbours = [neighbour for neighbour in rowGroup if neighbour != location]
+        neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
+
+        return neighbours
+
+    def getAllColumnNeighbours(self, location, *exclusions):
+        columnGroup = self.staticGroups["column"][self.getColumn(location) - 1]
+        neighbours = [neighbour for neighbour in columnGroup if neighbour != location]
+        neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
+
+        return neighbours
+
+    def getAllBaseNeighbours(self, location, *exclusions):
+        return set(self.getAllSubGridNeighbours(location, *exclusions) +
+                   self.getAllRowNeighbours(location, *exclusions) +
+                   self.getAllColumnNeighbours(location, *exclusions))
 
 
 
@@ -572,88 +787,130 @@ class Sudoku():
 
 
 
-    def getSubGrid(self, location):
-        subGridRow = (location - 1) / (self.subGridsX * self.gridSize)
-        subGridRowOffset = subGridRow * self.subGridsX
+    def updatePuzzle(self):
 
-        subGridColumn = (self.getColumn(location) - 1) / self.subGridsY + 1
+        self.updateBaseGroupCandidates()
+        self.updatePointerGroups()
+        self.updateXWingGroups()
+        self.updateSwordfishGroups()
+        self.updateConjugatePairs()
+        self.updateChains()
+        self.updateYWingGroups()
 
-        return subGridRowOffset + subGridColumn
+    def updateBaseGroupCandidates(self):
+        for intersectionType in ["subGrid", "row", "column"]:
 
-    def getRow(self, location):
-        return (location - 1) / self.gridSize + 1
+            for group in self.intersectionTypes[intersectionType]:
 
-    def getColumn(self, location):
-        return (location - 1) % self.gridSize + 1
+                surroundingValues = self.getValues(*group)
 
-    def getAlignment(self, *locations):
-        locationMethods = (self.getRow, self.getColumn, self.getSubGrid)
-        intersectionTypes = ("row", "column", "subGrid")
-        intersection = []
+                for location in group[:]:
+                    if self.isEmpty(location):
+                        self.candidates[location] -= surroundingValues
+                    else:
+                        group.remove(location)
 
-        for methodNumber, method in enumerate(locationMethods):
-            if all(method(locations[0]) == method(location) for location in locations):
-                intersection.append(intersectionTypes[methodNumber])
+    def updatePointerGroups(self):
+        # As pointer groups uses a tuple containing the pointer name and
+        # type as the dictionary key, we must try each intersection type
+        # as it is unknown what size pointer group is initialsed.
+        for intersectionType in self.intersectionTypes:
+            try:
+                currentIntersectionType = intersectionType[0]
+                n = intersectionType[1]
+            except:
+                continue
 
-        return intersection
+            if currentIntersectionType == "pointer":
+                # For every pointer group, we must check if any location in it
+                # has been filled (making the pointer group invalid.) In this
+                # case we remove the pointer group, after checking it still
+                # exists as there is a chance it may have been deleted by a
+                # location discovered earlier in the same combination.
+                for group in self.intersectionTypes[("pointer", n)]:
+                    combination = group[0]
+                    for location in combination:
+                        if self.isEmpty(location):
+                            continue
+                        if group in self.intersectionTypes[("pointer", n)]:
+                            self.intersectionTypes[("pointer", n)].remove(group)
 
+    def updateXWingGroups(self):
+        if "xWing" not in self.intersectionTypes:
+            return
 
+        for group in self.intersectionTypes["xWing"]:
+            for location in group:
+                if self.isEmpty(location):
+                    continue
+                if location not in group:
+                    continue
+                if group in self.intersectionTypes["xWing"]:
+                    self.intersectionTypes["xWing"].remove(group)
 
+    def updateSwordfishGroups(self):
+        if "swordfish" not in self.intersectionTypes:
+            return
 
-    def getSubGridNeighbours(self, location, *exclusions):
-        subGridGroup = self.intersectionTypes["subGrid"][self.getSubGrid(location) - 1]
-        neighbours = [neighbour for neighbour in subGridGroup if neighbour != location and self.isEmpty(neighbour)]
-        neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
+        for group in self.intersectionTypes["swordfish"]:
+            for location in group:
+                if self.isEmpty(location):
+                    continue
+                if location not in group:
+                    continue
+                if group in self.intersectionTypes["swordfish"]:
+                    self.intersectionTypes["swordfish"].remove(group)
 
-        return neighbours
+    def updateConjugatePairs(self):
+        if "conjugatePairs" not in self.intersectionTypes:
+            return
 
-    def getRowNeighbours(self, location, *exclusions):
-        rowGroup = self.intersectionTypes["row"][self.getRow(location) - 1]
-        neighbours = [neighbour for neighbour in rowGroup if neighbour != location and self.isEmpty(neighbour)]
-        neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
+        for group in self.intersectionTypes["conjugatePairs"]:
+            pair = group[0]
+            for location in pair:
+                if self.isEmpty(location):
+                    continue
+                if group in self.intersectionTypes["conjugatePairs"]:
+                    self.intersectionTypes["conjugatePairs"].remove(group)
+                    break
 
-        return neighbours
+    def updateChains(self):
+        if "chains" not in self.intersectionTypes:
+            return
 
-    def getColumnNeighbours(self, location, *exclusions):
-        columnGroup = self.intersectionTypes["column"][self.getColumn(location) - 1]
-        neighbours = [neighbour for neighbour in columnGroup if neighbour != location and self.isEmpty(neighbour)]
-        neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
+        for chainGroup in self.intersectionTypes["chains"]:
+            if not self.validChain(chainGroup):
+                if chainGroup in self.intersectionTypes["conjugatePairs"]:
+                    self.intersectionTypes["conjugatePairs"].remove(chainGroup)
 
-        return neighbours
+    def validChain(self, chainGroup):
+        chain, candidate = chainGroup[0], chainGroup[1]
+        if (chain, candidate) not in self.intersectionTypes["chains"]:
+            return False
 
-    def getBaseNeighbours(self, location, *exclusions):
-        return set(self.getSubGridNeighbours(location, *exclusions) +
-                   self.getRowNeighbours(location, *exclusions) +
-                   self.getColumnNeighbours(location, *exclusions))
+        for location in chain:
+            if not self.isEmpty(location):
+                return False
+            if len(self.getSolvingCandidates(location)) <= 1:
+                return False
+            if candidate not in self.candidates[location]:
+                return False
+        return True
 
+    def updateYWingGroups(self):
+        if "yWing" not in self.intersectionTypes:
+            return
 
-
-
-    def getAllSubGridNeighbours(self, location, *exclusions):
-        subGridGroup = self.staticGroups["subGrid"][self.getSubGrid(location) - 1]
-        neighbours = [neighbour for neighbour in subGridGroup if neighbour != location]
-        neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
-
-        return neighbours
-
-    def getAllRowNeighbours(self, location, *exclusions):
-        rowGroup = self.staticGroups["row"][self.getRow(location) - 1]
-        neighbours = [neighbour for neighbour in rowGroup if neighbour != location]
-        neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
-
-        return neighbours
-
-    def getAllColumnNeighbours(self, location, *exclusions):
-        columnGroup = self.staticGroups["column"][self.getColumn(location) - 1]
-        neighbours = [neighbour for neighbour in columnGroup if neighbour != location]
-        neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
-
-        return neighbours
-
-    def getAllBaseNeighbours(self, location, *exclusions):
-        return set(self.getAllSubGridNeighbours(location, *exclusions) +
-                   self.getAllRowNeighbours(location, *exclusions) +
-                   self.getAllColumnNeighbours(location, *exclusions))
+        for yWingGroup in self.intersectionTypes["yWing"]:
+            yWingLocations = yWingGroup[0]
+            for location in yWingLocations:
+                if not self.isEmpty(location):
+                    continue
+                if len(self.getSolvingCandidates(location)) != 2:
+                    continue
+                if yWingGroup in self.intersectionTypes["yWing"]:
+                    self.intersectionTypes["yWing"].remove(yWingGroup)
+                    break
 
 
 
@@ -780,234 +1037,6 @@ class Sudoku():
 
     def getNumberOfFilledLocations(self):
         return (self.gridSize ** 2) - len(self.getEmptyLocations())
-
-
-
-
-    def solve(self, maxLevel, history=None):
-        methods = [self.nakedSingle, self.hiddenSingle,
-                   self.nakedTwin, self.hiddenTwin,
-                   self.pointingPair, self.pointingTriplet,
-                   self.boxLineReduction2, self.boxLineReduction3,
-                   self.nakedTriplet, self.hiddenTriplet,
-                   self.xWing, self.swordfish,
-                   self.yWing,
-                   self.simpleColouring]
-
-        if self.isComplete():
-            return [(entry[0], entry[2]) for entry in history if history is not None]
-
-        if maxLevel > len(methods) or maxLevel < 1:
-            maxLevel = len(methods)
-
-        #if solver is run for the first time, solve using first method
-        if history is None:
-            log = methods[0]()[1]
-            history = [(0, self.changes, log)]
-            return self.solve(maxLevel, history)
-
-        #if last attempt was successful, go back to first level
-        lastMethod = history[-1][0]
-        lastMethodSuccess = history[-1][1]
-        if lastMethodSuccess:
-            nextMethod = 0
-        #or if unsuccessful, increase level or exit if highest level was tried
-        else:
-            moreMethods = (maxLevel - lastMethod) - 1
-            if moreMethods:
-                nextMethod = lastMethod + 1
-            else:
-                return [(entry[0], entry[2]) for entry in history if history is not None]
-
-        log = methods[nextMethod]()[1]
-        history.append((nextMethod, self.changes, log))
-
-        return self.solve(maxLevel, history)
-
-
-
-
-    def initialiseIntersections(self, *requiredIntersections):
-        self.solveMode = True
-        #three main intersection types needed for candidates to work
-        for intersectionType in self.units:
-            if intersectionType in self.intersectionTypes:
-                continue
-
-            self.intersectionTypes[intersectionType] = self.generationMethods[intersectionType]()
-
-        self.hasIntersections = True
-
-        if not self.hasCandidates:
-            self.initialiseCandidates()
-
-        for intersectionType in requiredIntersections:
-            if intersectionType in self.intersectionTypes:
-                continue
-
-            if intersectionType not in self.generationMethods:
-                continue
-
-            self.intersectionTypes[intersectionType] = self.generationMethods[intersectionType]()
-
-        for intersectionType in requiredIntersections:
-            try:
-                # n variable
-                currentIntersectionType = intersectionType[0]
-                n = intersectionType[1]
-            except:
-                continue
-            if currentIntersectionType == "pointer":
-                if ("pointer", n) not in self.intersectionTypes:
-                    self.intersectionTypes[("pointer", n)] = self.generatePointerGroups(n)
-
-        self.updatePuzzle()
-
-    def initialiseCandidates(self):
-
-        if not self.hasIntersections:
-            self.initialiseIntersections()
-
-        for location in xrange(1, self.gridSize ** 2 + 1):
-
-            if not self.isEmpty(location):
-                continue
-
-            neighbours = [neighbour for neighbour in self.getAllBaseNeighbours(location) if not self.isEmpty(neighbour)]
-
-            surroundingValues = self.getValues(*neighbours)
-
-            self.candidates[location] = self.setOfPossibleValues - surroundingValues
-
-        self.hasCandidates = True
-
-
-
-
-    def updatePuzzle(self):
-
-        self.updateBaseGroupCandidates()
-        self.updatePointerGroups()
-        self.updateXWingGroups()
-        self.updateSwordfishGroups()
-        self.updateConjugatePairs()
-        self.updateChains()
-        self.updateYWingGroups()
-
-    def updateBaseGroupCandidates(self):
-        for intersectionType in ["subGrid", "row", "column"]:
-
-            for group in self.intersectionTypes[intersectionType]:
-
-                surroundingValues = self.getValues(*group)
-
-                for location in group[:]:
-                    if self.isEmpty(location):
-                        self.candidates[location] -= surroundingValues
-                    else:
-                        group.remove(location)
-
-    def updatePointerGroups(self):
-        # As pointer groups uses a tuple containing the pointer name and
-        # type as the dictionary key, we must try each intersection type
-        # as it is unknown what size pointer group is initialsed.
-        for intersectionType in self.intersectionTypes:
-            try:
-                currentIntersectionType = intersectionType[0]
-                n = intersectionType[1]
-            except:
-                continue
-
-            if currentIntersectionType == "pointer":
-                # For every pointer group, we must check if any location in it
-                # has been filled (making the pointer group invalid.) In this
-                # case we remove the pointer group, after checking it still
-                # exists as there is a chance it may have been deleted by a
-                # location discovered earlier in the same combination.
-                for group in self.intersectionTypes[("pointer", n)]:
-                    combination = group[0]
-                    for location in combination:
-                        if self.isEmpty(location):
-                            continue
-                        if group in self.intersectionTypes[("pointer", n)]:
-                            self.intersectionTypes[("pointer", n)].remove(group)
-
-    def updateXWingGroups(self):
-        if "xWing" not in self.intersectionTypes:
-            return
-
-        for group in self.intersectionTypes["xWing"]:
-            for location in group:
-                if self.isEmpty(location):
-                    continue
-                if location not in group:
-                    continue
-                if group in self.intersectionTypes["xWing"]:
-                    self.intersectionTypes["xWing"].remove(group)
-
-    def updateSwordfishGroups(self):
-        if "swordfish" not in self.intersectionTypes:
-            return
-
-        for group in self.intersectionTypes["swordfish"]:
-            for location in group:
-                if self.isEmpty(location):
-                    continue
-                if location not in group:
-                    continue
-                if group in self.intersectionTypes["swordfish"]:
-                    self.intersectionTypes["swordfish"].remove(group)
-
-    def updateConjugatePairs(self):
-        if "conjugatePairs" not in self.intersectionTypes:
-            return
-
-        for group in self.intersectionTypes["conjugatePairs"]:
-            pair = group[0]
-            for location in pair:
-                if self.isEmpty(location):
-                    continue
-                if group in self.intersectionTypes["conjugatePairs"]:
-                    self.intersectionTypes["conjugatePairs"].remove(group)
-                    break
-
-    def updateChains(self):
-        if "chains" not in self.intersectionTypes:
-            return
-
-        for chainGroup in self.intersectionTypes["chains"]:
-            if not self.validChain(chainGroup):
-                if chainGroup in self.intersectionTypes["conjugatePairs"]:
-                    self.intersectionTypes["conjugatePairs"].remove(chainGroup)
-
-    def validChain(self, chainGroup):
-        chain, candidate = chainGroup[0], chainGroup[1]
-        if (chain, candidate) not in self.intersectionTypes["chains"]:
-            return False
-
-        for location in chain:
-            if not self.isEmpty(location):
-                return False
-            if len(self.getSolvingCandidates(location)) <= 1:
-                return False
-            if candidate not in self.candidates[location]:
-                return False
-        return True
-
-    def updateYWingGroups(self):
-        if "yWing" not in self.intersectionTypes:
-            return
-
-        for yWingGroup in self.intersectionTypes["yWing"]:
-            yWingLocations = yWingGroup[0]
-            for location in yWingLocations:
-                if not self.isEmpty(location):
-                    continue
-                if len(self.getSolvingCandidates(location)) != 2:
-                    continue
-                if yWingGroup in self.intersectionTypes["yWing"]:
-                    self.intersectionTypes["yWing"].remove(yWingGroup)
-                    break
 
 
 
@@ -1557,37 +1586,3 @@ class Sudoku():
                     log.append(successString % (yWingCandidate, location, (firstArm, secondArm)))
 
         return self.changes, log
-
-
-
-
-    def prospectiveChange(self, candidatesToRemove=None, valuesToAdd=None):
-        from copy import deepcopy
-
-        prospectivePuzzle = deepcopy(self)
-
-        if candidatesToRemove is not None:
-            for location, candidates in candidatesToRemove.iteritems():
-                prospectivePuzzle.candidates[location] -= set([candidates])
-
-        if valuesToAdd is not None:
-            for location, value in valuesToAdd.iteritems():
-                del prospectivePuzzle.candidates[location]
-                prospectivePuzzle.values[location] = value
-
-        prospectivePuzzle.updatePuzzle()
-        prospectivePuzzle.solve(4)
-
-        return prospectivePuzzle.isValid()
-
-    def applyProspectiveChange(self, candidatesToRemove=None, valuesToAdd=None):
-        if candidatesToRemove is not None:
-            for location, candidates in candidatesToRemove.iteritems():
-                self.candidates[location] -= set([candidates])
-
-        if valuesToAdd is not None:
-            for location, value in valuesToAdd.iteritems():
-                del self.candidates[location]
-                self.values[location] = value
-
-        self.updatePuzzle()
