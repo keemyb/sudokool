@@ -42,7 +42,7 @@ class candidates(GridLayout):
         self.cols = sudoku.getSubGridsX()
         
         if userCandidates:
-            if sudoku.locationHasUserCandidates(location):
+            if sudoku.hasUserCandidates(location):
                 for candidate in sudoku.userCandidates(location):
                     self.add_widget(Label(text = str(candidate)))
         else:

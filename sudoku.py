@@ -990,7 +990,7 @@ class Sudoku():
         if not self.isEmpty(location):
             self.clearLocation(location)
 
-        if not self.locationHasUserCandidates(location):
+        if not self.hasUserCandidates(location):
             self.userCandidates[location] = [candidate]
             return
 
@@ -1008,7 +1008,7 @@ class Sudoku():
 
         return True
 
-    def locationHasUserCandidates(self, location):
+    def hasUserCandidates(self, location):
         if location not in self.userCandidates:
             return False
 
