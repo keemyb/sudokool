@@ -216,10 +216,11 @@ class Sudoku():
         return True
 
     def isComplete(self):
-        numberOfFilledLocations = len(self.emptyLocations())
-        if numberOfFilledLocations:
-            return False
-        return True
+        numberOfLocations = len(self.locations())
+        numberOfFilledLocations = len(self.filledLocations())
+        if numberOfFilledLocations == numberOfLocations:
+            return True
+        return False
 
     def solve(self, maxLevel, history=None):
         methods = [self.nakedSingle, self.hiddenSingle,
