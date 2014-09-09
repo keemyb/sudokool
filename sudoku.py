@@ -496,7 +496,7 @@ class Sudoku():
         pointers = []
 
         for subGrid in self.intersectionTypes["subGrid"]:
-            for combination in self.getNLocations(subGrid, n):
+            for combination in self.nLocations(subGrid, n):
 
                 if "row" in self.getAlignment(*combination):
                     pointers.append((combination, "row"))
@@ -517,13 +517,13 @@ class Sudoku():
             if len(firstRow) < 2:
                 continue
 
-            for firstRowGroup in self.getNLocations(firstRow, 2):
+            for firstRowGroup in self.nLocations(firstRow, 2):
 
                     for secondRow in self.intersectionTypes["row"][firstRowIndex + 1:]:
                         if len(secondRow) < 2:
                             continue
 
-                        for secondRowGroup in self.getNLocations(secondRow, 2):
+                        for secondRowGroup in self.nLocations(secondRow, 2):
                                 if "subGrid" in self.getAlignment(firstRowGroup[0], secondRowGroup[1]):
                                     continue
 
@@ -547,13 +547,13 @@ class Sudoku():
             if len(firstRow) < 2:
                 continue
 
-            for firstRowGroup in self.getNLocations(firstRow, 2):
+            for firstRowGroup in self.nLocations(firstRow, 2):
 
                 for secondRowIndex, secondRow in enumerate(self.intersectionTypes["row"][firstRowIndex + 1:-2]):
                     if len(secondRow) < 2:
                         continue
 
-                    for secondRowGroup in self.getNLocations(secondRow, 2):
+                    for secondRowGroup in self.nLocations(secondRow, 2):
                         alignments = 0
 
                         for locationOne in firstRowGroup:
@@ -569,7 +569,7 @@ class Sudoku():
                             if len(thirdRow) < 2:
                                 continue
 
-                            for thirdRowGroup in self.getNLocations(thirdRow, 2):
+                            for thirdRowGroup in self.nLocations(thirdRow, 2):
                                 alignments2 = 0
 
                                 for locationOne in thirdRowGroup:
@@ -593,13 +593,13 @@ class Sudoku():
             if len(firstRow) < 3:
                 continue
 
-            for firstRowGroup in self.getNLocations(firstRow, 3):
+            for firstRowGroup in self.nLocations(firstRow, 3):
 
                 for secondRowIndex, secondRow in enumerate(self.intersectionTypes["row"][firstRowIndex + 1:-2]):
                     if len(secondRow) < 3:
                         continue
 
-                    for secondRowGroup in self.getNLocations(secondRow, 3):
+                    for secondRowGroup in self.nLocations(secondRow, 3):
                         alignments = 0
 
                         for i in xrange(3):
@@ -613,7 +613,7 @@ class Sudoku():
                             if len(thirdRow) < 3:
                                 continue
 
-                            for thirdRowGroup in self.getNLocations(thirdRow, 3):
+                            for thirdRowGroup in self.nLocations(thirdRow, 3):
                                 alignments2 = 0
 
                                 for i in xrange(3):
@@ -712,7 +712,7 @@ class Sudoku():
     def generateYWingGroups(self):
         yWings = []
 
-        for firstPair in self.getNLocations(self.emptyLocations(), 2):
+        for firstPair in self.nLocations(self.emptyLocations(), 2):
             yWingResult = self.yWingPairValid(firstPair)
             if not yWingResult:
                 continue
@@ -720,7 +720,7 @@ class Sudoku():
             firstAlignment = yWingResult[0]
             firstCommonCandidates = yWingResult[1]
 
-            for secondPair in self.getNLocations(self.emptyLocations(), 2):
+            for secondPair in self.nLocations(self.emptyLocations(), 2):
                 if secondPair == firstPair:
                     continue
 
@@ -942,7 +942,7 @@ class Sudoku():
 
         return self.candidates.keys()
 
-    def getNLocations(self, unit, n):
+    def nLocations(self, unit, n):
         from itertools import combinations
 
         return combinations(unit, n)
@@ -1081,7 +1081,7 @@ class Sudoku():
                 if len(group) <= n:
                     continue
 
-                for combination in self.getNLocations(group, n):
+                for combination in self.nLocations(group, n):
 
                     nakedNcandidates = self.solvingCandidates(*combination)
 
@@ -1136,7 +1136,7 @@ class Sudoku():
                 if len(group) <= n:
                     continue
 
-                for combination in self.getNLocations(group, n):
+                for combination in self.nLocations(group, n):
 
                     surroundingLocations = [location for location in group if location not in combination]
 
@@ -1482,7 +1482,7 @@ class Sudoku():
             if not self.validChain((chain, candidate)):
                 break
 
-            for pair in self.getNLocations(colour, 2):
+            for pair in self.nLocations(colour, 2):
 
                 if not self.getAlignment(*pair):
                     continue
@@ -1506,7 +1506,7 @@ class Sudoku():
 
         successString = "%s has been removed from %s, as these locations are in the same unit as one of two locations that must be ON"
 
-        for pair in self.getNLocations(chain, 2):
+        for pair in self.nLocations(chain, 2):
             if not self.validChain((chain, candidate)):
                 break
 
@@ -1537,7 +1537,7 @@ class Sudoku():
             if candidate not in self.solvingCandidates(location):
                 continue
 
-            for pair in self.getNLocations(chain, 2):
+            for pair in self.nLocations(chain, 2):
                 if not self.validChain((chain, candidate)):
                     break
 
