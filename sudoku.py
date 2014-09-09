@@ -1029,10 +1029,10 @@ class Sudoku():
     def getSubGridsY(self):
         return self.subGridsY
 
-    def getSubGridLength(self):
+    def subGridLength(self):
         return self.subGridsY
 
-    def getSubGridHeight(self):
+    def subGridHeight(self):
         return self.subGridsX
 
     def possibleValues(self):
