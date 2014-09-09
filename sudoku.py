@@ -977,7 +977,7 @@ class Sudoku():
     def commonCandidates(self, *locations):
         return set.intersection(*[self.candidates[location] for location in locations])
 
-    def getUserCandidates(self, location):
+    def userCandidates(self, location):
         return self.userCandidates[location]
 
     def toggleUserCandidate(self, location, candidate):

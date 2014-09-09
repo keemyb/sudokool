@@ -43,7 +43,7 @@ class candidates(GridLayout):
         
         if userCandidates:
             if sudoku.locationHasUserCandidates(location):
-                for candidate in sudoku.getUserCandidates(location):
+                for candidate in sudoku.userCandidates(location):
                     self.add_widget(Label(text = str(candidate)))
         else:
             if sudoku.locationHasSolvingCandidates(location):
