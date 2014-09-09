@@ -39,7 +39,7 @@ class candidates(GridLayout):
     def __init__(self, location, userCandidates = False, **kwargs):
         super(candidates, self).__init__(**kwargs)
         
-        self.cols = sudoku.getSubGridsX()
+        self.cols = sudoku.subGridsInRow()
         
         if userCandidates:
             if sudoku.hasUserCandidates(location):
@@ -55,7 +55,7 @@ class inputs(GridLayout):
     def __init__(self, **kwargs):
         super(inputs, self).__init__(**kwargs)  
         
-        self.cols = sudoku.getSubGridsX()
+        self.cols = sudoku.subGridsInRow()
         
         for value in sudoku.possibleValues():
             self.add_widget(Button(text = str(value)))
