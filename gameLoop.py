@@ -57,7 +57,7 @@ class inputs(GridLayout):
         
         self.cols = sudoku.getSubGridsX()
         
-        for value in sudoku.getPossibleValues():
+        for value in sudoku.possibleValues():
             self.add_widget(Button(text = str(value)))
 
 class SudokuApp(App):

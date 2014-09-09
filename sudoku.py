@@ -1032,7 +1032,7 @@ class Sudoku():
     def getSubGridHeight(self):
         return self.subGridsX
 
-    def getPossibleValues(self):
+    def possibleValues(self):
         return sorted(self.setOfPossibleValues)
 
     def getNumberOfFilledLocations(self):
