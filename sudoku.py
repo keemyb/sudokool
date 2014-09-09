@@ -66,6 +66,10 @@ class Sudoku():
                                     "column": self.getAllColumnNeighbours,
                                     "subGrid": self.getAllSubGridNeighbours}
 
+        self.alignmentMethods = {"row": self.getRow,
+                                 "column": self.getColumn,
+                                 "subGrid": self.getSubGrid}
+
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return other.values == self.values
@@ -421,16 +425,14 @@ class Sudoku():
     def getColumn(self, location):
         return (location - 1) % self.gridSize + 1
 
-    def getAlignment(self, *locations):
-        locationMethods = (self.getRow, self.getColumn, self.getSubGrid)
-        intersectionTypes = ("row", "column", "subGrid")
-        intersection = []
+    def alignment(self, *locations):
+        alignments = []
 
-        for methodNumber, method in enumerate(locationMethods):
+        for unit, method in self.alignmentMethods.iteritems():
             if all(method(locations[0]) == method(location) for location in locations):
-                intersection.append(intersectionTypes[methodNumber])
+                alignments.append(unit)
 
-        return intersection
+        return sorted(alignments)
 
 
 
@@ -498,9 +500,9 @@ class Sudoku():
         for subGrid in self.intersectionTypes["subGrid"]:
             for combination in self.nLocations(subGrid, n):
 
-                if "row" in self.getAlignment(*combination):
+                if "row" in self.alignment(*combination):
                     pointers.append((combination, "row"))
-                elif "column" in self.getAlignment(*combination):
+                elif "column" in self.alignment(*combination):
                     pointers.append((combination, "column"))
 
         return pointers
@@ -524,11 +526,11 @@ class Sudoku():
                             continue
 
                         for secondRowGroup in self.nLocations(secondRow, 2):
-                                if "subGrid" in self.getAlignment(firstRowGroup[0], secondRowGroup[1]):
+                                if "subGrid" in self.alignment(firstRowGroup[0], secondRowGroup[1]):
                                     continue
 
-                                if "column" in self.getAlignment(firstRowGroup[0], secondRowGroup[0]) and \
-                                   "column" in self.getAlignment(firstRowGroup[1], secondRowGroup[1]):
+                                if "column" in self.alignment(firstRowGroup[0], secondRowGroup[0]) and \
+                                   "column" in self.alignment(firstRowGroup[1], secondRowGroup[1]):
                                     xWingGroups.append((firstRowGroup + secondRowGroup))
 
         return xWingGroups
@@ -558,7 +560,7 @@ class Sudoku():
 
                         for locationOne in firstRowGroup:
                             for locationTwo in secondRowGroup:
-                                if "column" in self.getAlignment(locationOne, locationTwo):
+                                if "column" in self.alignment(locationOne, locationTwo):
                                     alignments += 1
                                     locationsInSameColumn = (locationOne, locationTwo)
 
@@ -575,7 +577,7 @@ class Sudoku():
                                 for locationOne in thirdRowGroup:
                                     for row in (firstRowGroup, secondRowGroup):
                                         for locationTwo in [location for location in row if location not in locationsInSameColumn]:
-                                            if "column" in self.getAlignment(locationOne, locationTwo):
+                                            if "column" in self.alignment(locationOne, locationTwo):
                                                 alignments2 += 1
 
                                 if alignments2 == 2:
@@ -603,7 +605,7 @@ class Sudoku():
                         alignments = 0
 
                         for i in xrange(3):
-                            if "column" in self.getAlignment(firstRowGroup[i], secondRowGroup[i]):
+                            if "column" in self.alignment(firstRowGroup[i], secondRowGroup[i]):
                                     alignments += 1
 
                         if alignments != 3:
@@ -617,7 +619,7 @@ class Sudoku():
                                 alignments2 = 0
 
                                 for i in xrange(3):
-                                    if "column" in self.getAlignment(firstRowGroup[i], thirdRowGroup[i]):
+                                    if "column" in self.alignment(firstRowGroup[i], thirdRowGroup[i]):
                                         alignments2 += 1
 
                                 if alignments2 == 3:
@@ -762,7 +764,7 @@ class Sudoku():
         return yWings
 
     def yWingPairValid(self, pair):
-        alignment = self.getAlignment(*pair)
+        alignment = self.alignment(*pair)
         if not alignment:
             return False
 
@@ -1099,7 +1101,7 @@ class Sudoku():
                             self.candidates[surroundingLocation] -= nakedNcandidates
                             self.changes = True
 
-                            log.append(successString % (str(removedCandidates)[1:-1], location, self.getAlignment(*combination)[0], combination))
+                            log.append(successString % (str(removedCandidates)[1:-1], location, self.alignment(*combination)[0], combination))
 
         if self.changes:
             self.updatePuzzle()
@@ -1484,7 +1486,7 @@ class Sudoku():
 
             for pair in self.nLocations(colour, 2):
 
-                if not self.getAlignment(*pair):
+                if not self.alignment(*pair):
                     continue
 
                 if colour == colourOne:
@@ -1510,7 +1512,7 @@ class Sudoku():
             if not self.validChain((chain, candidate)):
                 break
 
-            for alignment in self.getAlignment(*pair):
+            for alignment in self.alignment(*pair):
                 if ((pair[0] in colourOne and pair[1] in colourTwo) or
                     (pair[1] in colourOne and pair[0] in colourTwo)):
                     for location in self.neighbourMethods[alignment](pair[0], *pair):
@@ -1545,8 +1547,8 @@ class Sudoku():
                         (pair[1] in colourOne and pair[0] in colourTwo))):
                     continue
 
-                alignsWithFirstElement = self.getAlignment(pair[0], location)
-                alignsWithSecondElement = self.getAlignment(pair[1], location)
+                alignsWithFirstElement = self.alignment(pair[0], location)
+                alignsWithSecondElement = self.alignment(pair[1], location)
                 if alignsWithFirstElement and alignsWithSecondElement:
                     self.candidates[location] -= set([candidate])
                     self.changes = True
