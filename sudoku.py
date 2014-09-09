@@ -999,7 +999,7 @@ class Sudoku():
         else:
             self.userCandidates[location].append(candidate)
 
-    def locationHasSolvingCandidates(self, location):
+    def hasSolvingCandidates(self, location):
         if location not in self.candidates:
             return False
 
