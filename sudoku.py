@@ -212,7 +212,7 @@ class Sudoku():
         return True
 
     def isComplete(self):
-        numberOfFilledLocations = len(self.getEmptyLocations())
+        numberOfFilledLocations = len(self.emptyLocations())
         if numberOfFilledLocations:
             return False
         return True
@@ -630,7 +630,7 @@ class Sudoku():
 
         conjugatePairs = []
 
-        for location in self.getEmptyLocations():
+        for location in self.emptyLocations():
 
             locationCandidates = self.getSolvingCandidates(location)
 
@@ -712,7 +712,7 @@ class Sudoku():
     def generateYWingGroups(self):
         yWings = []
 
-        for firstPair in self.getNLocations(self.getEmptyLocations(), 2):
+        for firstPair in self.getNLocations(self.emptyLocations(), 2):
             yWingResult = self.yWingPairValid(firstPair)
             if not yWingResult:
                 continue
@@ -720,7 +720,7 @@ class Sudoku():
             firstAlignment = yWingResult[0]
             firstCommonCandidates = yWingResult[1]
 
-            for secondPair in self.getNLocations(self.getEmptyLocations(), 2):
+            for secondPair in self.getNLocations(self.emptyLocations(), 2):
                 if secondPair == firstPair:
                     continue
 
@@ -936,7 +936,7 @@ class Sudoku():
     def locations(self):
         return range(1, self.gridSize ** 2 + 1)
 
-    def getEmptyLocations(self):
+    def emptyLocations(self):
         if not self.hasCandidates:
             self.initialiseCandidates()
 
@@ -1036,7 +1036,7 @@ class Sudoku():
         return sorted(self.setOfPossibleValues)
 
     def getNumberOfFilledLocations(self):
-        return (self.gridSize ** 2) - len(self.getEmptyLocations())
+        return (self.gridSize ** 2) - len(self.emptyLocations())
 
 
 
@@ -1530,7 +1530,7 @@ class Sudoku():
 
         log = []
 
-        for location in self.getEmptyLocations():
+        for location in self.emptyLocations():
             if location in chain:
                 continue
 
