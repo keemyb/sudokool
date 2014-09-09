@@ -1020,7 +1020,7 @@ class Sudoku():
 
         return True
 
-    def getGridSize(self):
+    def unitSize(self):
         return self.gridSize
 
     def getSubGridsX(self):

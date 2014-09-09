@@ -25,7 +25,7 @@ class puzzle(GridLayout):
     def __init__(self, **kwargs):
         super(puzzle, self).__init__(**kwargs)  
         
-        self.cols = sudoku.getGridSize()
+        self.cols = sudoku.unitSize()
         
         for location in self.locations:
             if sudoku.isEmpty(location):
