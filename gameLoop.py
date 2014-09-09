@@ -10,60 +10,60 @@ from kivy.uix.boxlayout import BoxLayout
 
 class screen(BoxLayout):
 
-	def __init__(self, horizontalFormat = True, **kwargs):
-		super(screen, self).__init__(**kwargs)
-		
-		if horizontalFormat:
-			self.orientation = "horizontal"
-		else:
-			self.orientation = "vertical"
-		self.add_widget(puzzle())
-		self.add_widget(inputs())
+    def __init__(self, horizontalFormat = True, **kwargs):
+        super(screen, self).__init__(**kwargs)
+        
+        if horizontalFormat:
+            self.orientation = "horizontal"
+        else:
+            self.orientation = "vertical"
+        self.add_widget(puzzle())
+        self.add_widget(inputs())
 
 class puzzle(GridLayout):
-	
-	def __init__(self, **kwargs):
-		super(puzzle, self).__init__(**kwargs)	
-		
-		self.cols = sudoku.getGridSize()
-		
-		for location in sudoku.getLocations():
-			if sudoku.isEmpty(location):
-				self.add_widget(candidates(location))
-			else:
-				value = str(sudoku.getLocationValue(location))
-				self.add_widget(Label(text = value, font_size = 40))
+    
+    def __init__(self, **kwargs):
+        super(puzzle, self).__init__(**kwargs)  
+        
+        self.cols = sudoku.getGridSize()
+        
+        for location in self.locations:
+            if sudoku.isEmpty(location):
+                self.add_widget(candidates(location))
+            else:
+                value = str(sudoku.getLocationValue(location))
+                self.add_widget(Label(text = value, font_size = 40))
 
 class candidates(GridLayout):
-	
-	def __init__(self, location, userCandidates = False, **kwargs):
-		super(candidates, self).__init__(**kwargs)
-		
-		self.cols = sudoku.getSubGridsX()
-		
-		if userCandidates:
-			if sudoku.locationHasUserCandidates(location):
-				for candidate in sudoku.getUserCandidates(location):
-					self.add_widget(Label(text = str(candidate)))
-		else:
-			if sudoku.locationHasSolvingCandidates(location):
-				for candidate in sudoku.getSolvingCandidates(location):
-					self.add_widget(Label(text = str(candidate)))			
-		
+    
+    def __init__(self, location, userCandidates = False, **kwargs):
+        super(candidates, self).__init__(**kwargs)
+        
+        self.cols = sudoku.getSubGridsX()
+        
+        if userCandidates:
+            if sudoku.locationHasUserCandidates(location):
+                for candidate in sudoku.getUserCandidates(location):
+                    self.add_widget(Label(text = str(candidate)))
+        else:
+            if sudoku.locationHasSolvingCandidates(location):
+                for candidate in sudoku.getSolvingCandidates(location):
+                    self.add_widget(Label(text = str(candidate)))           
+        
 class inputs(GridLayout):
-	
-	def __init__(self, **kwargs):
-		super(inputs, self).__init__(**kwargs)	
-		
-		self.cols = sudoku.getSubGridsX()
-		
-		for value in sudoku.getPossibleValues():
-			self.add_widget(Button(text = str(value)))
+    
+    def __init__(self, **kwargs):
+        super(inputs, self).__init__(**kwargs)  
+        
+        self.cols = sudoku.getSubGridsX()
+        
+        for value in sudoku.getPossibleValues():
+            self.add_widget(Button(text = str(value)))
 
 class SudokuApp(App):
 
-	def build(self):
-		return screen(False)
+    def build(self):
+        return screen(False)
 
 string9 = "003020600\
 900305001\
@@ -97,4 +97,4 @@ sudoku = Sudoku(string9)
 sudoku.initialiseIntersections()
 
 if __name__ == '__main__':
-	SudokuApp().run()
+    SudokuApp().run()

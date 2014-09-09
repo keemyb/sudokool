@@ -107,7 +107,7 @@ class Sudoku():
                 return True
             return False
 
-        for location in self.getLocations():
+        for location in self.locations():
 
             if isFirstLocationOnLine(location):
                 string += horizontalDivider
@@ -933,7 +933,7 @@ class Sudoku():
 
         return False
 
-    def getLocations(self):
+    def locations(self):
         return range(1, self.gridSize ** 2 + 1)
 
     def getEmptyLocations(self):
