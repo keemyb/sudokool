@@ -746,7 +746,7 @@ class Sudoku():
                          (set(secondPair) - pivot).pop()]
                 yWingLocations.insert(0, pivot.pop())
 
-                yWingCandidate = self.getCommonCandidates(*yWingLocations[1:])
+                yWingCandidate = self.commonCandidates(*yWingLocations[1:])
 
                 if not yWingCandidate:
                     continue
@@ -766,7 +766,7 @@ class Sudoku():
         if not alignment:
             return False
 
-        commonCandidates = self.getCommonCandidates(*pair)
+        commonCandidates = self.commonCandidates(*pair)
         if not commonCandidates:
             return False
 
@@ -974,7 +974,7 @@ class Sudoku():
     def solvingCandidates(self, *locations):
         return set([]).union(*[self.candidates[location] for location in locations])
 
-    def getCommonCandidates(self, *locations):
+    def commonCandidates(self, *locations):
         return set.intersection(*[self.candidates[location] for location in locations])
 
     def getUserCandidates(self, location):
@@ -1199,7 +1199,7 @@ class Sudoku():
             subGridNeighbours = self.getSubGridNeighbours(combination[0], *combination)
             subGridNeighbourCandidates = self.solvingCandidates(*subGridNeighbours)
 
-            commonPointerCandidates = self.getCommonCandidates(*combination)
+            commonPointerCandidates = self.commonCandidates(*combination)
             uniquePointerCandidates = set([candidate for candidate in commonPointerCandidates if candidate not in subGridNeighbourCandidates])
 
             if not uniquePointerCandidates:
@@ -1247,7 +1247,7 @@ class Sudoku():
             linearNeighbours = self.neighbourMethods[pointerType](combination[0], *combination)
             linearNeighbourCandidates = self.solvingCandidates(*linearNeighbours)
 
-            commonPointerCandidates = self.getCommonCandidates(*combination)
+            commonPointerCandidates = self.commonCandidates(*combination)
             uniquePointerCandidates = set([candidate for candidate in commonPointerCandidates if candidate not in linearNeighbourCandidates])
 
             if not uniquePointerCandidates:
@@ -1295,7 +1295,7 @@ class Sudoku():
 
         for group in self.intersectionTypes["xWing"]:
 
-            commonXWingCandidates = self.getCommonCandidates(*group)
+            commonXWingCandidates = self.commonCandidates(*group)
 
             if len(commonXWingCandidates) == 0:
                 continue
@@ -1350,7 +1350,7 @@ class Sudoku():
 
         for group in self.intersectionTypes["swordfish"]:
 
-            commonCandidates = self.getCommonCandidates(*group)
+            commonCandidates = self.commonCandidates(*group)
 
             if len(commonCandidates) == 0:
                 continue
