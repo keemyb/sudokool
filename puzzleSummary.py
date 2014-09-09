@@ -8,8 +8,8 @@ def puzzleSummary(puzzle, maxLevel, printPuzzle, printChangedCandidates, printHi
 
     solveReport = postSolved.solve(maxLevel)
 
-    numberOfPreSolvedValues = preSolved.getNumberOfFilledLocations()
-    numberOfPostSolvedValues = postSolved.getNumberOfFilledLocations()
+    numberOfPreSolvedValues = len(preSolved.filledLocations())
+    numberOfPostSolvedValues = len(postSolved.filledLocations())
 
     if number is None:
         number = ""

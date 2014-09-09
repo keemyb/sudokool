@@ -942,6 +942,9 @@ class Sudoku():
 
         return self.candidates.keys()
 
+    def filledLocations(self):
+        return [location for location in self.locations() if not self.isEmpty(location)]
+
     def nLocations(self, unit, n):
         from itertools import combinations
 
@@ -1034,9 +1037,6 @@ class Sudoku():
 
     def possibleValues(self):
         return sorted(self.setOfPossibleValues)
-
-    def getNumberOfFilledLocations(self):
-        return (self.gridSize ** 2) - len(self.emptyLocations())
 
 
 
