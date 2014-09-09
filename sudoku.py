@@ -70,6 +70,15 @@ class Sudoku():
                                  "column": self.getColumn,
                                  "subGrid": self.getSubGrid}
 
+        self.solvingMethods = [self.nakedSingle, self.hiddenSingle,
+                               self.nakedTwin, self.hiddenTwin,
+                               self.pointingPair, self.pointingTriplet,
+                               self.boxLineReduction2, self.boxLineReduction3,
+                               self.nakedTriplet, self.hiddenTriplet,
+                               self.xWing, self.swordfish,
+                               self.yWing,
+                               self.simpleColouring]
+
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return other.values == self.values
@@ -223,24 +232,16 @@ class Sudoku():
         return False
 
     def solve(self, maxLevel, history=None):
-        methods = [self.nakedSingle, self.hiddenSingle,
-                   self.nakedTwin, self.hiddenTwin,
-                   self.pointingPair, self.pointingTriplet,
-                   self.boxLineReduction2, self.boxLineReduction3,
-                   self.nakedTriplet, self.hiddenTriplet,
-                   self.xWing, self.swordfish,
-                   self.yWing,
-                   self.simpleColouring]
 
         if self.isComplete():
             return [(entry[0], entry[2]) for entry in history if history is not None]
 
-        if maxLevel > len(methods) or maxLevel < 1:
-            maxLevel = len(methods)
+        if maxLevel > len(self.solvingMethods) or maxLevel < 1:
+            maxLevel = len(self.solvingMethods)
 
         #if solver is run for the first time, solve using first method
         if history is None:
-            log = methods[0]()[1]
+            log = self.solvingMethods[0]()[1]
             history = [(0, self.changes, log)]
             return self.solve(maxLevel, history)
 
@@ -257,7 +258,7 @@ class Sudoku():
             else:
                 return [(entry[0], entry[2]) for entry in history if history is not None]
 
-        log = methods[nextMethod]()[1]
+        log = self.solvingMethods[nextMethod]()[1]
         history.append((nextMethod, self.changes, log))
 
         return self.solve(maxLevel, history)
