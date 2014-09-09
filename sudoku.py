@@ -798,7 +798,7 @@ class Sudoku():
         self.updateYWingGroups()
 
     def updateBaseGroupCandidates(self):
-        for intersectionType in ["subGrid", "row", "column"]:
+        for intersectionType in self.units:
 
             for group in self.intersectionTypes[intersectionType]:
 
@@ -1074,7 +1074,7 @@ class Sudoku():
         successString = "Naked %s: %s removes %s from %s"
         successString = name + ": %s have been removed from %s as it shares a %s with the " + name + ", %s"
 
-        for intersectionType in ["subGrid", "row", "column"]:
+        for intersectionType in self.units:
 
             for group in self.intersectionTypes[intersectionType]:
 
@@ -1129,7 +1129,7 @@ class Sudoku():
         else:
             successString = name + ": %s has been set to %s, as all other candidates have been removed"
 
-        for intersectionType in ["subGrid", "row", "column"]:
+        for intersectionType in self.units:
 
             for group in self.intersectionTypes[intersectionType]:
 
