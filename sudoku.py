@@ -45,40 +45,53 @@ class Sudoku():
 
         self.intersectionTypes = {}
 
-        self.staticGroups = {"row": self.generateRowGroups(),
-                             "column": self.generateColumnGroups(),
-                             "subGrid": self.generateSubGridGroups()}
+        self.staticGroups = {
+            "row": self.generateRowGroups(),
+            "column": self.generateColumnGroups(),
+            "subGrid": self.generateSubGridGroups(),
+            }
 
-        self.generationMethods = {"row": self.generateRowGroups,
-                                  "column": self.generateColumnGroups,
-                                  "subGrid": self.generateSubGridGroups,
-                                  "xWing": self.generateXWingGroups,
-                                  "swordfish": self.generateSwordfishGroups,
-                                  "conjugatePairs": self.generateConjugatePairs,
-                                  "chains": self.generateChains,
-                                  "yWing": self.generateYWingGroups,
-                                  "xyzWing": self.generateXYZWingGroups,}
+        self.generationMethods = {
+            "row": self.generateRowGroups,
+            "column": self.generateColumnGroups,
+            "subGrid": self.generateSubGridGroups,
+            "xWing": self.generateXWingGroups,
+            "swordfish": self.generateSwordfishGroups,
+            "conjugatePairs": self.generateConjugatePairs,
+            "chains": self.generateChains,
+            "yWing": self.generateYWingGroups,
+            "xyzWing": self.generateXYZWingGroups,
+            }
 
-        self.neighbourMethods = {"row": self.getRowNeighbours,
-                                 "column": self.getColumnNeighbours,
-                                 "subGrid": self.getSubGridNeighbours}
+        self.neighbourMethods = {
+            "row": self.getRowNeighbours,
+            "column": self.getColumnNeighbours,
+            "subGrid": self.getSubGridNeighbours,
+            }
 
-        self.allNeighbourMethods = {"row": self.getAllRowNeighbours,
-                                    "column": self.getAllColumnNeighbours,
-                                    "subGrid": self.getAllSubGridNeighbours}
+        self.allNeighbourMethods = {
+            "row": self.getAllRowNeighbours,
+            "column": self.getAllColumnNeighbours,
+            "subGrid": self.getAllSubGridNeighbours,
+            }
 
-        self.alignmentMethods = {"row": self.getRow,
-                                 "column": self.getColumn,
-                                 "subGrid": self.getSubGrid}
+        self.alignmentMethods = {
+            "row": self.getRow,
+            "column": self.getColumn,
+            "subGrid": self.getSubGrid,
+            }
 
-        self.solvingMethods = [self.nakedSingle, self.hiddenSingle,
-                               self.nakedTwin, self.hiddenTwin,
-                               self.pointingPair, self.pointingTriplet,
-                               self.boxLineReduction2, self.boxLineReduction3,
-                               self.nakedTriplet, self.hiddenTriplet,
-                               self.xWing, self.swordfish,
-                               self.yWing,
-                               self.simpleColouring]
+        self.solvingMethods = [
+            self.nakedSingle, self.hiddenSingle,
+            self.nakedTwin, self.hiddenTwin,
+            self.pointingPair, self.pointingTriplet,
+            self.boxLineReduction2, self.boxLineReduction3,
+            self.nakedTriplet, self.hiddenTriplet,
+            self.xWing, self.swordfish,
+            self.yWing,
+            self.simpleColouring,
+            self.xyzWing,
+            ]
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -825,7 +838,7 @@ class Sudoku():
 
                 arms = firstArm, secondArm
 
-                xyzWing = ([pivot] + sorted(arms), xyzWingCandidate)
+                xyzWing = ([pivot] + sorted(arms), xyzWingCandidate.pop())
 
                 if xyzWing in xyzWings:
                     continue
@@ -1658,5 +1671,38 @@ class Sudoku():
                     self.candidates[location] -= set([yWingCandidate])
                     self.changes = True
                     log.append(successString % (yWingCandidate, location, (firstArm, secondArm)))
+
+        return self.changes, log
+
+    def xyzWing(self):
+        self.initialiseIntersections("xyzWing")
+
+        self.changes = False
+
+        log = []
+
+        successString = "XYZ-Wing: %s has been removed from %s, as it can be seen by %s, an XYZ-Wing"
+
+        for xyzWingGroup in self.intersectionTypes["xyzWing"]:
+            xyzWingLocations = xyzWingGroup[0]
+            xyzWingCandidate = xyzWingGroup[1]
+            pivot = xyzWingLocations[0]
+            firstArm = xyzWingLocations[1]
+            secondArm = xyzWingLocations[2]
+
+            pivotNeighbours = self.getBaseNeighbours(pivot, *xyzWingLocations)
+            firstArmNeighbours = self.getBaseNeighbours(firstArm, *xyzWingLocations)
+            secondArmNeighbours = self.getBaseNeighbours(secondArm, *xyzWingLocations)
+
+            commonNeighbours = (set(pivotNeighbours) &
+                                set(firstArmNeighbours) &
+                                set(secondArmNeighbours))
+
+            for location in commonNeighbours:
+                locationCandidates = self.solvingCandidates(location)
+                if xyzWingCandidate in locationCandidates:
+                    self.candidates[location] -= set([xyzWingCandidate])
+                    self.changes = True
+                    log.append(successString % (xyzWingCandidate, location, xyzWingLocations))
 
         return self.changes, log
