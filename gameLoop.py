@@ -1,5 +1,5 @@
 import kivy
-kivy.require('1.8.0') # replace with your current kivy version !
+kivy.require('1.8.0')  # replace with your current kivy version !
 
 from kivy.app import App
 from sudoku import Sudoku
@@ -8,11 +8,12 @@ from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
 
+
 class screen(BoxLayout):
 
-    def __init__(self, horizontalFormat = True, **kwargs):
+    def __init__(self, horizontalFormat=True, **kwargs):
         super(screen, self).__init__(**kwargs)
-        
+
         if horizontalFormat:
             self.orientation = "horizontal"
         else:
@@ -20,45 +21,49 @@ class screen(BoxLayout):
         self.add_widget(puzzle())
         self.add_widget(inputs())
 
+
 class puzzle(GridLayout):
-    
+
     def __init__(self, **kwargs):
-        super(puzzle, self).__init__(**kwargs)  
-        
+        super(puzzle, self).__init__(**kwargs)
+
         self.cols = sudoku.unitSize()
-        
+
         for location in self.locations:
             if sudoku.isEmpty(location):
                 self.add_widget(candidates(location))
             else:
                 value = str(sudoku.getLocationValue(location))
-                self.add_widget(Label(text = value, font_size = 40))
+                self.add_widget(Label(text=value, font_size=40))
+
 
 class candidates(GridLayout):
-    
-    def __init__(self, location, userCandidates = False, **kwargs):
+
+    def __init__(self, location, userCandidates=False, **kwargs):
         super(candidates, self).__init__(**kwargs)
-        
+
         self.cols = sudoku.subGridsInRow()
-        
+
         if userCandidates:
             if sudoku.hasUserCandidates(location):
                 for candidate in sudoku.userCandidates(location):
-                    self.add_widget(Label(text = str(candidate)))
+                    self.add_widget(Label(text=str(candidate)))
         else:
             if sudoku.hasSolvingCandidates(location):
                 for candidate in sudoku.solvingCandidates(location):
-                    self.add_widget(Label(text = str(candidate)))           
-        
+                    self.add_widget(Label(text=str(candidate)))
+
+
 class inputs(GridLayout):
-    
+
     def __init__(self, **kwargs):
-        super(inputs, self).__init__(**kwargs)  
-        
+        super(inputs, self).__init__(**kwargs)
+
         self.cols = sudoku.subGridsInRow()
-        
+
         for value in sudoku.possibleValues():
-            self.add_widget(Button(text = str(value)))
+            self.add_widget(Button(text=str(value)))
+
 
 class SudokuApp(App):
 
