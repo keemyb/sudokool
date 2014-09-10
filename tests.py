@@ -2,11 +2,11 @@ from sudoku import Sudoku
 from puzzleSummary import puzzleSummary
 
 def fromTextPuzzleSummary(textfile, seperator, maxLevel, n, specific, showModified, showSolved, printPuzzle, printGhostValues, printHistory):
-    
+
     fileToRead = open(textfile, "r")
     currentPuzzle = ""
     puzzles = []
-    
+
     for line in fileToRead:
         if len(puzzles) <= n:
             if line == seperator:
@@ -36,7 +36,7 @@ def fromTextToPuzzle(textfile, seperator, n):
     fileToRead = open(textfile, "r")
     currentPuzzle = ""
     puzzles = []
-    
+
     for line in fileToRead:
         if len(puzzles) <= n:
             if line == seperator:
@@ -52,7 +52,7 @@ def fromTextToPuzzle(textfile, seperator, n):
 
 def visualizer(puzzle, *groups):
     wholeString = ""
-    
+
     for group in groups:
         gridSize = puzzle.gridSize
         subGridsX = puzzle.subGridsX
@@ -92,7 +92,7 @@ def visualizer(puzzle, *groups):
 xyzWing = Sudoku("600000008500908007820001030340209080200080300180307025750400092900005004400090003")
 # xyzWing = Sudoku("092001750500200008000030200075004960200060075069700030008090020700003089903800040")
 print puzzleSummary(xyzWing, 0, True, True, True)
-# print xyzWing.generateXYZWingGroups()
+print xyzWing.intersectionTypes["xyzWing"]
 # for group in xyzWing.generateXYZWingGroups():
 #     locations = group[0]
 #     print visualizer(xyzWing, locations)

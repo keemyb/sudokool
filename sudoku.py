@@ -883,6 +883,7 @@ class Sudoku():
         self.updateConjugatePairs()
         self.updateChains()
         self.updateYWingGroups()
+        self.updateXYZWingGroups()
 
     def updateBaseGroupCandidates(self):
         for intersectionType in self.units:
@@ -999,7 +1000,21 @@ class Sudoku():
                     self.intersectionTypes["yWing"].remove(yWingGroup)
                     break
 
+    def updateXYZWingGroups(self):
+        if "xyzWing" not in self.intersectionTypes:
+            return
 
+        for xyzWingGroup in self.intersectionTypes["xyzWing"]:
+            xyzWingLocations = xyzWingGroup[0]
+            for location in xyzWingLocations:
+                if not self.isEmpty(location):
+                    continue
+                numberOfCandidates = len(self.solvingCandidates(location))
+                if numberOfCandidates not in (2,3):
+                    continue
+                if xyzWingGroup in self.intersectionTypes["xyzWing"]:
+                    self.intersectionTypes["xyzWing"].remove(xyzWingGroup)
+                    break
 
 
     def isEmpty(self, location):
