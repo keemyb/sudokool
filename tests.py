@@ -92,7 +92,6 @@ def visualizer(puzzle, *groups):
 xyzWing = Sudoku("600000008500908007820001030340209080200080300180307025750400092900005004400090003")
 # xyzWing = Sudoku("092001750500200008000030200075004960200060075069700030008090020700003089903800040")
 print puzzleSummary(xyzWing, 0, True, True, True)
-print xyzWing.intersectionTypes["xyzWing"]
 # for group in xyzWing.generateXYZWingGroups():
 #     locations = group[0]
 #     print visualizer(xyzWing, locations)
