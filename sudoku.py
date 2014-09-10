@@ -56,7 +56,8 @@ class Sudoku():
                                   "swordfish": self.generateSwordfishGroups,
                                   "conjugatePairs": self.generateConjugatePairs,
                                   "chains": self.generateChains,
-                                  "yWing": self.generateYWingGroups,}
+                                  "yWing": self.generateYWingGroups,
+                                  "xyzWing": self.generateXYZWingGroups,}
 
         self.neighbourMethods = {"row": self.getRowNeighbours,
                                  "column": self.getColumnNeighbours,
@@ -788,9 +789,78 @@ class Sudoku():
 
         return alignment, commonCandidates, firstLocationCandidates, secondLocationCandidates
 
+    def generateXYZWingGroups(self):
+        xyzWings = []
+
+        for firstPair in self.nLocations(self.emptyLocations(), 2):
+            result = self.xyzWingPairValid(firstPair)
+            if not result:
+                continue
+
+            pivot = result[0]
+            firstArm = result[1]
+            firstArmCandidates = result[2]
+
+            for secondPair in self.nLocations(self.emptyLocations(), 2):
+                if sorted(secondPair) == sorted(firstPair):
+                    continue
+
+                if pivot not in secondPair:
+                    continue
+
+                result = self.xyzWingPairValid(secondPair)
+                if not result:
+                    continue
+
+                secondArm = result[1]
+                secondArmCandidates = result[2]
+
+                if self.alignment(pivot, firstArm, secondArm):
+                    continue
+
+                if secondArmCandidates == firstArmCandidates:
+                    continue
+
+                xyzWingCandidate = self.commonCandidates(firstArm, secondArm)
+
+                arms = firstArm, secondArm
+
+                xyzWing = ([pivot] + sorted(arms), xyzWingCandidate)
+
+                if xyzWing in xyzWings:
+                    continue
+
+                xyzWings.append(xyzWing)
+
+        return xyzWings
+
+    def xyzWingPairValid(self, pair):
+        alignment = self.alignment(*pair)
+        if not alignment:
+            return False
+
+        pivot, nonPivot = None, None
+
+        for location in pair:
+            candidates = self.solvingCandidates(location)
+            if len(candidates) == 3:
+                pivot = location
+                pivotCandidates = candidates
+            elif len(candidates) == 2:
+                nonPivot = location
+                nonPivotCandidates = candidates
+
+        if any(location is None for location in (pivot, nonPivot)):
+            return False
+
+        if not pivotCandidates > nonPivotCandidates:
+            return False
+
+        return pivot, nonPivot, nonPivotCandidates
 
 
 
+    
     def updatePuzzle(self):
 
         self.updateBaseGroupCandidates()
