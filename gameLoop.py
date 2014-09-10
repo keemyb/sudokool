@@ -29,11 +29,11 @@ class puzzle(GridLayout):
 
         self.cols = sudoku.unitSize()
 
-        for location in self.locations:
+        for location in sudoku.locations():
             if sudoku.isEmpty(location):
                 self.add_widget(candidates(location))
             else:
-                value = str(sudoku.getLocationValue(location))
+                value = str(sudoku.getValue(location))
                 self.add_widget(Label(text=value, font_size=40))
 
 
