@@ -1720,4 +1720,7 @@ class Sudoku():
                     self.changes = True
                     log.append(successString % (xyzWingCandidate, location, xyzWingLocations))
 
+        if self.changes:
+            self.updatePuzzle()
+
         return self.changes, log
