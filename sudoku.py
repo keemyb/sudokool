@@ -62,6 +62,7 @@ class Sudoku():
             "yWing": self.generateYWingGroups,
             "xyzWing": self.generateXYZWingGroups,
             "lockedPairs": self.generateLockedPairs,
+            "lockedChains": self.generateLockedChains,
             }
 
         self.neighbourMethods = {
@@ -879,7 +880,7 @@ class Sudoku():
             alignment = self.alignment(*pair)
             if not alignment:
                 continue
-            
+
             locationOneCandidates = self.solvingCandidates(pair[0])
             if len(locationOneCandidates) != 2:
                 continue
@@ -897,6 +898,62 @@ class Sudoku():
 
         return lockedPairs
 
+    def generateLockedChains(self):
+        self.initialiseIntersections("lockedPairs")
+
+        lockedChains = []
+
+        for pairGroup in self.intersectionTypes["lockedPairs"]:
+            pair, candidates = pairGroup[0], pairGroup[1]
+
+            chain = pair[:]
+            lastChain = None
+            while lastChain != chain:
+
+                firstLink, lastLink = chain[0], chain[-1]
+                lastChain = chain[:]
+
+                for prospectivePairGroup in self.intersectionTypes["lockedPairs"]:
+
+                    prospectivePair = prospectivePairGroup[0]
+                    prospectiveCandidates = prospectivePairGroup[1]
+
+                    if prospectiveCandidates != candidates:
+                        continue
+
+                    if all(location in chain for location in prospectivePair):
+                        continue
+
+                    if any(location == firstLink for location in prospectivePair):
+                        if prospectivePair[0] in chain:
+                            chain.insert(0, prospectivePair[1])
+                            break
+                        else:
+                            chain.insert(0, prospectivePair[0])
+                            break
+
+                    if any(location == lastLink for location in prospectivePair):
+                        if prospectivePair[0] in chain:
+                            chain.append(prospectivePair[1])
+                            break
+                        else:
+                            chain.append(prospectivePair[0])
+                            break
+
+            if len(chain) < 3:
+                continue
+
+            permutationExists = False
+            for chainGroup in lockedChains:
+                existingChain = chainGroup[0]
+                if all(location in existingChain for location in chain):
+                    permutationExists = True
+
+            if not permutationExists:
+                lockedChains.append((chain, candidates))
+
+        return lockedChains
+
 
 
 
@@ -911,6 +968,7 @@ class Sudoku():
         self.updateYWingGroups()
         self.updateXYZWingGroups()
         self.updateLockedPairs()
+        self.updateLockedChains()
 
     def updateBaseGroupCandidates(self):
         for intersectionType in self.units:
@@ -1058,6 +1116,28 @@ class Sudoku():
                 if group in self.intersectionTypes["lockedPairs"]:
                     self.intersectionTypes["lockedPairs"].remove(group)
                     break
+
+    def updateLockedChains(self):
+        if "lockedChains" not in self.intersectionTypes:
+            return
+
+        for chainGroup in self.intersectionTypes["lockedChains"]:
+            if not self.validLockedChain(chainGroup):
+                if chainGroup in self.intersectionTypes["lockedChains"]:
+                    self.intersectionTypes["lockedChains"].remove(chainGroup)
+
+    def validLockedChain(self, chainGroup):
+        if chainGroup not in self.intersectionTypes["lockedChains"]:
+            return False
+
+        chain, candidates = chainGroup[0], chainGroup[1]
+        
+        for location in chain:
+            if not self.isEmpty(location):
+                return False
+            if candidates != self.solvingCandidates(location):
+                return False
+        return True
 
 
 
