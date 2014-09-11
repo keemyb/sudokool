@@ -89,15 +89,16 @@ def visualizer(puzzle, *groups):
 
     return wholeString
 
-xyzWing = Sudoku("600000008500908007820001030340209080200080300180307025750400092900005004400090003")
-# xyzWing = Sudoku("092001750500200008000030200075004960200060075069700030008090020700003089903800040")
-print puzzleSummary(xyzWing, 0, True, True, True)
-# for group in xyzWing.generateXYZWingGroups():
-#     locations = group[0]
-#     print visualizer(xyzWing, locations)
-#     print locations
-# xyzWing.solve(0)
-# print xyzWing
+rp = Sudoku("520609173017003569396175428789564312030718956165392847650031794041907635973456281")
+# print puzzleSummary(rp, 0, True, True, True)
+rp.solve(11)
+for group in rp.generateLockedPairs():
+    locations = group[0]
+    print visualizer(rp, locations)
+    print group
+print rp
+# rp.solve(0)
+# print rp
 
 
 # print puzzleSummary(conjugatePairPuzzle, 0, True, True, True)

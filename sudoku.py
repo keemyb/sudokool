@@ -61,6 +61,7 @@ class Sudoku():
             "chains": self.generateChains,
             "yWing": self.generateYWingGroups,
             "xyzWing": self.generateXYZWingGroups,
+            "lockedPairs": self.generateLockedPairs,
             }
 
         self.neighbourMethods = {
@@ -278,7 +279,7 @@ class Sudoku():
         return self.solve(maxLevel, history)
 
 
-    
+
 
     def prospectiveChange(self, candidatesToRemove=None, valuesToAdd=None):
         from copy import deepcopy
@@ -313,7 +314,7 @@ class Sudoku():
 
 
 
-    
+
     def initialiseIntersections(self, *requiredIntersections):
         self.solveMode = True
         #three main intersection types needed for candidates to work
@@ -871,9 +872,34 @@ class Sudoku():
 
         return pivot, nonPivot, nonPivotCandidates
 
+    def generateLockedPairs(self):
+        lockedPairs = []
+
+        for pair in self.nLocations(self.emptyLocations(), 2):
+            alignment = self.alignment(*pair)
+            if not alignment:
+                continue
+            
+            locationOneCandidates = self.solvingCandidates(pair[0])
+            if len(locationOneCandidates) != 2:
+                continue
+
+            locationTwoCandidates = self.solvingCandidates(pair[1])
+            if locationTwoCandidates != locationOneCandidates:
+                continue
+
+            lockedPair = (sorted(pair), locationOneCandidates)
+
+            if lockedPair in lockedPairs:
+                continue
+
+            lockedPairs.append(lockedPair)
+
+        return lockedPairs
 
 
-    
+
+
     def updatePuzzle(self):
 
         self.updateBaseGroupCandidates()
@@ -884,6 +910,7 @@ class Sudoku():
         self.updateChains()
         self.updateYWingGroups()
         self.updateXYZWingGroups()
+        self.updateLockedPairs()
 
     def updateBaseGroupCandidates(self):
         for intersectionType in self.units:
@@ -1015,6 +1042,24 @@ class Sudoku():
                 if xyzWingGroup in self.intersectionTypes["xyzWing"]:
                     self.intersectionTypes["xyzWing"].remove(xyzWingGroup)
                     break
+
+    def updateLockedPairs(self):
+        if "lockedPairs" not in self.intersectionTypes:
+            return
+
+        for group in self.intersectionTypes["lockedPairs"]:
+            pair = group[0]
+            for location in pair:
+                if self.isEmpty(location):
+                    continue
+                numberOfCandidates = len(self.solvingCandidates(location))
+                if numberOfCandidates == 2:
+                    continue
+                if group in self.intersectionTypes["lockedPairs"]:
+                    self.intersectionTypes["lockedPairs"].remove(group)
+                    break
+
+
 
 
     def isEmpty(self, location):
