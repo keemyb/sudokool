@@ -1053,9 +1053,10 @@ class Sudoku():
             return
 
         for chainGroup in self.intersectionTypes["chains"]:
-            if not self.validChain(chainGroup):
-                if chainGroup in self.intersectionTypes["conjugatePairs"]:
-                    self.intersectionTypes["conjugatePairs"].remove(chainGroup)
+            if self.validChain(chainGroup):
+                continue
+            if chainGroup in self.intersectionTypes["chains"]:
+                self.intersectionTypes["chains"].remove(chainGroup)
 
     def validChain(self, chainGroup):
         chain, candidate = chainGroup[0], chainGroup[1]
