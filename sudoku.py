@@ -93,6 +93,7 @@ class Sudoku():
             self.yWing,
             self.simpleColouring,
             self.xyzWing,
+            self.remotePairs,
             ]
 
     def __eq__(self, other):
@@ -1107,15 +1108,12 @@ class Sudoku():
 
         for group in self.intersectionTypes["lockedPairs"]:
             pair = group[0]
-            for location in pair:
-                if self.isEmpty(location):
-                    continue
-                numberOfCandidates = len(self.solvingCandidates(location))
-                if numberOfCandidates == 2:
-                    continue
-                if group in self.intersectionTypes["lockedPairs"]:
-                    self.intersectionTypes["lockedPairs"].remove(group)
-                    break
+
+            if all(self.isEmpty(location) for location in pair):
+                continue
+            if group in self.intersectionTypes["lockedPairs"]:
+                self.intersectionTypes["lockedPairs"].remove(group)
+                break
 
     def updateLockedChains(self):
         if "lockedChains" not in self.intersectionTypes:
@@ -1131,7 +1129,7 @@ class Sudoku():
             return False
 
         chain, candidates = chainGroup[0], chainGroup[1]
-        
+
         for location in chain:
             if not self.isEmpty(location):
                 return False
@@ -1847,6 +1845,51 @@ class Sudoku():
                     self.candidates[location] -= set([xyzWingCandidate])
                     self.changes = True
                     log.append(successString % (xyzWingCandidate, location, xyzWingLocations))
+
+        if self.changes:
+            self.updatePuzzle()
+
+        return self.changes, log
+
+
+
+
+    def remotePairs(self):
+        self.initialiseIntersections("lockedChains")
+
+        self.changes = False
+
+        log = []
+
+        successString = "Remote Pair: %s has been removed from %s, as it can be seen by the remote pair %s, part of the locked chain %s"
+
+        for lockedChainGroup in self.intersectionTypes["lockedChains"]:
+            lockedChain, candidates = lockedChainGroup[0], lockedChainGroup[1]
+
+            remotePairs = []
+            steps = xrange(3, len(lockedChain), 2)
+            for step in steps:
+                for i in xrange(len(lockedChain) - step):
+                    remotePairs.append((lockedChain[i], lockedChain[i+step]))
+
+            for remotePair in remotePairs:
+                locationOne, locationTwo = remotePair[0], remotePair[1]
+
+                locationOneNeighbours = self.getBaseNeighbours(locationOne, *lockedChain)
+                locationTwoNeighbours = self.getBaseNeighbours(locationTwo, *lockedChain)
+                remotePairNeighbours = (set(locationOneNeighbours) &
+                                        set(locationTwoNeighbours))
+
+                for neighbour in remotePairNeighbours:
+                    neighbourCandidates = self.solvingCandidates(neighbour)
+                    if any(candidate in neighbourCandidates for candidate in candidates):
+
+                        removedCandidates = [candidate for candidate in neighbourCandidates if candidate in candidates]
+
+                        self.candidates[neighbour] -= set(removedCandidates)
+                        self.changes = True
+
+                        log.append(successString % (removedCandidates, neighbour, remotePair, lockedChain))
 
         if self.changes:
             self.updatePuzzle()

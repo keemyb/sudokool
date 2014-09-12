@@ -91,18 +91,11 @@ def visualizer(puzzle, *groups):
 
 rp = Sudoku("520609173017003569396175428789564312030718956165392847650031794041907635973456281")
 # print puzzleSummary(rp, 0, True, True, True)
-rp.solve(11)
-# for group in rp.generateLockedPairs():
-rp.initialiseIntersections("lockedChains")
-# rp.candidates[57] = set([8])
-rp.updateLockedChains()
-for group in rp.intersectionTypes["lockedChains"]:
-    locations = group[0]
-    print visualizer(rp, locations)
-    print group
-print rp
-# rp.solve(0)
-# print rp
+# rp.solve(11)
+
+# print rp.remotePairs()
+print puzzleSummary(rp, 0, True, True, True)
+print rp.intersectionTypes
 
 
 # print puzzleSummary(conjugatePairPuzzle, 0, True, True, True)
