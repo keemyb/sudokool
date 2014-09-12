@@ -1041,12 +1041,10 @@ class Sudoku():
 
         for group in self.intersectionTypes["conjugatePairs"]:
             pair = group[0]
-            for location in pair:
-                if self.isEmpty(location):
-                    continue
-                if group in self.intersectionTypes["conjugatePairs"]:
-                    self.intersectionTypes["conjugatePairs"].remove(group)
-                    break
+            if all(self.isEmpty(location) for location in pair):
+                continue
+            if group in self.intersectionTypes["conjugatePairs"]:
+                self.intersectionTypes["conjugatePairs"].remove(group)
 
     def updateChains(self):
         if "chains" not in self.intersectionTypes:
