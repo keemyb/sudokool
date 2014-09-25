@@ -1520,15 +1520,11 @@ class Sudoku():
             subGridNeighbours = self.getSubGridNeighbours(combination[0], *combination)
 
             for location in subGridNeighbours:
-                locationCandidates = self.solvingCandidates(location)
-                if any(candidate in locationCandidates for candidate in uniquePointerCandidates):
+                removedCandidates = self.removeSolvingCandidates(location, *uniquePointerCandidates)
 
-                    removedCandidates = [candidate for candidate in locationCandidates if candidate in uniquePointerCandidates][0]
+                if removedCandidates:
 
-                    self.candidates[location] -= uniquePointerCandidates
-                    self.changes = True
-
-                    log.append(successString % (removedCandidates, location, removedCandidates, pointerType))
+                    log.append(successString % (removedCandidates, location, commonPointerCandidates, pointerType))
 
         if self.changes:
             self.updatePuzzle()
