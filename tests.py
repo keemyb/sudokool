@@ -96,6 +96,8 @@ rp = Sudoku("5206091730170035693961754287895643120307189561653928476500317940419
 # print rp.remotePairs()
 print puzzleSummary(rp, 9, True, True, True)
 print rp.candidates
+print rp.removeSolvingCandidates(3,*[8,5])
+print rp.candidates
 
 # print puzzleSummary(conjugatePairPuzzle, 0, True, True, True)
 

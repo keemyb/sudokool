@@ -1234,6 +1234,27 @@ class Sudoku():
     def userCandidates(self, location):
         return self.userCandidatesDict[location]
 
+    def removeSolvingCandidates(self, location, *candidates):
+
+        removedCandidates = []
+
+        if self.isConstant(location):
+            raise Exception("location is a constant and cannot be changed")
+
+        if not self.hasSolvingCandidates(location):
+            return removedCandidates
+
+        for candidate in candidates:
+
+            if not self.isValidInput(candidate):
+                raise Exception("candidate is not vaild")
+
+            if candidate in self.solvingCandidates(location):
+                self.candidates[location].remove(candidate)
+                removedCandidates.append(candidate)
+
+        return removedCandidates
+
     def toggleUserCandidate(self, location, candidate):
         if self.isConstant(location):
             raise Exception("location is a constant and cannot be changed")
