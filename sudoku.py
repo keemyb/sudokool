@@ -1,4 +1,4 @@
-# -*- coding: cp1252 -*-
+
 
 #subGridsx = amount of subgrids in X plane
 def isPrime(n):
@@ -28,12 +28,13 @@ def factors(n):
 class Sudoku():
 
     def __init__(self, data, horizontalFormat=True):
+        self.horizontalFormat = horizontalFormat
         self.calculateDimensions(data, horizontalFormat)
         self.generatePossibleValues()
         self.processData(data)
 
         self.candidates = {}
-        self.userCandidates = {}
+        self.userCandidatesDict = {}
 
         self.solveMode = False
         self.changes = False
@@ -371,6 +372,29 @@ class Sudoku():
 
         self.hasCandidates = True
 
+
+    def initialiseUserCandidates(self):
+
+        if not self.hasIntersections:
+            self.initialiseIntersections()
+
+        for location in self.emptyLocations():
+
+            neighbours = self.getAllBaseNeighbours(location)
+
+            surroundingValues = self.getValues(*neighbours)
+
+            self.userCandidatesDict[location] = self.setOfPossibleValues - surroundingValues
+
+    def updateUserCandidates(self):
+
+        for location in self.userCandidatesDict.iterkeys():
+
+            neighbours = self.getAllBaseNeighbours(location)
+
+            surroundingValues = self.getValues(*neighbours)
+
+            self.userCandidatesDict[location] -= surroundingValues
 
 
 
@@ -1186,8 +1210,8 @@ class Sudoku():
 
         self.values[location] = value
 
-        if location in self.userCandidates:
-            del self.userCandidates[location]
+        if location in self.userCandidatesDict:
+            del self.userCandidatesDict[location]
 
     def getValue(self, location):
         return self.values[location]
@@ -1208,7 +1232,7 @@ class Sudoku():
         return set.intersection(*[self.candidates[location] for location in locations])
 
     def userCandidates(self, location):
-        return self.userCandidates[location]
+        return self.userCandidatesDict[location]
 
     def toggleUserCandidate(self, location, candidate):
         if self.isConstant(location):
@@ -1221,13 +1245,13 @@ class Sudoku():
             self.clearLocation(location)
 
         if not self.hasUserCandidates(location):
-            self.userCandidates[location] = [candidate]
+            self.userCandidatesDict[location] = set([candidate])
             return
 
-        if candidate in self.userCandidates[location]:
-            self.userCandidates[location].remove(candidate)
+        if candidate in self.userCandidatesDict[location]:
+            self.userCandidatesDict[location].remove(candidate)
         else:
-            self.userCandidates[location].append(candidate)
+            self.userCandidatesDict[location].add(candidate)
 
     def hasSolvingCandidates(self, location):
         if location not in self.candidates:
@@ -1239,10 +1263,10 @@ class Sudoku():
         return True
 
     def hasUserCandidates(self, location):
-        if location not in self.userCandidates:
+        if location not in self.userCandidatesDict:
             return False
 
-        if not self.userCandidates[location]:
+        if not self.userCandidatesDict[location]:
             return False
 
         return True

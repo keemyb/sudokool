@@ -94,9 +94,8 @@ rp = Sudoku("5206091730170035693961754287895643120307189561653928476500317940419
 # rp.solve(11)
 
 # print rp.remotePairs()
-print puzzleSummary(rp, 0, True, True, True)
-rp.updateConjugatePairs()
-print rp.intersectionTypes
+print puzzleSummary(rp, 9, True, True, True)
+print rp.candidates
 
 # print puzzleSummary(conjugatePairPuzzle, 0, True, True, True)
 
