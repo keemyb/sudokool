@@ -101,9 +101,9 @@ rp = Sudoku("5206091730170035693961754287895643120307189561653928476500317940419
 
 # print puzzleSummary(conjugatePairPuzzle, 0, True, True, True)
 
-for puzzleNo in [6,7,42,47,48,49,50]:
+# for puzzleNo in [6,7,42,47,48,49,50]:
 # for puzzleNo in xrange(5,11):
-# for puzzleNo in xrange(1,51):
+for puzzleNo in xrange(1,51):
     print fromTextPuzzleSummary("easy50.txt", "========\n", 0, puzzleNo, True, True, True, True, True, True)
     print
 

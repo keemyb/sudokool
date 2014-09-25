@@ -1475,15 +1475,12 @@ class Sudoku():
             linearNeighbours = self.neighbourMethods[pointerType](combination[0], *combination)
 
             for location in linearNeighbours:
-                locationCandidates = self.solvingCandidates(location)
-                if any(candidate in locationCandidates for candidate in uniquePointerCandidates):
 
-                    removedCandidates = [candidate for candidate in locationCandidates if candidate in uniquePointerCandidates]
+                removedCandidates = self.removeSolvingCandidates(location, *uniquePointerCandidates)
 
-                    self.candidates[location] -= uniquePointerCandidates
-                    self.changes = True
+                if removedCandidates:
 
-                    log.append(successString % (str(removedCandidates)[1:-1], str(location), pointerType, combination))
+                    log.append(successString % (removedCandidates, str(location), pointerType, combination))
 
         if self.changes:
             self.updatePuzzle()
