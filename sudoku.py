@@ -1657,12 +1657,10 @@ class Sudoku():
                     swordfishNeighbours += self.neighbourMethods[swordfishType](location, *group)
 
                 for location in swordfishNeighbours:
-                    locationCandidates = self.solvingCandidates(location)
-                    if candidate in locationCandidates:
 
-                        self.candidates[location].remove(candidate)
-                        self.changes = True
+                    removedCandidates = self.removeSolvingCandidates(location, candidate)
 
+                    if removedCandidates:
                         log.append(successString % (candidate, location, group))
 
         if self.changes:
