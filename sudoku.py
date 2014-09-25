@@ -1253,6 +1253,9 @@ class Sudoku():
                 self.candidates[location].remove(candidate)
                 removedCandidates.append(candidate)
 
+        if removedCandidates:
+            self.changes = True
+
         return removedCandidates
 
     def toggleUserCandidate(self, location, candidate):
