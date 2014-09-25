@@ -364,7 +364,7 @@ class Sudoku():
             if not self.isEmpty(location):
                 continue
 
-            neighbours = [neighbour for neighbour in self.getAllBaseNeighbours(location) if not self.isEmpty(neighbour)]
+            neighbours = [neighbour for neighbour in self.getAllCombinedNeighbours(location) if not self.isEmpty(neighbour)]
 
             surroundingValues = self.getValues(*neighbours)
 
@@ -380,7 +380,7 @@ class Sudoku():
 
         for location in self.emptyLocations():
 
-            neighbours = self.getAllBaseNeighbours(location)
+            neighbours = self.getAllCombinedNeighbours(location)
 
             surroundingValues = self.getValues(*neighbours)
 
@@ -390,7 +390,7 @@ class Sudoku():
 
         for location in self.userCandidatesDict.iterkeys():
 
-            neighbours = self.getAllBaseNeighbours(location)
+            neighbours = self.getAllCombinedNeighbours(location)
 
             surroundingValues = self.getValues(*neighbours)
 
@@ -501,7 +501,7 @@ class Sudoku():
 
         return neighbours
 
-    def getBaseNeighbours(self, location, *exclusions):
+    def getCombinedNeighbours(self, location, *exclusions):
         return set(self.getSubGridNeighbours(location, *exclusions) +
                    self.getRowNeighbours(location, *exclusions) +
                    self.getColumnNeighbours(location, *exclusions))
@@ -527,7 +527,7 @@ class Sudoku():
 
         return neighbours
 
-    def getAllBaseNeighbours(self, location, *exclusions):
+    def getAllCombinedNeighbours(self, location, *exclusions):
         return set(self.getAllSubGridNeighbours(location, *exclusions) +
                    self.getAllRowNeighbours(location, *exclusions) +
                    self.getAllColumnNeighbours(location, *exclusions))
@@ -1804,8 +1804,8 @@ class Sudoku():
             firstArm = yWingLocations[1]
             secondArm = yWingLocations[2]
 
-            firstArmNeighbours = self.getBaseNeighbours(firstArm)
-            secondArmNeighbours = self.getBaseNeighbours(secondArm)
+            firstArmNeighbours = self.getCombinedNeighbours(firstArm)
+            secondArmNeighbours = self.getCombinedNeighbours(secondArm)
 
             commonNeighbours = ((set(firstArmNeighbours) &
                                 set(secondArmNeighbours)) -
@@ -1839,9 +1839,9 @@ class Sudoku():
             firstArm = xyzWingLocations[1]
             secondArm = xyzWingLocations[2]
 
-            pivotNeighbours = self.getBaseNeighbours(pivot, *xyzWingLocations)
-            firstArmNeighbours = self.getBaseNeighbours(firstArm, *xyzWingLocations)
-            secondArmNeighbours = self.getBaseNeighbours(secondArm, *xyzWingLocations)
+            pivotNeighbours = self.getCombinedNeighbours(pivot, *xyzWingLocations)
+            firstArmNeighbours = self.getCombinedNeighbours(firstArm, *xyzWingLocations)
+            secondArmNeighbours = self.getCombinedNeighbours(secondArm, *xyzWingLocations)
 
             commonNeighbours = (set(pivotNeighbours) &
                                 set(firstArmNeighbours) &
@@ -1883,8 +1883,8 @@ class Sudoku():
             for remotePair in remotePairs:
                 locationOne, locationTwo = remotePair[0], remotePair[1]
 
-                locationOneNeighbours = self.getBaseNeighbours(locationOne, *lockedChain)
-                locationTwoNeighbours = self.getBaseNeighbours(locationTwo, *lockedChain)
+                locationOneNeighbours = self.getCombinedNeighbours(locationOne, *lockedChain)
+                locationTwoNeighbours = self.getCombinedNeighbours(locationTwo, *lockedChain)
                 remotePairNeighbours = (set(locationOneNeighbours) &
                                         set(locationTwoNeighbours))
 
