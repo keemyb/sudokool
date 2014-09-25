@@ -1837,10 +1837,10 @@ class Sudoku():
                                 set(yWingLocations))
 
             for location in commonNeighbours:
-                locationCandidates = self.solvingCandidates(location)
-                if yWingCandidate in locationCandidates:
-                    self.candidates[location] -= set([yWingCandidate])
-                    self.changes = True
+
+                removedCandidates = self.removeSolvingCandidates(location, yWingCandidate)
+
+                if removedCandidates:
                     log.append(successString % (yWingCandidate, location, (firstArm, secondArm)))
 
         if self.changes:

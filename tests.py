@@ -101,11 +101,8 @@ rp = Sudoku("5206091730170035693961754287895643120307189561653928476500317940419
 
 # print puzzleSummary(conjugatePairPuzzle, 0, True, True, True)
 
-swordFish = Sudoku("050030602642895317037020800023504700406000520571962483214000900760109234300240170")
-print puzzleSummary(swordFish, 0, True, True, True)
-# print swordFish.swordfish()
-print swordFish.candidates
-# print puzzleSummary(swordFish, 0, True, True, True)
+yWing = Sudoku("900240000050690231020050090090700320002935607070002900069020073510079062207086009")
+print puzzleSummary(yWing, 0, True, True, True)
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
 # for puzzleNo in xrange(5,11):
