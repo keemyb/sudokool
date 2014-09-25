@@ -703,14 +703,14 @@ class Sudoku():
 
         return conjugatePairs
 
-    def generateConjugateChains(self):
-        self.initialiseIntersections("conjugatePairs")
+    def generatePairChains(self, pairType):
+        self.initialiseIntersections(pairType)
 
         chains = []
 
-        for initialPairGroup in self.intersectionTypes["conjugatePairs"]:
+        for pairGroup in self.intersectionTypes[pairType]:
 
-            pair, candidate = initialPairGroup[0], initialPairGroup[1]
+            pair, candidates = pairGroup[0], pairGroup[1]
             chain = pair[:]
 
             lastChain = None
@@ -719,12 +719,12 @@ class Sudoku():
                 firstLink, lastLink = chain[0], chain[-1]
                 lastChain = chain[:]
 
-                for prospectivePairGroup in self.intersectionTypes["conjugatePairs"]:
+                for prospectivePairGroup in self.intersectionTypes[pairType]:
 
                     prospectivePair = prospectivePairGroup[0]
-                    prospectiveCandidate = prospectivePairGroup[1]
+                    prospectiveCandidates = prospectivePairGroup[1]
 
-                    if prospectiveCandidate != candidate:
+                    if prospectiveCandidates != candidates:
                         continue
 
                     if all(location in chain for location in prospectivePair):
@@ -752,9 +752,9 @@ class Sudoku():
             chainIsASubset = False
             for existingChainGroup in chains[:]:
                 existingChain = existingChainGroup[0]
-                existingChainCandidate = existingChainGroup[1]
+                existingChainCandidates = existingChainGroup[1]
 
-                if existingChainCandidate != candidate:
+                if existingChainCandidates != candidates:
                     continue
 
                 # if all locations in the current chain already exist in another,
@@ -771,9 +771,13 @@ class Sudoku():
                         chains.remove(existingChainGroup)
 
             if not chainIsASubset:
-                chains.append((chain, candidate))
+                chains.append((chain, candidates))
 
         return chains
+
+    def generateConjugateChains(self):
+
+        return self.generatePairChains("conjugatePairs")
 
 
 
@@ -947,76 +951,8 @@ class Sudoku():
         return lockedPairs
 
     def generateLockedChains(self):
-        self.initialiseIntersections("lockedPairs")
 
-        lockedChains = []
-
-        for pairGroup in self.intersectionTypes["lockedPairs"]:
-
-            pair, candidates = pairGroup[0], pairGroup[1]
-            chain = pair[:]
-            
-            lastChain = None
-            while lastChain != chain:
-
-                firstLink, lastLink = chain[0], chain[-1]
-                lastChain = chain[:]
-
-                for prospectivePairGroup in self.intersectionTypes["lockedPairs"]:
-
-                    prospectivePair = prospectivePairGroup[0]
-                    prospectiveCandidates = prospectivePairGroup[1]
-
-                    if prospectiveCandidates != candidates:
-                        continue
-
-                    if all(location in chain for location in prospectivePair):
-                        continue
-
-                    if any(location == firstLink for location in prospectivePair):
-                        if prospectivePair[0] in chain:
-                            chain.insert(0, prospectivePair[1])
-                            break
-                        else:
-                            chain.insert(0, prospectivePair[0])
-                            break
-
-                    if any(location == lastLink for location in prospectivePair):
-                        if prospectivePair[0] in chain:
-                            chain.append(prospectivePair[1])
-                            break
-                        else:
-                            chain.append(prospectivePair[0])
-                            break
-
-            if len(chain) < 3:
-                continue
-
-            chainIsASubset = False
-            for existingChainGroup in lockedChains[:]:
-                existingChain = existingChainGroup[0]
-                existingChainCandidates = existingChainGroup[1]
-
-                if existingChainCandidates != candidates:
-                    continue
-
-                # if all locations in the current chain already exist in another,
-                # it is a subset and will not be added. We break here as the
-                # larger chain does not need to be purged.
-                if all(location in existingChain for location in chain):
-                    chainIsASubset = True
-                    break
-
-                # if all locations in the existing chain exist in the current chain,
-                # the existing chain will be removed.
-                if all(location in chain for location in existingChain):
-                    if existingChainGroup in lockedChains:
-                        lockedChains.remove(existingChainGroup)
-
-            if not chainIsASubset:
-                lockedChains.append((chain, candidates))
-
-        return lockedChains
+        return self.generatePairChains("lockedPairs")
 
 
 
