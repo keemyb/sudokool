@@ -1577,13 +1577,10 @@ class Sudoku():
                                self.getColumnNeighbours(group[1], *group))
 
             for location in xWingNeighbours:
-                locationCandidates = self.solvingCandidates(location)
-                if any(candidate in locationCandidates for candidate in candidates):
 
-                    removedCandidates = [candidate for candidate in locationCandidates if candidate in candidates]
+                removedCandidates = self.removeSolvingCandidates(location, *candidates)
 
-                    self.candidates[location] -= set(removedCandidates)
-                    self.changes = True
+                if removedCandidates:
 
                     # Needs to be more verbose, showing where the alignment occours
                     log.append(successString % (removedCandidates, location, group))
