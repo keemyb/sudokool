@@ -67,15 +67,15 @@ class Sudoku():
             }
 
         self.neighbourMethods = {
-            "row": self.getRowNeighbours,
-            "column": self.getColumnNeighbours,
-            "subGrid": self.getSubGridNeighbours,
+            "row": self.rowNeighbours,
+            "column": self.columnNeighbours,
+            "subGrid": self.subGridNeighbours,
             }
 
         self.allNeighbourMethods = {
-            "row": self.getAllRowNeighbours,
-            "column": self.getAllColumnNeighbours,
-            "subGrid": self.getAllSubGridNeighbours,
+            "row": self.allRowNeighbours,
+            "column": self.allColumnNeighbours,
+            "subGrid": self.allSubGridNeighbours,
             }
 
         self.alignmentMethods = {
@@ -364,7 +364,7 @@ class Sudoku():
             if not self.isEmpty(location):
                 continue
 
-            neighbours = [neighbour for neighbour in self.getAllCombinedNeighbours(location) if not self.isEmpty(neighbour)]
+            neighbours = [neighbour for neighbour in self.allCombinedNeighbours(location) if not self.isEmpty(neighbour)]
 
             surroundingValues = self.getValues(*neighbours)
 
@@ -380,7 +380,7 @@ class Sudoku():
 
         for location in self.emptyLocations():
 
-            neighbours = self.getAllCombinedNeighbours(location)
+            neighbours = self.allCombinedNeighbours(location)
 
             surroundingValues = self.getValues(*neighbours)
 
@@ -390,7 +390,7 @@ class Sudoku():
 
         for location in self.userCandidatesDict.iterkeys():
 
-            neighbours = self.getAllCombinedNeighbours(location)
+            neighbours = self.allCombinedNeighbours(location)
 
             surroundingValues = self.getValues(*neighbours)
 
@@ -480,57 +480,57 @@ class Sudoku():
 
 
 
-    def getSubGridNeighbours(self, location, *exclusions):
+    def subGridNeighbours(self, location, *exclusions):
         subGridGroup = self.intersectionTypes["subGrid"][self.getSubGrid(location) - 1]
         neighbours = [neighbour for neighbour in subGridGroup if neighbour != location and self.isEmpty(neighbour)]
         neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
 
         return neighbours
 
-    def getRowNeighbours(self, location, *exclusions):
+    def rowNeighbours(self, location, *exclusions):
         rowGroup = self.intersectionTypes["row"][self.getRow(location) - 1]
         neighbours = [neighbour for neighbour in rowGroup if neighbour != location and self.isEmpty(neighbour)]
         neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
 
         return neighbours
 
-    def getColumnNeighbours(self, location, *exclusions):
+    def columnNeighbours(self, location, *exclusions):
         columnGroup = self.intersectionTypes["column"][self.getColumn(location) - 1]
         neighbours = [neighbour for neighbour in columnGroup if neighbour != location and self.isEmpty(neighbour)]
         neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
 
         return neighbours
 
-    def getCombinedNeighbours(self, location, *exclusions):
-        return set(self.getSubGridNeighbours(location, *exclusions) +
-                   self.getRowNeighbours(location, *exclusions) +
-                   self.getColumnNeighbours(location, *exclusions))
+    def combinedNeighbours(self, location, *exclusions):
+        return set(self.subGridNeighbours(location, *exclusions) +
+                   self.rowNeighbours(location, *exclusions) +
+                   self.columnNeighbours(location, *exclusions))
 
-    def getAllSubGridNeighbours(self, location, *exclusions):
+    def allSubGridNeighbours(self, location, *exclusions):
         subGridGroup = self.staticGroups["subGrid"][self.getSubGrid(location) - 1]
         neighbours = [neighbour for neighbour in subGridGroup if neighbour != location]
         neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
 
         return neighbours
 
-    def getAllRowNeighbours(self, location, *exclusions):
+    def allRowNeighbours(self, location, *exclusions):
         rowGroup = self.staticGroups["row"][self.getRow(location) - 1]
         neighbours = [neighbour for neighbour in rowGroup if neighbour != location]
         neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
 
         return neighbours
 
-    def getAllColumnNeighbours(self, location, *exclusions):
+    def allColumnNeighbours(self, location, *exclusions):
         columnGroup = self.staticGroups["column"][self.getColumn(location) - 1]
         neighbours = [neighbour for neighbour in columnGroup if neighbour != location]
         neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
 
         return neighbours
 
-    def getAllCombinedNeighbours(self, location, *exclusions):
-        return set(self.getAllSubGridNeighbours(location, *exclusions) +
-                   self.getAllRowNeighbours(location, *exclusions) +
-                   self.getAllColumnNeighbours(location, *exclusions))
+    def allCombinedNeighbours(self, location, *exclusions):
+        return set(self.allSubGridNeighbours(location, *exclusions) +
+                   self.allRowNeighbours(location, *exclusions) +
+                   self.allColumnNeighbours(location, *exclusions))
 
 
 
@@ -1438,7 +1438,7 @@ class Sudoku():
         for pointerGroup in self.intersectionTypes[("pointer", n)]:
             combination, pointerType = pointerGroup[0], pointerGroup[1]
 
-            subGridNeighbours = self.getSubGridNeighbours(combination[0], *combination)
+            subGridNeighbours = self.subGridNeighbours(combination[0], *combination)
             subGridNeighbourCandidates = self.solvingCandidates(*subGridNeighbours)
 
             commonPointerCandidates = self.commonCandidates(*combination)
@@ -1492,7 +1492,7 @@ class Sudoku():
             if not uniquePointerCandidates:
                 continue
 
-            subGridNeighbours = self.getSubGridNeighbours(combination[0], *combination)
+            subGridNeighbours = self.subGridNeighbours(combination[0], *combination)
 
             for location in subGridNeighbours:
                 removedCandidates = self.removeSolvingCandidates(location, *uniquePointerCandidates)
@@ -1546,10 +1546,10 @@ class Sudoku():
 
         for group, candidates in xWings.iteritems():
 
-            xWingNeighbours = (self.getRowNeighbours(group[0], *group) +
-                               self.getRowNeighbours(group[2], *group) +
-                               self.getColumnNeighbours(group[0], *group) +
-                               self.getColumnNeighbours(group[1], *group))
+            xWingNeighbours = (self.rowNeighbours(group[0], *group) +
+                               self.rowNeighbours(group[2], *group) +
+                               self.columnNeighbours(group[0], *group) +
+                               self.columnNeighbours(group[1], *group))
 
             for location in xWingNeighbours:
 
@@ -1602,12 +1602,12 @@ class Sudoku():
                 columnTwoLocation = sortedGroup[2]
                 columnThreeLocation = sortedGroup[4]
 
-            otherRowOneCandidates = self.solvingCandidates(*self.getRowNeighbours(rowOneLocation, *group))
-            otherRowTwoCandidates = self.solvingCandidates(*self.getRowNeighbours(rowTwoLocation, *group))
-            otherRowThreeCandidates = self.solvingCandidates(*self.getRowNeighbours(rowThreeLocation, *group))
-            otherColumnOneCandidates = self.solvingCandidates(*self.getColumnNeighbours(columnOneLocation, *group))
-            otherColumnTwoCandidates = self.solvingCandidates(*self.getColumnNeighbours(columnTwoLocation, *group))
-            otherColumnThreeCandidates = self.solvingCandidates(*self.getColumnNeighbours(columnThreeLocation, *group))
+            otherRowOneCandidates = self.solvingCandidates(*self.rowNeighbours(rowOneLocation, *group))
+            otherRowTwoCandidates = self.solvingCandidates(*self.rowNeighbours(rowTwoLocation, *group))
+            otherRowThreeCandidates = self.solvingCandidates(*self.rowNeighbours(rowThreeLocation, *group))
+            otherColumnOneCandidates = self.solvingCandidates(*self.columnNeighbours(columnOneLocation, *group))
+            otherColumnTwoCandidates = self.solvingCandidates(*self.columnNeighbours(columnTwoLocation, *group))
+            otherColumnThreeCandidates = self.solvingCandidates(*self.columnNeighbours(columnThreeLocation, *group))
 
             for candidate in commonCandidates:
                 if (candidate not in otherRowOneCandidates and
@@ -1804,8 +1804,8 @@ class Sudoku():
             firstArm = yWingLocations[1]
             secondArm = yWingLocations[2]
 
-            firstArmNeighbours = self.getCombinedNeighbours(firstArm)
-            secondArmNeighbours = self.getCombinedNeighbours(secondArm)
+            firstArmNeighbours = self.combinedNeighbours(firstArm)
+            secondArmNeighbours = self.combinedNeighbours(secondArm)
 
             commonNeighbours = ((set(firstArmNeighbours) &
                                 set(secondArmNeighbours)) -
@@ -1839,9 +1839,9 @@ class Sudoku():
             firstArm = xyzWingLocations[1]
             secondArm = xyzWingLocations[2]
 
-            pivotNeighbours = self.getCombinedNeighbours(pivot, *xyzWingLocations)
-            firstArmNeighbours = self.getCombinedNeighbours(firstArm, *xyzWingLocations)
-            secondArmNeighbours = self.getCombinedNeighbours(secondArm, *xyzWingLocations)
+            pivotNeighbours = self.combinedNeighbours(pivot, *xyzWingLocations)
+            firstArmNeighbours = self.combinedNeighbours(firstArm, *xyzWingLocations)
+            secondArmNeighbours = self.combinedNeighbours(secondArm, *xyzWingLocations)
 
             commonNeighbours = (set(pivotNeighbours) &
                                 set(firstArmNeighbours) &
@@ -1883,8 +1883,8 @@ class Sudoku():
             for remotePair in remotePairs:
                 locationOne, locationTwo = remotePair[0], remotePair[1]
 
-                locationOneNeighbours = self.getCombinedNeighbours(locationOne, *lockedChain)
-                locationTwoNeighbours = self.getCombinedNeighbours(locationTwo, *lockedChain)
+                locationOneNeighbours = self.combinedNeighbours(locationOne, *lockedChain)
+                locationTwoNeighbours = self.combinedNeighbours(locationTwo, *lockedChain)
                 remotePairNeighbours = (set(locationOneNeighbours) &
                                         set(locationTwoNeighbours))
 
