@@ -1769,9 +1769,10 @@ class Sudoku():
                 if ((pair[0] in colourOne and pair[1] in colourTwo) or
                     (pair[1] in colourOne and pair[0] in colourTwo)):
                     for location in self.neighbourMethods[alignment](pair[0], *pair):
-                        if candidate in self.candidates[location]:
-                            self.candidates[location] -= set([candidate])
-                            self.changes = True
+
+                        removedCandidates = self.removeSolvingCandidates(location, candidate)
+
+                        if removedCandidates:
                             log.append(successString % (candidate, location))
 
         return log
@@ -1803,9 +1804,11 @@ class Sudoku():
                 alignsWithFirstElement = self.alignment(pair[0], location)
                 alignsWithSecondElement = self.alignment(pair[1], location)
                 if alignsWithFirstElement and alignsWithSecondElement:
-                    self.candidates[location] -= set([candidate])
-                    self.changes = True
-                    log.append(successString % (candidate, location, pair))
+
+                    removedCandidates = self.removeSolvingCandidates(location, candidate)
+
+                    if removedCandidates:
+                        log.append(successString % (candidate, location, pair))
 
         return log
 
