@@ -1420,6 +1420,9 @@ class Sudoku():
 
                         removedCandidates = self.removeSolvingCandidates(location, *surroundingCandidates)
 
+                        if not removedCandidates:
+                            continue
+
                         if n == 1:
                             self.setValue(location, uniqueCombinationCandidates.pop())
 
