@@ -90,7 +90,7 @@ def visualizer(puzzle, *groups):
     return wholeString
 
 rp = Sudoku("520609173017003569396175428789564312030718956165392847650031794041907635973456281")
-# print puzzleSummary(rp, 0, True, True, True)
+print puzzleSummary(rp, 0, True, True, True)
 # rp.solve(11)
 
 # print rp.remotePairs()
@@ -98,11 +98,6 @@ rp = Sudoku("5206091730170035693961754287895643120307189561653928476500317940419
 # print rp.candidates
 # print rp.removeSolvingCandidates(3,*[8,5])
 # print rp.candidates
-
-# print puzzleSummary(conjugatePairPuzzle, 0, True, True, True)
-
-xyzWing = Sudoku("092001750500200008000030200075004960200060075069700030008090020700003089903800040")
-print puzzleSummary(xyzWing, 0, True, True, True)
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
 # for puzzleNo in xrange(5,11):

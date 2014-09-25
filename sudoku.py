@@ -1914,13 +1914,10 @@ class Sudoku():
                                         set(locationTwoNeighbours))
 
                 for neighbour in remotePairNeighbours:
-                    neighbourCandidates = self.solvingCandidates(neighbour)
-                    if any(candidate in neighbourCandidates for candidate in candidates):
 
-                        removedCandidates = [candidate for candidate in neighbourCandidates if candidate in candidates]
+                    removedCandidates = self.removeSolvingCandidates(neighbour, *candidates)
 
-                        self.candidates[neighbour] -= set(removedCandidates)
-                        self.changes = True
+                    if removedCandidates:
 
                         log.append(successString % (removedCandidates, neighbour, remotePair, lockedChain))
 
