@@ -59,7 +59,7 @@ class Sudoku():
             "xWing": self.generateXWingGroups,
             "swordfish": self.generateSwordfishGroups,
             "conjugatePairs": self.generateConjugatePairs,
-            "chains": self.generateChains,
+            "conjugateChains": self.generateConjugateChains,
             "yWing": self.generateYWingGroups,
             "xyzWing": self.generateXYZWingGroups,
             "lockedPairs": self.generateLockedPairs,
@@ -703,7 +703,7 @@ class Sudoku():
 
         return conjugatePairs
 
-    def generateChains(self):
+    def generateConjugateChains(self):
         self.initialiseIntersections("conjugatePairs")
 
         chains = []
@@ -952,9 +952,10 @@ class Sudoku():
         lockedChains = []
 
         for pairGroup in self.intersectionTypes["lockedPairs"]:
-            pair, candidates = pairGroup[0], pairGroup[1]
 
+            pair, candidates = pairGroup[0], pairGroup[1]
             chain = pair[:]
+            
             lastChain = None
             while lastChain != chain:
 
@@ -1027,7 +1028,7 @@ class Sudoku():
         self.updateXWingGroups()
         self.updateSwordfishGroups()
         self.updateConjugatePairs()
-        self.updateChains()
+        self.updateConjugateChains()
         self.updateYWingGroups()
         self.updateXYZWingGroups()
         self.updateLockedPairs()
@@ -1108,19 +1109,19 @@ class Sudoku():
             if group in self.intersectionTypes["conjugatePairs"]:
                 self.intersectionTypes["conjugatePairs"].remove(group)
 
-    def updateChains(self):
-        if "chains" not in self.intersectionTypes:
+    def updateConjugateChains(self):
+        if "conjugateChains" not in self.intersectionTypes:
             return
 
-        for chainGroup in self.intersectionTypes["chains"]:
-            if self.validChain(chainGroup):
+        for chainGroup in self.intersectionTypes["conjugateChains"]:
+            if self.validConjugateChain(chainGroup):
                 continue
-            if chainGroup in self.intersectionTypes["chains"]:
-                self.intersectionTypes["chains"].remove(chainGroup)
+            if chainGroup in self.intersectionTypes["conjugateChains"]:
+                self.intersectionTypes["conjugateChains"].remove(chainGroup)
 
-    def validChain(self, chainGroup):
+    def validConjugateChain(self, chainGroup):
         chain, candidate = chainGroup[0], chainGroup[1]
-        if (chain, candidate) not in self.intersectionTypes["chains"]:
+        if (chain, candidate) not in self.intersectionTypes["conjugateChains"]:
             return False
 
         for location in chain:
@@ -1711,13 +1712,13 @@ class Sudoku():
 
     def simpleColouring(self):
 
-        self.initialiseIntersections("chains")
+        self.initialiseIntersections("conjugateChains")
 
         self.changes = False
 
         log = []
 
-        for chainGroup in self.intersectionTypes["chains"]:
+        for chainGroup in self.intersectionTypes["conjugateChains"]:
             chain, candidate = chainGroup[0], chainGroup[1]
             colourOne, colourTwo = chain[::2], chain[1::2]
 
@@ -1748,7 +1749,7 @@ class Sudoku():
         successString = "%s has been removed from locations %s, as it is part of an invalid colour"
 
         for testColour in (colourOne, colourTwo):
-            if not self.validChain((chain, candidate)):
+            if not self.validConjugateChain((chain, candidate)):
                 break
 
             candidatesToRemove = {location: candidate for location in testColour}
@@ -1772,7 +1773,7 @@ class Sudoku():
         successString = "locations %s have been set to %s, as it shares a unit with a chain where two colours are the same"
 
         for colour in (colourOne, colourTwo):
-            if not self.validChain((chain, candidate)):
+            if not self.validConjugateChain((chain, candidate)):
                 break
 
             for pair in self.nLocations(colour, 2):
@@ -1800,7 +1801,7 @@ class Sudoku():
         successString = "%s has been removed from %s, as these locations are in the same unit as one of two locations that must be ON"
 
         for pair in self.nLocations(chain, 2):
-            if not self.validChain((chain, candidate)):
+            if not self.validConjugateChain((chain, candidate)):
                 break
 
             for alignment in self.alignment(*pair):
@@ -1832,7 +1833,7 @@ class Sudoku():
                 continue
 
             for pair in self.nLocations(chain, 2):
-                if not self.validChain((chain, candidate)):
+                if not self.validConjugateChain((chain, candidate)):
                     break
 
                 if not (((pair[0] in colourOne and pair[1] in colourTwo) or
