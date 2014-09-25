@@ -1394,7 +1394,7 @@ class Sudoku():
         log = []
         name = "Hidden " + self.multiples[n - 1]
         if n > 1:
-            successString = name + ": %s has been removed from %s as the remaining candidates only appear in it's %s"
+            successString = name + ": %s has been removed from %s as the " + name +", %s only appears in it's %s"
         else:
             successString = name + ": %s has been set to %s, as all other candidates have been removed"
 
@@ -1417,21 +1417,16 @@ class Sudoku():
                         continue
 
                     for location in combination:
-                        if any(candidate in surroundingCandidates for candidate in self.candidates[location]):
 
-                            removedCandidates = [candidate for candidate in self.candidates[location] if candidate in surroundingCandidates]
+                        removedCandidates = self.removeSolvingCandidates(location, *surroundingCandidates)
 
-                            self.candidates[location] -= surroundingCandidates
+                        if n == 1:
+                            self.setValue(location, uniqueCombinationCandidates.pop())
 
-                            if n == 1:
-                                self.setValue(location, uniqueCombinationCandidates.pop())
-
-                            self.changes = True
-
-                            if n > 1:
-                                log.append(successString % (removedCandidates, location, intersectionType))
-                            else:
-                                log.append(successString % (location, self.getValue(location)))
+                        if n > 1:
+                            log.append(successString % (removedCandidates, location, self.solvingCandidates(location), intersectionType))
+                        else:
+                            log.append(successString % (location, self.getValue(location)))
 
         if self.changes:
             self.updatePuzzle()
