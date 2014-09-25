@@ -710,49 +710,72 @@ class Sudoku():
 
         for initialPairGroup in self.intersectionTypes["conjugatePairs"]:
 
-            candidate = initialPairGroup[1]
+            pair, candidate = initialPairGroup[0], initialPairGroup[1]
+            chain = pair[:]
 
-            reversedInitialPairGroup = (initialPairGroup[0][::-1], candidate)
+            lastChain = None
+            while lastChain != chain:
 
-            for pairGroup in (initialPairGroup, reversedInitialPairGroup):
+                firstLink, lastLink = chain[0], chain[-1]
+                lastChain = chain[:]
 
-                chain = self.chainBuilder(pairGroup)
+                for prospectivePairGroup in self.intersectionTypes["conjugatePairs"]:
 
-                if len(chain) > 2:
-                    chains.append((chain, candidate))
+                    prospectivePair = prospectivePairGroup[0]
+                    prospectiveCandidate = prospectivePairGroup[1]
+
+                    if prospectiveCandidate != candidate:
+                        continue
+
+                    if all(location in chain for location in prospectivePair):
+                        continue
+
+                    if any(location == firstLink for location in prospectivePair):
+                        if prospectivePair[0] in chain:
+                            chain.insert(0, prospectivePair[1])
+                            break
+                        else:
+                            chain.insert(0, prospectivePair[0])
+                            break
+
+                    if any(location == lastLink for location in prospectivePair):
+                        if prospectivePair[0] in chain:
+                            chain.append(prospectivePair[1])
+                            break
+                        else:
+                            chain.append(prospectivePair[0])
+                            break
+
+            if len(chain) < 3:
+                continue
+
+            chainIsASubset = False
+            for existingChainGroup in chains[:]:
+                existingChain = existingChainGroup[0]
+                existingChainCandidate = existingChainGroup[1]
+
+                if existingChainCandidate != candidate:
+                    continue
+
+                # if all locations in the current chain already exist in another,
+                # it is a subset and will not be added. We break here as the
+                # larger chain does not need to be purged.
+                if all(location in existingChain for location in chain):
+                    chainIsASubset = True
+                    break
+                
+                # if all locations in the existing chain exist in the current chain,
+                # the existing chain will be removed.
+                if all(location in chain for location in existingChain):
+                    if existingChainGroup in chains:
+                        chains.remove(existingChainGroup)
+
+            if not chainIsASubset:
+                chains.append((chain, candidate))
 
         return chains
 
-    def chainBuilder(self, initialPairGroup):
-        pair, candidate = initialPairGroup[0], initialPairGroup[1]
-        chain = pair[:]
 
-        lastChain = None
-        while lastChain != chain:
-
-            lastLink = chain[-1]
-            lastChain = chain[:]
-
-            for prospectivePairGroup in self.intersectionTypes["conjugatePairs"]:
-
-                prospectivePair = prospectivePairGroup[0]
-                prospectiveCandidate = prospectivePairGroup[1]
-
-                if prospectiveCandidate != candidate:
-                    continue
-
-                if all(location in chain for location in prospectivePair):
-                    continue
-
-                if any(location == lastLink for location in prospectivePair):
-                    if prospectivePair[0] in chain:
-                        chain.append(prospectivePair[1])
-                        break
-                    else:
-                        chain.append(prospectivePair[0])
-                        break
-
-        return chain
 
     def generateYWingGroups(self):
         yWings = []
