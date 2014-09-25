@@ -1364,12 +1364,9 @@ class Sudoku():
 
                     for surroundingLocation in surroundingLocations:
 
-                        if any(candidate in nakedNcandidates for candidate in self.candidates[surroundingLocation]):
+                        removedCandidates = self.removeSolvingCandidates(surroundingLocation, *nakedNcandidates)
 
-                            removedCandidates = [candidate for candidate in self.candidates[surroundingLocation] if candidate in nakedNcandidates]
-
-                            self.candidates[surroundingLocation] -= nakedNcandidates
-                            self.changes = True
+                        if removedCandidates:
 
                             log.append(successString % (str(removedCandidates)[1:-1], location, self.alignment(*combination)[0], combination))
 

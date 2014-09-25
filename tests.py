@@ -94,17 +94,18 @@ rp = Sudoku("5206091730170035693961754287895643120307189561653928476500317940419
 # rp.solve(11)
 
 # print rp.remotePairs()
-print puzzleSummary(rp, 9, True, True, True)
-print rp.candidates
-print rp.removeSolvingCandidates(3,*[8,5])
-print rp.candidates
+# print puzzleSummary(rp, 9, True, True, True)
+# print rp.candidates
+# print rp.removeSolvingCandidates(3,*[8,5])
+# print rp.candidates
 
 # print puzzleSummary(conjugatePairPuzzle, 0, True, True, True)
 
-# for puzzleNo in [6,7,42,47,48,49,50]:
+for puzzleNo in [6,7,42,47,48,49,50]:
 # for puzzleNo in xrange(5,11):
 # for puzzleNo in xrange(1,51):
-    # print fromTextPuzzleSummary("easy50.txt", "========\n", 0, puzzleNo, True, True, True, True, True, True)
+    print fromTextPuzzleSummary("easy50.txt", "========\n", 0, puzzleNo, True, True, True, True, True, True)
+    print
 
 # string16 = "B07805E0300AD0CG\
 # 004007000C0FA002\
