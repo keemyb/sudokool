@@ -89,14 +89,14 @@ def visualizer(puzzle, *groups):
 
     return wholeString
 
-# sc = Sudoku("007083600039706800826419753640190387080367000073048060390870026764900138208630970")
-# sc.solve(13)
-# print len(sc.generateChains())
-# for chain in sc.generateChains():
-#     # if chain[1] not in [4,7]:
-#     #     continue
-#     print visualizer(sc, chain[0])
-#     print chain[1]
+sc = Sudoku("007083600039706800826419753640190387080367000073048060390870026764900138208630970")
+sc.solve(13)
+print len(sc.generateLockedChains())
+for chain in sc.generateLockedChains():
+    # if chain[1] not in [4,7]:
+    #     continue
+    print visualizer(sc, chain[0])
+    print chain[1]
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
 # for puzzleNo in xrange(5,11):
@@ -124,13 +124,13 @@ def visualizer(puzzle, *groups):
 # puzzle16 = Sudoku(string16)
 # print puzzleSummary(puzzle16, 0, True, True, True)
 
-fileToRead = open("top95.txt", "r")
-number = 1
-for line in fileToRead:
-    try:
-        puzzle = Sudoku(str(line)[:81])
-        print puzzleSummary(puzzle, 0, True, True, True, number)
-    except:
-        continue
-    else:
-        number += 1
+# fileToRead = open("top95.txt", "r")
+# number = 1
+# for line in fileToRead:
+#     try:
+#         puzzle = Sudoku(str(line)[:81])
+#         print puzzleSummary(puzzle, 0, True, True, True, number)
+#     except:
+#         continue
+#     else:
+#         number += 1

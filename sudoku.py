@@ -763,7 +763,7 @@ class Sudoku():
                 if all(location in existingChain for location in chain):
                     chainIsASubset = True
                     break
-                
+
                 # if all locations in the existing chain exist in the current chain,
                 # the existing chain will be removed.
                 if all(location in chain for location in existingChain):
@@ -991,13 +991,28 @@ class Sudoku():
             if len(chain) < 3:
                 continue
 
-            permutationExists = False
-            for chainGroup in lockedChains:
-                existingChain = chainGroup[0]
-                if all(location in existingChain for location in chain):
-                    permutationExists = True
+            chainIsASubset = False
+            for existingChainGroup in lockedChains[:]:
+                existingChain = existingChainGroup[0]
+                existingChainCandidates = existingChainGroup[1]
 
-            if not permutationExists:
+                if existingChainCandidates != candidates:
+                    continue
+
+                # if all locations in the current chain already exist in another,
+                # it is a subset and will not be added. We break here as the
+                # larger chain does not need to be purged.
+                if all(location in existingChain for location in chain):
+                    chainIsASubset = True
+                    break
+
+                # if all locations in the existing chain exist in the current chain,
+                # the existing chain will be removed.
+                if all(location in chain for location in existingChain):
+                    if existingChainGroup in lockedChains:
+                        lockedChains.remove(existingChainGroup)
+
+            if not chainIsASubset:
                 lockedChains.append((chain, candidates))
 
         return lockedChains
