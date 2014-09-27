@@ -89,14 +89,11 @@ def visualizer(puzzle, *groups):
 
     return wholeString
 
-sc = Sudoku("007083600039706800826419753640190387080367000073048060390870026764900138208630970")
-# print puzzleSummary(sc, 0, True, True, True)
-print len(sc.generateConjugateChains())
-for chain in sc.generateConjugateChains():
-    # if chain[1] not in [4,7]:
-    #     continue
-    print visualizer(sc, chain[0])
-    print chain[1]
+swordfish = Sudoku("0"*81)
+swordfish.initialiseIntersections()
+for neighbours in swordfish.swordfishNeighbours([20,22,40,43,65,70]):
+    print visualizer(swordfish, neighbours)
+    print visualizer(swordfish, [20,22,40,43,65,70])
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
 # for puzzleNo in xrange(5,11):

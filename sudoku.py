@@ -538,6 +538,15 @@ class Sudoku():
                 self.columnNeighbours(xWing[0], *xWing) +
                 self.columnNeighbours(xWing[1], *xWing))
 
+    def swordfishNeighbours(self, swordfish):
+        rowNeighbours = set([]).union(*[self.rowNeighbours(location) for location in swordfish])
+        columnNeighbours = set([]).union(*[self.columnNeighbours(location) for location in swordfish])
+
+        rowNeighbours -= set(swordfish)
+        columnNeighbours -= set(swordfish)
+
+        return rowNeighbours, columnNeighbours
+
 
 
 
