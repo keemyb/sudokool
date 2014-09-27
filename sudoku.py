@@ -1535,10 +1535,10 @@ class Sudoku():
             if len(commonXWingCandidates) == 0:
                 continue
 
-            rowCandidates = (self.solvingCandidates(*self.getRowNeighbours(group[0], *group)) |
-                             self.solvingCandidates(*self.getRowNeighbours(group[2], *group)))
-            columnCandidates = (self.solvingCandidates(*self.getColumnNeighbours(group[0], *group)) |
-                                self.solvingCandidates(*self.getColumnNeighbours(group[1], *group)))
+            rowCandidates = (self.solvingCandidates(*self.rowNeighbours(group[0], *group)) |
+                             self.solvingCandidates(*self.rowNeighbours(group[2], *group)))
+            columnCandidates = (self.solvingCandidates(*self.columnNeighbours(group[0], *group)) |
+                                self.solvingCandidates(*self.columnNeighbours(group[1], *group)))
 
             for candidate in commonXWingCandidates:
                 if (candidate not in rowCandidates or candidate not in columnCandidates):
