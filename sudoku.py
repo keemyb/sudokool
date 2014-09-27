@@ -532,6 +532,12 @@ class Sudoku():
                    self.allRowNeighbours(location, *exclusions) +
                    self.allColumnNeighbours(location, *exclusions))
 
+    def xWingNeighbours(self, xWing):
+        return (self.rowNeighbours(xWing[0], *xWing) +
+                self.rowNeighbours(xWing[2], *xWing) +
+                self.columnNeighbours(xWing[0], *xWing) +
+                self.columnNeighbours(xWing[1], *xWing))
+
 
 
 
@@ -1546,12 +1552,7 @@ class Sudoku():
 
         for group, candidates in xWings.iteritems():
 
-            xWingNeighbours = (self.rowNeighbours(group[0], *group) +
-                               self.rowNeighbours(group[2], *group) +
-                               self.columnNeighbours(group[0], *group) +
-                               self.columnNeighbours(group[1], *group))
-
-            for location in xWingNeighbours:
+            for location in self.xWingNeighbours(group):
 
                 removedCandidates = self.removeSolvingCandidates(location, *candidates)
 
