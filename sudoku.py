@@ -1489,7 +1489,6 @@ class Sudoku():
 
         self.changes = False
 
-        log = []
         name = "Pointing " + self.multiples[n - 1]
         successString = name + ": %s has been removed from %s, as it shares a %s with the " + name + " %s"
 
@@ -1513,12 +1512,12 @@ class Sudoku():
 
                 if removedCandidates:
 
-                    log.append(successString % (removedCandidates, str(location), pointerType, combination))
+                    self.addToLog(successString, removedCandidates, location, pointerType, combination)
 
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes, log
+        return self.changes
 
     def pointingPair(self):
         return self.pointingN(2)
