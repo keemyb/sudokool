@@ -35,9 +35,8 @@ def puzzleSummary(puzzle, maxLevel, printPuzzle, printChangedCandidates, printHi
     history = ""
     if printHistory:
         if verbose:
-            # history = "\n" + str(filter(lambda x: 4 in x, solveReport))
-            history = "\n" + "\n".join([str(x) for x in solveReport])
+            history = "\n" + "\n".join(postSolved.log)
         else:
-            history = "\n" + str([entry[0] for entry in solveReport])
+            history = "\n" + str(solveReport)
 
     return number + str(numberOfPreSolvedValues) + " ---> " + str(numberOfPostSolvedValues) + history + changedCandidatesString + printPuzzle + "\n"
