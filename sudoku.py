@@ -398,6 +398,33 @@ class Sudoku():
 
 
 
+
+    def logVariableFormatter(self, *variables):
+
+        seperator = ", "
+
+        formattedVariables = []
+
+        for variable in variables:
+            if hasattr(variable, "__iter__"):
+                for value in variable:
+                    try:
+                        float(value)
+                    except:
+                        formattedVariables.append(variable)
+                        break
+                else:
+                    variable = [str(value) for value in variable]
+                    newVariable = str(seperator).join(variable)
+                    formattedVariables.append(newVariable)
+            else:
+                formattedVariables.append(variable)
+
+        return formattedVariables
+
+
+
+
     def getSubGridStartLocations(self):
         subGridStartLocations = []
 
