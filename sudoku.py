@@ -1804,8 +1804,7 @@ class Sudoku():
 
         self.changes = False
 
-        log = []
-        successString = "Y-Wing: %s has been removed from %s, as it can be seen by %s, part of a Y-Wing"
+        successString = "Y-Wing: {0} has been removed from {1}, as it can be seen by {2}, part of a Y-Wing"
 
         for yWingGroup in self.intersectionTypes["yWing"]:
             yWingLocations = yWingGroup[0]
@@ -1825,12 +1824,12 @@ class Sudoku():
                 removedCandidates = self.removeSolvingCandidates(location, yWingCandidate)
 
                 if removedCandidates:
-                    log.append(successString % (yWingCandidate, location, (firstArm, secondArm)))
+                    self.addToLog(successString, yWingCandidate, location, (firstArm, secondArm))
 
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes, log
+        return self.changes
 
     def xyzWing(self):
         self.initialiseIntersections("xyzWing")
