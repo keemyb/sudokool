@@ -538,15 +538,26 @@ class Sudoku():
                 self.columnNeighbours(xWing[0], *xWing) +
                 self.columnNeighbours(xWing[1], *xWing))
 
-    def swordfishNeighbours(self, swordfish):
+    def swordfishRowNeighbours(self, swordfish):
 
         rowNeighbours = set([]).union(*[self.rowNeighbours(location) for location in swordfish])
-        columnNeighbours = set([]).union(*[self.columnNeighbours(location) for location in swordfish])
 
         rowNeighbours -= set(swordfish)
+
+        return rowNeighbours
+
+    def swordfishColumnNeighbours(self, swordfish):
+
+        columnNeighbours = set([]).union(*[self.columnNeighbours(location) for location in swordfish])
+
         columnNeighbours -= set(swordfish)
 
-        return rowNeighbours, columnNeighbours
+        return columnNeighbours
+
+    def swordfishNeighbours(self, swordfish):
+
+        return self.swordfishRowNeighbours(swordfish).union(
+            self.swordfishColumnNeighbours(swordfish))
 
 
 
@@ -1598,21 +1609,19 @@ class Sudoku():
             if len(commonCandidates) == 0:
                 continue
 
-            neighbours = self.swordfishNeighbours(group)
+            rowCandidates = defaultdict(set)
+            for neighbour in self.swordfishRowNeighbours(group):
+                rowCandidates[self.getRow(neighbour)].union(self.solvingCandidates(neighbour))
 
-            rowNeighbours = defaultdict(set)
-            for neighbour in neighbours[0]:
-                rowNeighbours[self.getRow(neighbour)].union(self.solvingCandidates(neighbour))
-
-            columnNeighbours = defaultdict(set)
-            for neighbour in neighbours[1]:
-                columnNeighbours[self.getColumn(neighbour)].union(self.solvingCandidates(neighbour))
+            columnCandidates = defaultdict(set)
+            for neighbour in self.swordfishColumnNeighbours(group):
+                columnCandidates[self.getColumn(neighbour)].union(self.solvingCandidates(neighbour))
 
             for candidate in commonCandidates:
-                inAllRows = all(candidate in candidates for candidates in rowNeighbours.itervalues())
-                inAllColumns = all(candidate in candidates for candidates in columnNeighbours.itervalues())
-                notInRows = not any(candidate in candidates for candidates in rowNeighbours.itervalues())
-                notInColumns = not any(candidate in candidates for candidates in columnNeighbours.itervalues())
+                inAllRows = all(candidate in candidates for candidates in rowCandidates.itervalues())
+                inAllColumns = all(candidate in candidates for candidates in columnCandidates.itervalues())
+                notInRows = not any(candidate in candidates for candidates in rowCandidates.itervalues())
+                notInColumns = not any(candidate in candidates for candidates in columnCandidates.itervalues())
 
                 if (inAllRows and notInColumns) or (inAllColumns and notInRows):
                     swordfishes[group].append(candidate)
@@ -1620,14 +1629,12 @@ class Sudoku():
         for group, candidates in swordfishes.iteritems():
             neighbours = self.swordfishNeighbours(group)
 
-            for neighbourGroup in neighbours:
+            for location in neighbours:
 
-                for location in neighbourGroup:
+                removedCandidates = self.removeSolvingCandidates(location, *candidates)
 
-                    removedCandidates = self.removeSolvingCandidates(location, *candidates)
-
-                    if removedCandidates:
-                        log.append(successString % (removedCandidates, location, group))
+                if removedCandidates:
+                    log.append(successString % (removedCandidates, location, group))
 
         if self.changes:
             self.updatePuzzle()
