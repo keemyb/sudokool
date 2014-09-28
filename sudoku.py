@@ -1623,7 +1623,6 @@ class Sudoku():
 
         self.changes = False
 
-        log = []
         successString = "Swordfish: %s has been removed from %s, as it is in alignment with the Swordfish, %s"
 
         from collections import defaultdict
@@ -1662,12 +1661,12 @@ class Sudoku():
                 removedCandidates = self.removeSolvingCandidates(location, *candidates)
 
                 if removedCandidates:
-                    log.append(successString % (removedCandidates, location, group))
+                    self.addToLog(successString, removedCandidates, location, group)
 
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes, log
+        return self.changes
 
 
 
