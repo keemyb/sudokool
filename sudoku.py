@@ -1425,7 +1425,6 @@ class Sudoku():
 
         self.changes = False
 
-        log = []
         name = "Hidden " + self.multiples[n - 1]
         if n > 1:
             successString = name + ": %s has been removed from %s as the " + name +", %s only appears in it's %s"
@@ -1461,14 +1460,14 @@ class Sudoku():
                             self.setValue(location, uniqueCombinationCandidates.pop())
 
                         if n > 1:
-                            log.append(successString % (removedCandidates, location, self.solvingCandidates(location), intersectionType))
+                            self.addToLog(successString, removedCandidates, location, self.solvingCandidates(location), intersectionType)
                         else:
-                            log.append(successString % (location, self.getValue(location)))
+                            self.addToLog(successString, location, self.getValue(location))
 
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes, log
+        return self.changes
 
     def hiddenSingle(self):
 
