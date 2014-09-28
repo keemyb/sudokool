@@ -1376,7 +1376,6 @@ class Sudoku():
 
         self.changes = False
 
-        log = []
         name = "Naked " + self.multiples[n - 1]
         successString = "Naked %s: %s removes %s from %s"
         successString = name + ": %s have been removed from %s as it shares a %s with the " + name + ", %s"
@@ -1403,12 +1402,12 @@ class Sudoku():
 
                         if removedCandidates:
 
-                            log.append(successString % (str(removedCandidates)[1:-1], location, self.alignment(*combination)[0], combination))
+                            self.addToLog(successString, removedCandidates, location, self.alignment(*combination)[0], combination)
 
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes, log
+        return self.changes
 
     def nakedTwin(self):
 
