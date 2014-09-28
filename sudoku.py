@@ -1576,7 +1576,6 @@ class Sudoku():
 
         self.changes = False
 
-        log = []
         successString = "X-Wing: %s has been removed from %s, as it is in alignment with the X-Wing, %s"
 
         from collections import defaultdict
@@ -1609,12 +1608,12 @@ class Sudoku():
                 if removedCandidates:
 
                     # Needs to be more verbose, showing where the alignment occours
-                    log.append(successString % (removedCandidates, location, group))
+                    self.addToLog(successString, removedCandidates, location, group)
 
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes, log
+        return self.changes
 
 
 
