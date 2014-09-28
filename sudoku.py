@@ -1377,8 +1377,7 @@ class Sudoku():
         self.changes = False
 
         name = "Naked " + self.multiples[n - 1]
-        successString = "Naked %s: %s removes %s from %s"
-        successString = name + ": %s have been removed from %s as it shares a %s with the " + name + ", %s"
+        successString = name + ": {0} have been removed from {1} as it shares a {2} with the " + name + ", {3}"
 
         for intersectionType in self.units:
 
@@ -1427,9 +1426,9 @@ class Sudoku():
 
         name = "Hidden " + self.multiples[n - 1]
         if n > 1:
-            successString = name + ": %s has been removed from %s as the " + name +", %s only appears in it's %s"
+            successString = name + ": {0} has been removed from {1} as the " + name +", {2} only appears in it's {3}"
         else:
-            successString = name + ": %s has been set to %s, as all other candidates have been removed"
+            successString = name + ": {0} has been set to {1}, as all other candidates have been removed"
 
         for intersectionType in self.units:
 
@@ -1490,7 +1489,7 @@ class Sudoku():
         self.changes = False
 
         name = "Pointing " + self.multiples[n - 1]
-        successString = name + ": %s has been removed from %s, as it shares a %s with the " + name + " %s"
+        successString = name + ": {0} has been removed from {1}, as it shares a {2} with the " + name + " {3}"
 
         for pointerGroup in self.intersectionTypes[("pointer", n)]:
             combination, pointerType = pointerGroup[0], pointerGroup[1]
@@ -1534,7 +1533,7 @@ class Sudoku():
         self.changes = False
 
         name = "Box Line Reduction (" + self.multiples[n - 1] + ")"
-        successString = name + ": %s has been removed from %s, as it is part of a subGrid where %s can only be placed along it's %s"
+        successString = name + ": {0} has been removed from {1}, as it is part of a subGrid where {2} can only be placed along it's {3}"
 
         for pointerGroup in self.intersectionTypes[("pointer", n)]:
             combination, pointerType = pointerGroup[0], pointerGroup[1]
@@ -1576,7 +1575,7 @@ class Sudoku():
 
         self.changes = False
 
-        successString = "X-Wing: %s has been removed from %s, as it is in alignment with the X-Wing, %s"
+        successString = "X-Wing: {0} has been removed from {1}, as it is in alignment with the X-Wing, {2}"
 
         from collections import defaultdict
         from itertools import chain
@@ -1623,7 +1622,7 @@ class Sudoku():
 
         self.changes = False
 
-        successString = "Swordfish: %s has been removed from %s, as it is in alignment with the Swordfish, %s"
+        successString = "Swordfish: {0} has been removed from {1}, as it is in alignment with the Swordfish, {2}"
 
         from collections import defaultdict
 
