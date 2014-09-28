@@ -1354,8 +1354,7 @@ class Sudoku():
 
         self.changes = False
 
-        log = []
-        successString = "Naked Single: %s was set to %s"
+        successString = "Naked Single: {0} was set to {1}"
 
         for location, candidates in self.candidates.items():
             if len(candidates) == 1:
@@ -1365,12 +1364,12 @@ class Sudoku():
                 del self.candidates[location]
                 self.changes = True
 
-                log.append(successString % (str(location), str(candidate)))
+                self.addToLog(successString, location, candidate)
 
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes, log
+        return self.changes
 
     def nakedN(self, n):
         self.initialiseIntersections()

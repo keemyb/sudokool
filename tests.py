@@ -89,12 +89,14 @@ def visualizer(puzzle, *groups):
 
     return wholeString
 
-blank = Sudoku("0"*81)
+# easy = Sudoku("016007803092800000870001260048000300650009082039000650060900020080002936924600510")
+# easy.nakedSingle()
+# print easy.log
 
-string = "blah {0} blah {1} blah {2}"
-blank.addToLog(string, [1,2,3], "string", set([4,5]))
-blank.addToLog(string, [1,2,3], "string", set([4,5]))
-print blank.log
+# string = "blah {0} blah {1} blah {2}"
+# blank.addToLog(string, [1,2,3], "string", set([4,5]))
+# blank.addToLog(string, [1,2,3], "string", set([4,5]))
+# print blank.log
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
 # for puzzleNo in xrange(5,11):
