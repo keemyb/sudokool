@@ -1873,9 +1873,7 @@ class Sudoku():
 
         self.changes = False
 
-        log = []
-
-        successString = "Remote Pair: %s has been removed from %s, as it can be seen by the remote pair %s, part of the locked chain %s"
+        successString = "Remote Pair: {0} has been removed from {1}, as it can be seen by the remote pair {2}, part of the locked chain {3}"
 
         for lockedChainGroup in self.intersectionTypes["lockedChains"]:
             lockedChain, candidates = lockedChainGroup[0], lockedChainGroup[1]
@@ -1900,9 +1898,9 @@ class Sudoku():
 
                     if removedCandidates:
 
-                        log.append(successString % (removedCandidates, neighbour, remotePair, lockedChain))
+                        self.addToLog(successString, removedCandidates, neighbour, remotePair, lockedChain)
 
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes, log
+        return self.changes
