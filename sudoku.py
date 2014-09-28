@@ -36,6 +36,7 @@ class Sudoku():
         self.candidates = {}
         self.userCandidatesDict = {}
         self.log = []
+        self.history = []
 
         self.solveMode = False
         self.changes = False
@@ -250,40 +251,34 @@ class Sudoku():
             return True
         return False
 
-    def solve(self, maxLevel, history=None):
+    def solve(self, maxLevel):
 
         if self.isComplete():
-            return history
+            return
 
         if maxLevel > len(self.solvingMethods) or maxLevel < 1:
             maxLevel = len(self.solvingMethods)
 
         #if solver is run for the first time, solve using first method
-        if history is None:
+        if self.history is None:
             self.solvingMethods[0]()
-            history = [0]
-            return self.solve(maxLevel, history)
+            self.history.append(0)
+            return self.solve(maxLevel)
 
         #if last attempt was successful, go back to first level
         lastMethodSuccess = self.changes
         if lastMethodSuccess:
             self.solvingMethods[0]()
-            history.append(0)
-            return self.solve(maxLevel, history)
+            self.history.append(0)
+            return self.solve(maxLevel)
 
         #or if unsuccessful, increase level or exit if highest level was tried
-
-        lastMethod = history[-1]
+        lastMethod = self.history[-1]
         if lastMethod < maxLevel:
             nextMethod = lastMethod + 1
             self.solvingMethods[nextMethod]()
-            history.append(nextMethod)
-
-            return self.solve(maxLevel, history)
-        else:
-            return history
-
-
+            self.history.append(nextMethod)
+            return self.solve(maxLevel)
 
 
 
