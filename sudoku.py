@@ -1533,7 +1533,6 @@ class Sudoku():
 
         self.changes = False
 
-        log = []
         name = "Box Line Reduction (" + self.multiples[n - 1] + ")"
         successString = name + ": %s has been removed from %s, as it is part of a subGrid where %s can only be placed along it's %s"
 
@@ -1556,12 +1555,12 @@ class Sudoku():
 
                 if removedCandidates:
 
-                    log.append(successString % (removedCandidates, location, commonPointerCandidates, pointerType))
+                    self.addToLog(successString, removedCandidates, location, commonPointerCandidates, pointerType)
 
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes, log
+        return self.changes
 
     def boxLineReduction2(self):
         return self.boxLineReductionN(2)
