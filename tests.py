@@ -89,21 +89,12 @@ def visualizer(puzzle, *groups):
 
     return wholeString
 
-# swordfish = Sudoku("0"*81)
-# swordfish.initialiseIntersections()
-# for neighbours in swordfish.swordfishNeighbours([20,22,40,43,65,70]):
-#     print visualizer(swordfish, neighbours)
-#     print visualizer(swordfish, [20,22,40,43,65,70])
+blank = Sudoku("0"*81)
 
-swordfish = Sudoku("529410703006003002003200000052300076637050200190627530300069420200830600960742305")
-swordfish.initialiseIntersections()
-print swordfish.solve(0)
-print swordfish.isValid()
-# print swordfish.swordfish()
-# print swordfish
-# for swordfishes in swordfish.generateSwordfishGroups():
-#     print visualizer(swordfish, swordfishes)
-
+string = "blah {0} blah {1} blah {2}"
+blank.addToLog(string, [1,2,3], "string", set([4,5]))
+blank.addToLog(string, [1,2,3], "string", set([4,5]))
+print blank.log
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
 # for puzzleNo in xrange(5,11):

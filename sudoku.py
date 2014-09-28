@@ -35,6 +35,7 @@ class Sudoku():
 
         self.candidates = {}
         self.userCandidatesDict = {}
+        self.log = []
 
         self.solveMode = False
         self.changes = False
@@ -421,6 +422,12 @@ class Sudoku():
                 formattedVariables.append(variable)
 
         return formattedVariables
+
+    def addToLog(self, string, *variables):
+
+        formattedVariables = self.logVariableFormatter(*variables)
+
+        self.log.append(string.format(*formattedVariables))
 
 
 
