@@ -539,6 +539,7 @@ class Sudoku():
                 self.columnNeighbours(xWing[1], *xWing))
 
     def swordfishNeighbours(self, swordfish):
+
         rowNeighbours = set([]).union(*[self.rowNeighbours(location) for location in swordfish])
         columnNeighbours = set([]).union(*[self.columnNeighbours(location) for location in swordfish])
 
@@ -1597,56 +1598,36 @@ class Sudoku():
             if len(commonCandidates) == 0:
                 continue
 
-            rowOneLocation = group[0]
-            rowTwoLocation = group[3]
+            neighbours = self.swordfishNeighbours(group)
 
-            if len(group) == 9:
-                rowThreeLocation = group[6]
-                columnOneLocation = group[0]
-                columnTwoLocation = group[1]
-                columnThreeLocation = group[2]
-            else:
-                sortedGroup = sorted(group, key=self.getColumn)
-                rowThreeLocation = group[4]
-                columnOneLocation = sortedGroup[0]
-                columnTwoLocation = sortedGroup[2]
-                columnThreeLocation = sortedGroup[4]
+            rowNeighbours = defaultdict(set)
+            for neighbour in neighbours[0]:
+                rowNeighbours[self.getRow(neighbour)].union(self.solvingCandidates(neighbour))
 
-            otherRowOneCandidates = self.solvingCandidates(*self.rowNeighbours(rowOneLocation, *group))
-            otherRowTwoCandidates = self.solvingCandidates(*self.rowNeighbours(rowTwoLocation, *group))
-            otherRowThreeCandidates = self.solvingCandidates(*self.rowNeighbours(rowThreeLocation, *group))
-            otherColumnOneCandidates = self.solvingCandidates(*self.columnNeighbours(columnOneLocation, *group))
-            otherColumnTwoCandidates = self.solvingCandidates(*self.columnNeighbours(columnTwoLocation, *group))
-            otherColumnThreeCandidates = self.solvingCandidates(*self.columnNeighbours(columnThreeLocation, *group))
+            columnNeighbours = defaultdict(set)
+            for neighbour in neighbours[1]:
+                columnNeighbours[self.getColumn(neighbour)].union(self.solvingCandidates(neighbour))
 
             for candidate in commonCandidates:
-                if (candidate not in otherRowOneCandidates and
-                    candidate not in otherRowTwoCandidates and
-                    candidate not in otherRowThreeCandidates):
-                    swordfishes[group].append((candidate, (columnOneLocation, columnTwoLocation, columnThreeLocation), "row"))
+                inAllRows = all(candidate in candidates for candidates in rowNeighbours.itervalues())
+                inAllColumns = all(candidate in candidates for candidates in columnNeighbours.itervalues())
+                notInRows = not any(candidate in candidates for candidates in rowNeighbours.itervalues())
+                notInColumns = not any(candidate in candidates for candidates in columnNeighbours.itervalues())
 
-                elif (candidate not in otherColumnOneCandidates and
-                      candidate not in otherColumnTwoCandidates and
-                      candidate not in otherColumnThreeCandidates):
-                    swordfishes[group].append((candidate, (rowOneLocation, rowTwoLocation, rowThreeLocation), "column"))
+                if (inAllRows and notInColumns) or (inAllColumns and notInRows):
+                    swordfishes[group].append(candidate)
 
-        for group, swordfishList in swordfishes.iteritems():
-            for swordfish in swordfishList:
-                candidate = swordfish[0]
-                locations = swordfish[1]
-                swordfishType = swordfish[2]
+        for group, candidates in swordfishes.iteritems():
+            neighbours = self.swordfishNeighbours(group)
 
-                swordfishNeighbours = []
+            for neighbourGroup in neighbours:
 
-                for location in locations:
-                    swordfishNeighbours += self.neighbourMethods[swordfishType](location, *group)
+                for location in neighbourGroup:
 
-                for location in swordfishNeighbours:
-
-                    removedCandidates = self.removeSolvingCandidates(location, candidate)
+                    removedCandidates = self.removeSolvingCandidates(location, *candidates)
 
                     if removedCandidates:
-                        log.append(successString % (candidate, location, group))
+                        log.append(successString % (removedCandidates, location, group))
 
         if self.changes:
             self.updatePuzzle()
