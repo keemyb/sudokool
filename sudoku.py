@@ -225,7 +225,8 @@ class Sudoku():
 
         for location in xrange(1, self.gridSize ** 2 + 1):
 
-            if location in xrange(1, self.gridSize ** 2 + 1, self.gridSize + 1):
+            if (location in xrange(1, self.gridSize ** 2 + 1, self.gridSize + 1) or
+                    location in self.getSubGridStartLocations()):
                 for group in self.staticGroups.itervalues():
                     for unit in group:
                         if location not in unit:
