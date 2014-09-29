@@ -35,6 +35,8 @@ class Sudoku():
 
         self.candidates = {}
         self.userCandidatesDict = {}
+        self.log = []
+        self.history = []
 
         self.solveMode = False
         self.changes = False
@@ -67,15 +69,15 @@ class Sudoku():
             }
 
         self.neighbourMethods = {
-            "row": self.getRowNeighbours,
-            "column": self.getColumnNeighbours,
-            "subGrid": self.getSubGridNeighbours,
+            "row": self.rowNeighbours,
+            "column": self.columnNeighbours,
+            "subGrid": self.subGridNeighbours,
             }
 
         self.allNeighbourMethods = {
-            "row": self.getAllRowNeighbours,
-            "column": self.getAllColumnNeighbours,
-            "subGrid": self.getAllSubGridNeighbours,
+            "row": self.allRowNeighbours,
+            "column": self.allColumnNeighbours,
+            "subGrid": self.allSubGridNeighbours,
             }
 
         self.alignmentMethods = {
@@ -249,37 +251,45 @@ class Sudoku():
             return True
         return False
 
-    def solve(self, maxLevel, history=None):
+    def solve(self, maxLevel=None, steps=None):
+
+        if steps == 0:
+            return
 
         if self.isComplete():
-            return [(entry[0], entry[2]) for entry in history if history is not None]
+            return
 
-        if maxLevel > len(self.solvingMethods) or maxLevel < 1:
+        if (maxLevel is None or
+                maxLevel > len(self.solvingMethods) or
+                maxLevel < 1):
             maxLevel = len(self.solvingMethods)
 
         #if solver is run for the first time, solve using first method
-        if history is None:
-            log = self.solvingMethods[0]()[1]
-            history = [(0, self.changes, log)]
-            return self.solve(maxLevel, history)
+        if not self.history:
+            self.solvingMethods[0]()
+            self.history.append(0)
+            if steps and self.changes:
+                steps -= 1
+            return self.solve(maxLevel, steps)
 
         #if last attempt was successful, go back to first level
-        lastMethod = history[-1][0]
-        lastMethodSuccess = history[-1][1]
+        lastMethodSuccess = self.changes
         if lastMethodSuccess:
-            nextMethod = 0
+            self.solvingMethods[0]()
+            self.history.append(0)
+            if steps and self.changes:
+                steps -= 1
+            return self.solve(maxLevel, steps)
+
         #or if unsuccessful, increase level or exit if highest level was tried
-        else:
-            moreMethods = (maxLevel - lastMethod) - 1
-            if moreMethods:
-                nextMethod = lastMethod + 1
-            else:
-                return [(entry[0], entry[2]) for entry in history if history is not None]
-
-        log = self.solvingMethods[nextMethod]()[1]
-        history.append((nextMethod, self.changes, log))
-
-        return self.solve(maxLevel, history)
+        lastMethod = self.history[-1]
+        if lastMethod < maxLevel:
+            nextMethod = lastMethod + 1
+            self.solvingMethods[nextMethod]()
+            self.history.append(nextMethod)
+            if steps and self.changes:
+                steps -= 1
+            return self.solve(maxLevel, steps)
 
 
 
@@ -364,7 +374,7 @@ class Sudoku():
             if not self.isEmpty(location):
                 continue
 
-            neighbours = [neighbour for neighbour in self.getAllCombinedNeighbours(location) if not self.isEmpty(neighbour)]
+            neighbours = [neighbour for neighbour in self.allCombinedNeighbours(location) if not self.isEmpty(neighbour)]
 
             surroundingValues = self.getValues(*neighbours)
 
@@ -380,7 +390,7 @@ class Sudoku():
 
         for location in self.emptyLocations():
 
-            neighbours = self.getAllCombinedNeighbours(location)
+            neighbours = self.allCombinedNeighbours(location)
 
             surroundingValues = self.getValues(*neighbours)
 
@@ -390,11 +400,44 @@ class Sudoku():
 
         for location in self.userCandidatesDict.iterkeys():
 
-            neighbours = self.getAllCombinedNeighbours(location)
+            neighbours = self.allCombinedNeighbours(location)
 
             surroundingValues = self.getValues(*neighbours)
 
             self.userCandidatesDict[location] -= surroundingValues
+
+
+
+
+    def logVariableFormatter(self, *variables):
+
+        seperator = ", "
+
+        formattedVariables = []
+
+        for variable in variables:
+            if hasattr(variable, "__iter__"):
+                for value in variable:
+                    try:
+                        float(value)
+                    except:
+                        formattedVariables.append(variable)
+                        break
+                else:
+                    variable = [str(value) for value in variable]
+                    newVariable = str(seperator).join(variable)
+                    formattedVariables.append(newVariable)
+            else:
+                formattedVariables.append(variable)
+
+        return formattedVariables
+
+    def addToLog(self, string, *variables):
+
+        formattedVariables = self.logVariableFormatter(*variables)
+
+        self.log.append(string.format(*formattedVariables))
+
 
 
 
@@ -480,57 +523,84 @@ class Sudoku():
 
 
 
-    def getSubGridNeighbours(self, location, *exclusions):
+    def subGridNeighbours(self, location, *exclusions):
         subGridGroup = self.intersectionTypes["subGrid"][self.getSubGrid(location) - 1]
         neighbours = [neighbour for neighbour in subGridGroup if neighbour != location and self.isEmpty(neighbour)]
         neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
 
         return neighbours
 
-    def getRowNeighbours(self, location, *exclusions):
+    def rowNeighbours(self, location, *exclusions):
         rowGroup = self.intersectionTypes["row"][self.getRow(location) - 1]
         neighbours = [neighbour for neighbour in rowGroup if neighbour != location and self.isEmpty(neighbour)]
         neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
 
         return neighbours
 
-    def getColumnNeighbours(self, location, *exclusions):
+    def columnNeighbours(self, location, *exclusions):
         columnGroup = self.intersectionTypes["column"][self.getColumn(location) - 1]
         neighbours = [neighbour for neighbour in columnGroup if neighbour != location and self.isEmpty(neighbour)]
         neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
 
         return neighbours
 
-    def getCombinedNeighbours(self, location, *exclusions):
-        return set(self.getSubGridNeighbours(location, *exclusions) +
-                   self.getRowNeighbours(location, *exclusions) +
-                   self.getColumnNeighbours(location, *exclusions))
+    def combinedNeighbours(self, location, *exclusions):
+        return set(self.subGridNeighbours(location, *exclusions) +
+                   self.rowNeighbours(location, *exclusions) +
+                   self.columnNeighbours(location, *exclusions))
 
-    def getAllSubGridNeighbours(self, location, *exclusions):
+    def allSubGridNeighbours(self, location, *exclusions):
         subGridGroup = self.staticGroups["subGrid"][self.getSubGrid(location) - 1]
         neighbours = [neighbour for neighbour in subGridGroup if neighbour != location]
         neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
 
         return neighbours
 
-    def getAllRowNeighbours(self, location, *exclusions):
+    def allRowNeighbours(self, location, *exclusions):
         rowGroup = self.staticGroups["row"][self.getRow(location) - 1]
         neighbours = [neighbour for neighbour in rowGroup if neighbour != location]
         neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
 
         return neighbours
 
-    def getAllColumnNeighbours(self, location, *exclusions):
+    def allColumnNeighbours(self, location, *exclusions):
         columnGroup = self.staticGroups["column"][self.getColumn(location) - 1]
         neighbours = [neighbour for neighbour in columnGroup if neighbour != location]
         neighbours = [neighbour for neighbour in neighbours if neighbour not in exclusions]
 
         return neighbours
 
-    def getAllCombinedNeighbours(self, location, *exclusions):
-        return set(self.getAllSubGridNeighbours(location, *exclusions) +
-                   self.getAllRowNeighbours(location, *exclusions) +
-                   self.getAllColumnNeighbours(location, *exclusions))
+    def allCombinedNeighbours(self, location, *exclusions):
+        return set(self.allSubGridNeighbours(location, *exclusions) +
+                   self.allRowNeighbours(location, *exclusions) +
+                   self.allColumnNeighbours(location, *exclusions))
+
+    def xWingNeighbours(self, xWing):
+        return (self.rowNeighbours(xWing[0], *xWing) +
+                self.rowNeighbours(xWing[2], *xWing) +
+                self.columnNeighbours(xWing[0], *xWing) +
+                self.columnNeighbours(xWing[1], *xWing))
+
+    def swordfishRowNeighbours(self, swordfish):
+
+        rowNeighbours = set([]).union(*[self.rowNeighbours(location) for location in swordfish])
+
+        rowNeighbours -= set(swordfish)
+
+        return rowNeighbours
+
+    def swordfishColumnNeighbours(self, swordfish):
+
+        columnNeighbours = set([]).union(*[self.columnNeighbours(location) for location in swordfish])
+
+        columnNeighbours -= set(swordfish)
+
+        return columnNeighbours
+
+    def swordfishNeighbours(self, swordfish):
+
+        return self.swordfishRowNeighbours(swordfish).union(
+            self.swordfishColumnNeighbours(swordfish))
 
 
 
@@ -1293,8 +1363,7 @@ class Sudoku():
 
         self.changes = False
 
-        log = []
-        successString = "Naked Single: %s was set to %s"
+        successString = "Naked Single: {0} was set to {1}"
 
         for location, candidates in self.candidates.items():
             if len(candidates) == 1:
@@ -1304,22 +1373,20 @@ class Sudoku():
                 del self.candidates[location]
                 self.changes = True
 
-                log.append(successString % (str(location), str(candidate)))
+                self.addToLog(successString, location, candidate)
 
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes, log
+        return self.changes
 
     def nakedN(self, n):
         self.initialiseIntersections()
 
         self.changes = False
 
-        log = []
         name = "Naked " + self.multiples[n - 1]
-        successString = "Naked %s: %s removes %s from %s"
-        successString = name + ": %s have been removed from %s as it shares a %s with the " + name + ", %s"
+        successString = name + ": {0} have been removed from {1} as it shares a {2} with the " + name + ", {3}"
 
         for intersectionType in self.units:
 
@@ -1343,12 +1410,12 @@ class Sudoku():
 
                         if removedCandidates:
 
-                            log.append(successString % (str(removedCandidates)[1:-1], location, self.alignment(*combination)[0], combination))
+                            self.addToLog(successString, removedCandidates, location, self.alignment(*combination)[0], combination)
 
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes, log
+        return self.changes
 
     def nakedTwin(self):
 
@@ -1366,12 +1433,11 @@ class Sudoku():
 
         self.changes = False
 
-        log = []
         name = "Hidden " + self.multiples[n - 1]
         if n > 1:
-            successString = name + ": %s has been removed from %s as the " + name +", %s only appears in it's %s"
+            successString = name + ": {0} has been removed from {1} as the " + name +", {2} only appears in it's {3}"
         else:
-            successString = name + ": %s has been set to %s, as all other candidates have been removed"
+            successString = name + ": {0} has been set to {1}, as all other candidates have been removed"
 
         for intersectionType in self.units:
 
@@ -1402,14 +1468,14 @@ class Sudoku():
                             self.setValue(location, uniqueCombinationCandidates.pop())
 
                         if n > 1:
-                            log.append(successString % (removedCandidates, location, self.solvingCandidates(location), intersectionType))
+                            self.addToLog(successString, removedCandidates, location, self.solvingCandidates(location), intersectionType)
                         else:
-                            log.append(successString % (location, self.getValue(location)))
+                            self.addToLog(successString, location, self.getValue(location))
 
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes, log
+        return self.changes
 
     def hiddenSingle(self):
 
@@ -1431,14 +1497,13 @@ class Sudoku():
 
         self.changes = False
 
-        log = []
         name = "Pointing " + self.multiples[n - 1]
-        successString = name + ": %s has been removed from %s, as it shares a %s with the " + name + " %s"
+        successString = name + ": {0} has been removed from {1}, as it shares a {2} with the " + name + " {3}"
 
         for pointerGroup in self.intersectionTypes[("pointer", n)]:
             combination, pointerType = pointerGroup[0], pointerGroup[1]
 
-            subGridNeighbours = self.getSubGridNeighbours(combination[0], *combination)
+            subGridNeighbours = self.subGridNeighbours(combination[0], *combination)
             subGridNeighbourCandidates = self.solvingCandidates(*subGridNeighbours)
 
             commonPointerCandidates = self.commonCandidates(*combination)
@@ -1455,12 +1520,12 @@ class Sudoku():
 
                 if removedCandidates:
 
-                    log.append(successString % (removedCandidates, str(location), pointerType, combination))
+                    self.addToLog(successString, removedCandidates, location, pointerType, combination)
 
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes, log
+        return self.changes
 
     def pointingPair(self):
         return self.pointingN(2)
@@ -1476,9 +1541,8 @@ class Sudoku():
 
         self.changes = False
 
-        log = []
         name = "Box Line Reduction (" + self.multiples[n - 1] + ")"
-        successString = name + ": %s has been removed from %s, as it is part of a subGrid where %s can only be placed along it's %s"
+        successString = name + ": {0} has been removed from {1}, as it is part of a subGrid where {2} can only be placed along it's {3}"
 
         for pointerGroup in self.intersectionTypes[("pointer", n)]:
             combination, pointerType = pointerGroup[0], pointerGroup[1]
@@ -1492,19 +1556,19 @@ class Sudoku():
             if not uniquePointerCandidates:
                 continue
 
-            subGridNeighbours = self.getSubGridNeighbours(combination[0], *combination)
+            subGridNeighbours = self.subGridNeighbours(combination[0], *combination)
 
             for location in subGridNeighbours:
                 removedCandidates = self.removeSolvingCandidates(location, *uniquePointerCandidates)
 
                 if removedCandidates:
 
-                    log.append(successString % (removedCandidates, location, commonPointerCandidates, pointerType))
+                    self.addToLog(successString, removedCandidates, location, commonPointerCandidates, pointerType)
 
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes, log
+        return self.changes
 
     def boxLineReduction2(self):
         return self.boxLineReductionN(2)
@@ -1520,8 +1584,7 @@ class Sudoku():
 
         self.changes = False
 
-        log = []
-        successString = "X-Wing: %s has been removed from %s, as it is in alignment with the X-Wing, %s"
+        successString = "X-Wing: {0} has been removed from {1}, as it is in alignment with the X-Wing, {2}"
 
         from collections import defaultdict
         from itertools import chain
@@ -1535,10 +1598,10 @@ class Sudoku():
             if len(commonXWingCandidates) == 0:
                 continue
 
-            rowCandidates = (self.solvingCandidates(*self.getRowNeighbours(group[0], *group)) |
-                             self.solvingCandidates(*self.getRowNeighbours(group[2], *group)))
-            columnCandidates = (self.solvingCandidates(*self.getColumnNeighbours(group[0], *group)) |
-                                self.solvingCandidates(*self.getColumnNeighbours(group[1], *group)))
+            rowCandidates = (self.solvingCandidates(*self.rowNeighbours(group[0], *group)) |
+                             self.solvingCandidates(*self.rowNeighbours(group[2], *group)))
+            columnCandidates = (self.solvingCandidates(*self.columnNeighbours(group[0], *group)) |
+                                self.solvingCandidates(*self.columnNeighbours(group[1], *group)))
 
             for candidate in commonXWingCandidates:
                 if (candidate not in rowCandidates or candidate not in columnCandidates):
@@ -1546,24 +1609,19 @@ class Sudoku():
 
         for group, candidates in xWings.iteritems():
 
-            xWingNeighbours = (self.getRowNeighbours(group[0], *group) +
-                               self.getRowNeighbours(group[2], *group) +
-                               self.getColumnNeighbours(group[0], *group) +
-                               self.getColumnNeighbours(group[1], *group))
-
-            for location in xWingNeighbours:
+            for location in self.xWingNeighbours(group):
 
                 removedCandidates = self.removeSolvingCandidates(location, *candidates)
 
                 if removedCandidates:
 
                     # Needs to be more verbose, showing where the alignment occours
-                    log.append(successString % (removedCandidates, location, group))
+                    self.addToLog(successString, removedCandidates, location, group)
 
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes, log
+        return self.changes
 
 
 
@@ -1573,8 +1631,7 @@ class Sudoku():
 
         self.changes = False
 
-        log = []
-        successString = "Swordfish: %s has been removed from %s, as it is in alignment with the Swordfish, %s"
+        successString = "Swordfish: {0} has been removed from {1}, as it is in alignment with the Swordfish, {2}"
 
         from collections import defaultdict
 
@@ -1587,61 +1644,37 @@ class Sudoku():
             if len(commonCandidates) == 0:
                 continue
 
-            rowOneLocation = group[0]
-            rowTwoLocation = group[3]
+            rowCandidates = defaultdict(set)
+            for neighbour in self.swordfishRowNeighbours(group):
+                rowCandidates[self.getRow(neighbour)].union(self.solvingCandidates(neighbour))
 
-            if len(group) == 9:
-                rowThreeLocation = group[6]
-                columnOneLocation = group[0]
-                columnTwoLocation = group[1]
-                columnThreeLocation = group[2]
-            else:
-                sortedGroup = sorted(group, key=self.getColumn)
-                rowThreeLocation = group[4]
-                columnOneLocation = sortedGroup[0]
-                columnTwoLocation = sortedGroup[2]
-                columnThreeLocation = sortedGroup[4]
-
-            otherRowOneCandidates = self.solvingCandidates(*self.getRowNeighbours(rowOneLocation, *group))
-            otherRowTwoCandidates = self.solvingCandidates(*self.getRowNeighbours(rowTwoLocation, *group))
-            otherRowThreeCandidates = self.solvingCandidates(*self.getRowNeighbours(rowThreeLocation, *group))
-            otherColumnOneCandidates = self.solvingCandidates(*self.getColumnNeighbours(columnOneLocation, *group))
-            otherColumnTwoCandidates = self.solvingCandidates(*self.getColumnNeighbours(columnTwoLocation, *group))
-            otherColumnThreeCandidates = self.solvingCandidates(*self.getColumnNeighbours(columnThreeLocation, *group))
+            columnCandidates = defaultdict(set)
+            for neighbour in self.swordfishColumnNeighbours(group):
+                columnCandidates[self.getColumn(neighbour)].union(self.solvingCandidates(neighbour))
 
             for candidate in commonCandidates:
-                if (candidate not in otherRowOneCandidates and
-                    candidate not in otherRowTwoCandidates and
-                    candidate not in otherRowThreeCandidates):
-                    swordfishes[group].append((candidate, (columnOneLocation, columnTwoLocation, columnThreeLocation), "row"))
+                inAllRows = all(candidate in candidates for candidates in rowCandidates.itervalues())
+                inAllColumns = all(candidate in candidates for candidates in columnCandidates.itervalues())
+                notInRows = not any(candidate in candidates for candidates in rowCandidates.itervalues())
+                notInColumns = not any(candidate in candidates for candidates in columnCandidates.itervalues())
 
-                elif (candidate not in otherColumnOneCandidates and
-                      candidate not in otherColumnTwoCandidates and
-                      candidate not in otherColumnThreeCandidates):
-                    swordfishes[group].append((candidate, (rowOneLocation, rowTwoLocation, rowThreeLocation), "column"))
+                if (inAllRows and notInColumns) or (inAllColumns and notInRows):
+                    swordfishes[group].append(candidate)
 
-        for group, swordfishList in swordfishes.iteritems():
-            for swordfish in swordfishList:
-                candidate = swordfish[0]
-                locations = swordfish[1]
-                swordfishType = swordfish[2]
+        for group, candidates in swordfishes.iteritems():
+            neighbours = self.swordfishNeighbours(group)
 
-                swordfishNeighbours = []
+            for location in neighbours:
 
-                for location in locations:
-                    swordfishNeighbours += self.neighbourMethods[swordfishType](location, *group)
+                removedCandidates = self.removeSolvingCandidates(location, *candidates)
 
-                for location in swordfishNeighbours:
-
-                    removedCandidates = self.removeSolvingCandidates(location, candidate)
-
-                    if removedCandidates:
-                        log.append(successString % (candidate, location, group))
+                if removedCandidates:
+                    self.addToLog(successString, removedCandidates, location, group)
 
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes, log
+        return self.changes
 
 
 
@@ -1652,37 +1685,28 @@ class Sudoku():
 
         self.changes = False
 
-        log = []
-
         for chainGroup in self.intersectionTypes["conjugateChains"]:
             chain, candidate = chainGroup[0], chainGroup[1]
             colourOne, colourTwo = chain[::2], chain[1::2]
-
-            logStrings = ("Simple Colouring - Chain ON OFF: ",
-                          "Simple Colouring - Case 2: "
-                          "Simple Colouring - Case 4: "
-                          "Simple Colouring - Case 5: ")
 
             simpleColouringMethods = (self.chainOnOff,
                                       self.simpleColourCase2,
                                       self.simpleColourCase4,
                                       self.simpleColourCase5)
 
-            for index, method in enumerate(simpleColouringMethods):
-                result = method(chain, colourOne, colourTwo, candidate)
-                if result:
-                    log.append(logStrings[index] + str(result))
+            for method in enumerate(simpleColouringMethods):
+                method(chain, colourOne, colourTwo, candidate)
 
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes, log
+        return self.changes
 
     def chainOnOff(self, chain, colourOne, colourTwo, candidate):
         """Tests to see if one colour being ON is valid, if it is invalid
            the other colour must be the solution."""
 
-        successString = "%s has been removed from locations %s, as it is part of an invalid colour"
+        successString = "Chain ON/OFF: {0} has been removed from locations {1}, as it is part of an invalid colour"
 
         for testColour in (colourOne, colourTwo):
             if not self.validConjugateChain((chain, candidate)):
@@ -1700,13 +1724,14 @@ class Sudoku():
                     candidatesToRemove = {location: candidate for location in correctColour}
                     self.applyProspectiveChange(candidatesToRemove)
                     self.changes = True
-                    return successString % (candidate, [location for location in correctColour])
+                    self.addToLog(successString, candidate, [location for location in correctColour])
+                    return
 
     def simpleColourCase2(self, chain, colourOne, colourTwo, candidate):
         """If two locations are in the same colour and unit, this colour must
            be OFF, and the other colour must be ON."""
 
-        successString = "locations %s have been set to %s, as it shares a unit with a chain where two colours are the same"
+        successString = "Simple Colouring Case 2: locations {0} have been set to {1}, as it shares a unit with a chain where two colours are the same"
 
         for colour in (colourOne, colourTwo):
             if not self.validConjugateChain((chain, candidate)):
@@ -1725,16 +1750,15 @@ class Sudoku():
                 valuesToAdd = {location: candidate for location in correctColour}
                 self.applyProspectiveChange(None, valuesToAdd)
                 self.changes = True
-                return successString % ([location for location in correctColour], candidate)
+                self.addToLog(successString, [location for location in correctColour], candidate)
+                return
 
     def simpleColourCase4(self, chain, colourOne, colourTwo, candidate):
         """If two locations are in the same unit and have different colours,
            all other locations in the unit must have that candidate removed,
            as one colour must be OFF, and the other colour must be ON."""
 
-        log = []
-
-        successString = "%s has been removed from %s, as these locations are in the same unit as one of two locations that must be ON"
+        successString = "Simple Colouring Case 4: {0} has been removed from {1}, as these locations are in the same unit as one of two locations that must be ON"
 
         for pair in self.nLocations(chain, 2):
             if not self.validConjugateChain((chain, candidate)):
@@ -1748,18 +1772,14 @@ class Sudoku():
                         removedCandidates = self.removeSolvingCandidates(location, candidate)
 
                         if removedCandidates:
-                            log.append(successString % (candidate, location))
-
-        return log
+                            self.addToLog(successString, candidate, location)
 
     def simpleColourCase5(self, chain, colourOne, colourTwo, candidate):
         """If a location can see two locations in a chain that have different
            colours, this location must have that candidate removed,
            as one colour must be OFF, and the other colour must be ON."""
 
-        successString = """%s has been removed from %s, as this location can "see" both %s, locations of different colours"""
-
-        log = []
+        successString = "Simple Colouring Case 5: {0} has been removed from {1}, as this location can see both {2}, locations of different colours"
 
         for location in self.emptyLocations():
             if location in chain:
@@ -1783,9 +1803,7 @@ class Sudoku():
                     removedCandidates = self.removeSolvingCandidates(location, candidate)
 
                     if removedCandidates:
-                        log.append(successString % (candidate, location, pair))
-
-        return log
+                        self.addToLog(successString, candidate, location, pair)
 
 
 
@@ -1795,8 +1813,7 @@ class Sudoku():
 
         self.changes = False
 
-        log = []
-        successString = "Y-Wing: %s has been removed from %s, as it can be seen by %s, part of a Y-Wing"
+        successString = "Y-Wing: {0} has been removed from {1}, as it can be seen by {2}, part of a Y-Wing"
 
         for yWingGroup in self.intersectionTypes["yWing"]:
             yWingLocations = yWingGroup[0]
@@ -1804,8 +1821,8 @@ class Sudoku():
             firstArm = yWingLocations[1]
             secondArm = yWingLocations[2]
 
-            firstArmNeighbours = self.getCombinedNeighbours(firstArm)
-            secondArmNeighbours = self.getCombinedNeighbours(secondArm)
+            firstArmNeighbours = self.combinedNeighbours(firstArm)
+            secondArmNeighbours = self.combinedNeighbours(secondArm)
 
             commonNeighbours = ((set(firstArmNeighbours) &
                                 set(secondArmNeighbours)) -
@@ -1816,21 +1833,19 @@ class Sudoku():
                 removedCandidates = self.removeSolvingCandidates(location, yWingCandidate)
 
                 if removedCandidates:
-                    log.append(successString % (yWingCandidate, location, (firstArm, secondArm)))
+                    self.addToLog(successString, yWingCandidate, location, (firstArm, secondArm))
 
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes, log
+        return self.changes
 
     def xyzWing(self):
         self.initialiseIntersections("xyzWing")
 
         self.changes = False
 
-        log = []
-
-        successString = "XYZ-Wing: %s has been removed from %s, as it can be seen by %s, an XYZ-Wing"
+        successString = "XYZ-Wing: {0} has been removed from {1}, as it can be seen by {2}, an XYZ-Wing"
 
         for xyzWingGroup in self.intersectionTypes["xyzWing"]:
             xyzWingLocations = xyzWingGroup[0]
@@ -1839,9 +1854,9 @@ class Sudoku():
             firstArm = xyzWingLocations[1]
             secondArm = xyzWingLocations[2]
 
-            pivotNeighbours = self.getCombinedNeighbours(pivot, *xyzWingLocations)
-            firstArmNeighbours = self.getCombinedNeighbours(firstArm, *xyzWingLocations)
-            secondArmNeighbours = self.getCombinedNeighbours(secondArm, *xyzWingLocations)
+            pivotNeighbours = self.combinedNeighbours(pivot, *xyzWingLocations)
+            firstArmNeighbours = self.combinedNeighbours(firstArm, *xyzWingLocations)
+            secondArmNeighbours = self.combinedNeighbours(secondArm, *xyzWingLocations)
 
             commonNeighbours = (set(pivotNeighbours) &
                                 set(firstArmNeighbours) &
@@ -1852,12 +1867,12 @@ class Sudoku():
                 removedCandidates = self.removeSolvingCandidates(location, xyzWingCandidate)
 
                 if removedCandidates:
-                    log.append(successString % (xyzWingCandidate, location, xyzWingLocations))
+                    self.addToLog(successString, xyzWingCandidate, location, xyzWingLocations)
 
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes, log
+        return self.changes
 
 
 
@@ -1867,9 +1882,7 @@ class Sudoku():
 
         self.changes = False
 
-        log = []
-
-        successString = "Remote Pair: %s has been removed from %s, as it can be seen by the remote pair %s, part of the locked chain %s"
+        successString = "Remote Pair: {0} has been removed from {1}, as it can be seen by the remote pair {2}, part of the locked chain {3}"
 
         for lockedChainGroup in self.intersectionTypes["lockedChains"]:
             lockedChain, candidates = lockedChainGroup[0], lockedChainGroup[1]
@@ -1883,8 +1896,8 @@ class Sudoku():
             for remotePair in remotePairs:
                 locationOne, locationTwo = remotePair[0], remotePair[1]
 
-                locationOneNeighbours = self.getCombinedNeighbours(locationOne, *lockedChain)
-                locationTwoNeighbours = self.getCombinedNeighbours(locationTwo, *lockedChain)
+                locationOneNeighbours = self.combinedNeighbours(locationOne, *lockedChain)
+                locationTwoNeighbours = self.combinedNeighbours(locationTwo, *lockedChain)
                 remotePairNeighbours = (set(locationOneNeighbours) &
                                         set(locationTwoNeighbours))
 
@@ -1894,9 +1907,9 @@ class Sudoku():
 
                     if removedCandidates:
 
-                        log.append(successString % (removedCandidates, neighbour, remotePair, lockedChain))
+                        self.addToLog(successString, removedCandidates, neighbour, remotePair, lockedChain)
 
         if self.changes:
             self.updatePuzzle()
 
-        return self.changes, log
+        return self.changes
