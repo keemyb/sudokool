@@ -6,7 +6,7 @@ def puzzleSummary(puzzle, maxLevel, printPuzzle, printChangedCandidates, printHi
     preSolved = deepcopy(puzzle)
     postSolved = puzzle
 
-    solveReport = postSolved.solve(maxLevel)
+    postSolved.solve(maxLevel)
 
     numberOfPreSolvedValues = len(preSolved.filledLocations())
     numberOfPostSolvedValues = len(postSolved.filledLocations())
@@ -37,6 +37,6 @@ def puzzleSummary(puzzle, maxLevel, printPuzzle, printChangedCandidates, printHi
         if verbose:
             history = "\n" + "\n".join(postSolved.log)
         else:
-            history = "\n" + str(solveReport)
+            history = "\n" + str(postSolved.history)
 
     return number + str(numberOfPreSolvedValues) + " ---> " + str(numberOfPostSolvedValues) + history + changedCandidatesString + printPuzzle + "\n"

@@ -260,7 +260,7 @@ class Sudoku():
             maxLevel = len(self.solvingMethods)
 
         #if solver is run for the first time, solve using first method
-        if self.history is None:
+        if not self.history:
             self.solvingMethods[0]()
             self.history.append(0)
             return self.solve(maxLevel)
