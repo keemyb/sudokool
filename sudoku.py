@@ -251,12 +251,14 @@ class Sudoku():
             return True
         return False
 
-    def solve(self, maxLevel):
+    def solve(self, maxLevel=None):
 
         if self.isComplete():
             return
 
-        if maxLevel > len(self.solvingMethods) or maxLevel < 1:
+        if (maxLevel is None or
+                maxLevel > len(self.solvingMethods) or
+                maxLevel < 1):
             maxLevel = len(self.solvingMethods)
 
         #if solver is run for the first time, solve using first method

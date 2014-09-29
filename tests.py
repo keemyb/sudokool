@@ -90,7 +90,7 @@ def visualizer(puzzle, *groups):
     return wholeString
 
 easy = Sudoku("000004028406000005100030600000301000087000140000709000002010003900000507670400000")
-print easy.solve(0)
+print easy.solve()
 print easy.log
 print easy
 
