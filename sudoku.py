@@ -302,7 +302,7 @@ class Sudoku():
 
         if candidatesToRemove is not None:
             for location, candidates in candidatesToRemove.iteritems():
-                prospectivePuzzle.candidates[location] -= set([candidates])
+                prospectivePuzzle.removeSolvingCandidates(location, *candidates)
 
         if valuesToAdd is not None:
             for location, value in valuesToAdd.iteritems():
@@ -317,7 +317,7 @@ class Sudoku():
     def applyProspectiveChange(self, candidatesToRemove=None, valuesToAdd=None):
         if candidatesToRemove is not None:
             for location, candidates in candidatesToRemove.iteritems():
-                self.candidates[location] -= set([candidates])
+                self.removeSolvingCandidates(location, *candidates)
 
         if valuesToAdd is not None:
             for location, value in valuesToAdd.iteritems():
