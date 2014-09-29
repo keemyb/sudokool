@@ -251,7 +251,10 @@ class Sudoku():
             return True
         return False
 
-    def solve(self, maxLevel=None):
+    def solve(self, maxLevel=None, steps=None):
+
+        if steps == 0:
+            return
 
         if self.isComplete():
             return
@@ -265,14 +268,18 @@ class Sudoku():
         if not self.history:
             self.solvingMethods[0]()
             self.history.append(0)
-            return self.solve(maxLevel)
+            if steps and self.changes:
+                steps -= 1
+            return self.solve(maxLevel, steps)
 
         #if last attempt was successful, go back to first level
         lastMethodSuccess = self.changes
         if lastMethodSuccess:
             self.solvingMethods[0]()
             self.history.append(0)
-            return self.solve(maxLevel)
+            if steps and self.changes:
+                steps -= 1
+            return self.solve(maxLevel, steps)
 
         #or if unsuccessful, increase level or exit if highest level was tried
         lastMethod = self.history[-1]
@@ -280,7 +287,9 @@ class Sudoku():
             nextMethod = lastMethod + 1
             self.solvingMethods[nextMethod]()
             self.history.append(nextMethod)
-            return self.solve(maxLevel)
+            if steps and self.changes:
+                steps -= 1
+            return self.solve(maxLevel, steps)
 
 
 
