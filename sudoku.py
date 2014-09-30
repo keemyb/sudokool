@@ -263,7 +263,9 @@ class Sudoku():
         if (maxLevel is None or
                 maxLevel > len(self.solvingMethods) or
                 maxLevel < 1):
-            maxLevel = len(self.solvingMethods)
+            # maxLevel is the lenght minus 1 as lists are zero indexed, so the
+            # first method has an index 0
+            maxLevel = len(self.solvingMethods) - 1
 
         #if solver is run for the first time, solve using first method
         if not self.history:
@@ -284,8 +286,8 @@ class Sudoku():
 
         #or if unsuccessful, increase level or exit if highest level was tried
         lastMethod = self.history[-1]
-        if lastMethod < maxLevel:
-            nextMethod = lastMethod + 1
+        nextMethod = lastMethod + 1
+        if nextMethod <= maxLevel:
             self.solvingMethods[nextMethod]()
             self.history.append(nextMethod)
             if steps and self.changes:
