@@ -1240,6 +1240,18 @@ class Sudoku():
 
         return False
 
+    def clashesWith(self, location):
+        clashes = []
+        locationValue = self.getValue(location)
+
+        neighbours = self.allCombinedNeighbours(location)
+            for neighbour in neighbours:
+                neighbourValue = self.getValue(neighbour)
+                if neighbourValue == locationValue:
+                    clashes.append(neighbour)
+
+        return clashes
+
     def isValidInput(self, value):
         if value in self.setOfPossibleValues:
             return True
