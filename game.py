@@ -274,32 +274,24 @@ class toggleSolveMode(Button):
 
             if sudoku.solveMode:
                 discrepancies = False
-                anyUserLocations = False
+                modifiedLocations = False
 
-                for location in sudoku.filledLocations():
-                    if sudoku.isConstant(location):
-                        continue
-                    anyUserLocations = True
+                if sudoku.modifiedLocations():
+                    modifiedLocations = True
 
-                if anyUserLocations:
+                if modifiedLocations:
                     solvedPuzzle = deepcopy(sudoku)
-                    for location in solvedPuzzle.filledLocations():
-                        if solvedPuzzle.isConstant(location):
-                            continue
+                    for location in solvedPuzzle.modifiedLocations():
                         solvedPuzzle.clearLocation(location)
                     solvedPuzzle.solve(10, bruteForceOnFail=True)
 
-                    for location in sudoku.filledLocations():
-                        if sudoku.isConstant(location):
-                            continue
+                    for location in sudoku.modifiedLocations():
                         if sudoku.getValue(location) != solvedPuzzle.getValue(location):
                             discrepancies = True
                             break
 
                 if discrepancies:
-                    for location in sudoku.filledLocations():
-                        if sudoku.isConstant(location):
-                            continue
+                    for location in sudoku.modifiedLocations():
                         sudoku.clearLocation(location)
 
                 sudoku.hasIntersections = False
