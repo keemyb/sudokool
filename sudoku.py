@@ -1233,10 +1233,10 @@ class Sudoku():
         locationValue = self.getValue(location)
 
         neighbours = self.allCombinedNeighbours(location)
-            for neighbour in neighbours:
-                neighbourValue = self.getValue(neighbour)
-                if neighbourValue == locationValue:
-                    return True
+        for neighbour in neighbours:
+            neighbourValue = self.getValue(neighbour)
+            if neighbourValue == locationValue:
+                return True
 
         return False
 
@@ -1245,10 +1245,10 @@ class Sudoku():
         locationValue = self.getValue(location)
 
         neighbours = self.allCombinedNeighbours(location)
-            for neighbour in neighbours:
-                neighbourValue = self.getValue(neighbour)
-                if neighbourValue == locationValue:
-                    clashes.append(neighbour)
+        for neighbour in neighbours:
+            neighbourValue = self.getValue(neighbour)
+            if neighbourValue == locationValue:
+                clashes.append(neighbour)
 
         return clashes
 
