@@ -1359,6 +1359,50 @@ class Sudoku():
 
 
 
+    def brute(self):
+        self.initialiseIntersections()
+
+        from collections import defaultdict
+
+        previouslyTriedValues = defaultdict(set)
+
+        modifiedLocations = []
+
+        while True:
+
+            if self.isComplete() and self.isValid():
+                return
+
+            for location in self.emptyLocations():
+
+                if self.isConstant(location) or location in modifiedLocations:
+                    continue
+
+                neighbours = self.allCombinedNeighbours(location)
+
+                possibleValues = self.setOfPossibleValues - self.getValues(*neighbours)
+                possibleValues -= previouslyTriedValues[location]
+
+                if possibleValues:
+                    newValue = possibleValues.pop()
+                    self.setValue(location, newValue)
+                    previouslyTriedValues[location].add(newValue)
+                    modifiedLocations.append(location)
+                    break
+                else:
+                    if modifiedLocations:
+                        incorrectLocation = modifiedLocations[-1]
+                        self.clearLocation(incorrectLocation)
+
+                        modifiedLocations = modifiedLocations[:-1]
+                        # Atleast one of the previous locations are incorrect,
+                        # so we may need to choose a previously chosen value again
+                        del previouslyTriedValues[location]
+                        break
+                    else:
+                        # if there are no modified locations, there are no solutions.
+                        return
+
     def nakedSingle(self):
         self.initialiseIntersections()
 
