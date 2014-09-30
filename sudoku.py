@@ -1242,10 +1242,7 @@ class Sudoku():
         return range(1, self.gridSize ** 2 + 1)
 
     def emptyLocations(self):
-        if not self.hasCandidates:
-            self.initialiseCandidates()
-
-        return self.candidates.keys()
+        return [location for location in self.locations() if self.isEmpty(location)]
 
     def filledLocations(self):
         return [location for location in self.locations() if not self.isEmpty(location)]
