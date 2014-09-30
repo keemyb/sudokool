@@ -1757,7 +1757,7 @@ class Sudoku():
             if not self.validConjugateChain((chain, candidate)):
                 break
 
-            candidatesToRemove = {location: candidate for location in testColour}
+            candidatesToRemove = {location: [candidate] for location in testColour}
 
             # We are looking for a contradiction, so if the prospective change
             # checks out we haven't learnt anything new.
@@ -1766,7 +1766,7 @@ class Sudoku():
 
             for correctColour in (colourOne, colourTwo):
                 if testColour != correctColour:
-                    candidatesToRemove = {location: candidate for location in correctColour}
+                    candidatesToRemove = {location: [candidate] for location in correctColour}
                     self.applyProspectiveChange(candidatesToRemove)
                     self.changes = True
                     self.addToLog(successString, candidate, [location for location in correctColour])
