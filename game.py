@@ -39,6 +39,7 @@ class screen(BoxLayout):
         self.userOrSolvingButton = toggleUserOrSolvingCandidates(sudoku)
         self.autoUpdateButton = toggleAutoUpdateCandidates(sudoku)
         self.solveModeButton = toggleSolveMode(sudoku)
+        self.solveOneStepButton = solveStep(sudoku, 1)
 
         self.buttonHolder = GridLayout(cols=4, size_hint_y=.1, height=20)
         self.buttonHolder.add_widget(self.valueOrCandidateButton)
@@ -46,9 +47,13 @@ class screen(BoxLayout):
         self.buttonHolder.add_widget(self.autoUpdateButton)
         self.buttonHolder.add_widget(self.solveModeButton)
 
+        self.buttonHolder2 = GridLayout(cols=4, size_hint_y=.1, height=20)
+        self.buttonHolder2.add_widget(self.solveOneStepButton)
+
         self.add_widget(self.locationsGrid)
         self.add_widget(self.inputButtonGrid)
         self.add_widget(self.buttonHolder)
+        self.add_widget(self.buttonHolder2)
 
 
 class cell(GridLayout):
@@ -134,6 +139,8 @@ class cell(GridLayout):
                     self.add_widget(candidateLabel)
 
             if sudoku.highlightOccourences:
+                if not sudoku.selected:
+                    return
                 if not sudoku.isEmpty(sudoku.selected):
                     if sudoku.getValue(sudoku.selected) in sudoku.userCandidates(self.location):
                         for candidate in self.children:
@@ -332,6 +339,25 @@ class toggleAutoUpdateCandidates(Button):
             self.text = self.states[sudoku.autoUpdateUserCandidates]
             if sudoku.autoUpdateUserCandidates:
                 sudoku.updateUserCandidates()
+                for cell in self.parent.parent.locationsGrid.children:
+                    cell.update(sudoku)
+            return True
+
+
+class solveStep(Button):
+
+    def __init__(self, sudoku, step, **kwargs):
+        super(solveStep, self).__init__(**kwargs)
+
+        self.step = step
+
+        self.text = "Solve " + str(step) + " step"
+
+    def on_touch_down(self, touch):
+
+        if self.collide_point(*touch.pos):
+            if sudoku.solveMode:
+                sudoku.solve(maxSuccessfulSolveOperations=self.step)
                 for cell in self.parent.parent.locationsGrid.children:
                     cell.update(sudoku)
             return True
