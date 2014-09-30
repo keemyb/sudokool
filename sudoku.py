@@ -1238,6 +1238,9 @@ class Sudoku():
     def filledLocations(self):
         return [location for location in self.locations() if not self.isEmpty(location)]
 
+    def modifiedLocations(self):
+        return [location for location in self.filledLocations() if not self.isConstant(location)]
+
     def nLocations(self, unit, n):
         from itertools import combinations
 
