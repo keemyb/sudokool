@@ -1250,6 +1250,21 @@ class Sudoku():
     def modifiedLocations(self):
         return [location for location in self.locations() if self.isModified(location)]
 
+    def clashingLocations(self):
+        clashingLocations = set([])
+
+        for location in self.locations:
+            locationValue = self.getValue(location)
+
+            neighbours = self.allCombinedNeighbours(location)
+            for neighbour in neighbours:
+                neighbourValue = self.getValue(neighbour)
+                if locationValue == neighbourValue:
+                    clashingLocations.add(location)
+                    clashingLocations.add(neighbour)
+
+        return clashingLocations
+
     def nLocations(self, unit, n):
         from itertools import combinations
 
