@@ -121,7 +121,7 @@ class cell(GridLayout):
         else:
             self.canvas.before.clear()
 
-        if not sudoku.isEmpty(self.location):
+        if sudoku.isModified(self.location):
             value = str(sudoku.getValue(self.location))
             self.add_widget(Label(text=value, font_size=40, color=blue))
             return
