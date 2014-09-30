@@ -74,7 +74,7 @@ class cell(GridLayout):
 
         if sudoku.displaySolvingCandidates:
             if sudoku.hasSolvingCandidates(location):
-                for candidate in sorted(sudoku.solvingCandidates(location)):
+                for candidate in sorted(sudoku.allSolvingCandidates(location)):
                     candidateValue = str(candidate)
                     candidateLabel = Label(text=candidateValue, color=red)
                     self.add_widget(candidateLabel)
