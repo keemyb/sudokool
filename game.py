@@ -38,11 +38,13 @@ class screen(BoxLayout):
         self.valueOrCandidateButton = toggleValueOrCandidateEdit(sudoku)
         self.userOrSolvingButton = toggleUserOrSolvingCandidates(sudoku)
         self.autoUpdateButton = toggleAutoUpdateCandidates(sudoku)
+        self.solveModeButton = toggleSolveMode(sudoku)
 
-        self.buttonHolder = GridLayout(cols=3, size_hint_y=.1, height=20)
+        self.buttonHolder = GridLayout(cols=4, size_hint_y=.1, height=20)
         self.buttonHolder.add_widget(self.valueOrCandidateButton)
         self.buttonHolder.add_widget(self.userOrSolvingButton)
         self.buttonHolder.add_widget(self.autoUpdateButton)
+        self.buttonHolder.add_widget(self.solveModeButton)
 
         self.add_widget(self.locationsGrid)
         self.add_widget(self.inputButtonGrid)
@@ -244,6 +246,75 @@ class toggleUserOrSolvingCandidates(Button):
             return True
 
 
+class toggleSolveMode(Button):
+
+    def __init__(self, sudoku, **kwargs):
+        super(toggleSolveMode, self).__init__(**kwargs)
+
+        self.states = {True: "Exit Solve Mode",
+                       False: "Go Solve!"}
+
+        self.text = self.states[sudoku.solveMode]
+
+    def on_touch_down(self, touch):
+        from copy import deepcopy
+
+        if self.collide_point(*touch.pos):
+            sudoku.solveMode = not sudoku.solveMode
+            self.text = self.states[sudoku.solveMode]
+
+            if sudoku.solveMode:
+                discrepancies = False
+                anyUserLocations = False
+
+                for location in sudoku.filledLocations():
+                    if sudoku.isConstant(location):
+                        continue
+                    anyUserLocations = True
+
+                if anyUserLocations:
+                    solvedPuzzle = deepcopy(sudoku)
+                    for location in solvedPuzzle.filledLocations():
+                        if solvedPuzzle.isConstant(location):
+                            continue
+                        solvedPuzzle.clearLocation(location)
+                    solvedPuzzle.solve(10, bruteForceOnFail=True)
+
+                    for location in sudoku.filledLocations():
+                        if sudoku.isConstant(location):
+                            continue
+                        if sudoku.getValue(location) != solvedPuzzle.getValue(location):
+                            discrepancies = True
+                            break
+
+                if discrepancies:
+                    for location in sudoku.filledLocations():
+                        if sudoku.isConstant(location):
+                            continue
+                        sudoku.clearLocation(location)
+
+                sudoku.hasIntersections = False
+                sudoku.hasCandidates = False
+                sudoku.initialiseCandidates()
+
+                sudoku.displaySolvingCandidates = True
+
+            else:
+                if not sudoku.isComplete():
+                    sudoku.userCandidatesDict = {}
+                    sudoku.userCandidatesDict.update(sudoku.candidates)
+
+                sudoku.displaySolvingCandidates = False
+
+            for button in self.parent.parent.inputButtonGrid.children:
+                button.disabled = sudoku.solveMode
+
+            for cell in self.parent.parent.locationsGrid.children:
+                cell.update(sudoku)
+
+            return True
+
+
 class toggleAutoUpdateCandidates(Button):
 
     def __init__(self, sudoku, **kwargs):
@@ -272,6 +343,7 @@ class SudokuApp(App):
         sudoku.selected = None
         sudoku.changeValues = True
         sudoku.displaySolvingCandidates = False
+        sudoku.solveMode = False
         sudoku.autoUpdateUserCandidates = True
         sudoku.highlightOccourences = True
         if sudoku.autoUpdateUserCandidates:
