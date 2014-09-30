@@ -40,6 +40,7 @@ class screen(BoxLayout):
         self.autoUpdateButton = toggleAutoUpdateCandidates(sudoku)
         self.solveModeButton = toggleSolveMode(sudoku)
         self.solveOneStepButton = solveStep(sudoku, 1)
+        self.solveAllButton = solveAll(sudoku)
 
         self.buttonHolder = GridLayout(cols=4, size_hint_y=.1, height=20)
         self.buttonHolder.add_widget(self.valueOrCandidateButton)
@@ -49,6 +50,7 @@ class screen(BoxLayout):
 
         self.buttonHolder2 = GridLayout(cols=4, size_hint_y=.1, height=20)
         self.buttonHolder2.add_widget(self.solveOneStepButton)
+        self.buttonHolder2.add_widget(self.solveAllButton)
 
         self.add_widget(self.locationsGrid)
         self.add_widget(self.inputButtonGrid)
@@ -358,6 +360,22 @@ class solveStep(Button):
         if self.collide_point(*touch.pos):
             if sudoku.solveMode:
                 sudoku.solve(maxSuccessfulSolveOperations=self.step)
+                for cell in self.parent.parent.locationsGrid.children:
+                    cell.update(sudoku)
+            return True
+
+class solveAll(Button):
+
+    def __init__(self, sudoku, **kwargs):
+        super(solveAll, self).__init__(**kwargs)
+
+        self.text = "Solve all"
+
+    def on_touch_down(self, touch):
+
+        if self.collide_point(*touch.pos):
+            if sudoku.solveMode:
+                sudoku.solve(bruteForceOnFail=True)
                 for cell in self.parent.parent.locationsGrid.children:
                     cell.update(sudoku)
             return True
