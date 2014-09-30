@@ -225,7 +225,8 @@ class Sudoku():
 
         for location in xrange(1, self.gridSize ** 2 + 1):
 
-            if location in xrange(1, self.gridSize ** 2 + 1, self.gridSize + 1):
+            if (location in xrange(1, self.gridSize ** 2 + 1, self.gridSize + 1) or
+                    location in self.getSubGridStartLocations()):
                 for group in self.staticGroups.itervalues():
                     for unit in group:
                         if location not in unit:
@@ -251,9 +252,9 @@ class Sudoku():
             return True
         return False
 
-    def solve(self, maxLevel=None, steps=None):
+    def solve(self, maxLevel=None, maxSuccessfulSolveOperations=None, bruteForceOnFail=False):
 
-        if steps == 0:
+        if maxSuccessfulSolveOperations == 0:
             return
 
         if self.isComplete():
@@ -262,34 +263,33 @@ class Sudoku():
         if (maxLevel is None or
                 maxLevel > len(self.solvingMethods) or
                 maxLevel < 1):
-            maxLevel = len(self.solvingMethods)
+            # maxLevel is the lenght minus 1 as lists are zero indexed, so the
+            # first method has an index 0
+            maxLevel = len(self.solvingMethods) - 1
 
         #if solver is run for the first time, solve using first method
         if not self.history:
-            self.solvingMethods[0]()
-            self.history.append(0)
-            if steps and self.changes:
-                steps -= 1
-            return self.solve(maxLevel, steps)
-
+            self.changes = False
+            nextMethod = 0
         #if last attempt was successful, go back to first level
-        lastMethodSuccess = self.changes
-        if lastMethodSuccess:
-            self.solvingMethods[0]()
-            self.history.append(0)
-            if steps and self.changes:
-                steps -= 1
-            return self.solve(maxLevel, steps)
-
-        #or if unsuccessful, increase level or exit if highest level was tried
-        lastMethod = self.history[-1]
-        if lastMethod < maxLevel:
+        elif self.changes:
+            nextMethod = 0
+        #or if unsuccessful, increase level
+        else:
+            lastMethod = self.history[-1]
             nextMethod = lastMethod + 1
+
+        if nextMethod <= maxLevel:
             self.solvingMethods[nextMethod]()
             self.history.append(nextMethod)
-            if steps and self.changes:
-                steps -= 1
-            return self.solve(maxLevel, steps)
+            if maxSuccessfulSolveOperations and self.changes:
+                maxSuccessfulSolveOperations -= 1
+            return self.solve(maxLevel, maxSuccessfulSolveOperations)
+        else:
+            #no more methods
+            if bruteForceOnFail:
+                self.brute()
+            return
 
 
 
@@ -301,7 +301,7 @@ class Sudoku():
 
         if candidatesToRemove is not None:
             for location, candidates in candidatesToRemove.iteritems():
-                prospectivePuzzle.candidates[location] -= set([candidates])
+                prospectivePuzzle.removeSolvingCandidates(location, *candidates)
 
         if valuesToAdd is not None:
             for location, value in valuesToAdd.iteritems():
@@ -316,7 +316,7 @@ class Sudoku():
     def applyProspectiveChange(self, candidatesToRemove=None, valuesToAdd=None):
         if candidatesToRemove is not None:
             for location, candidates in candidatesToRemove.iteritems():
-                self.candidates[location] -= set([candidates])
+                self.removeSolvingCandidates(location, *candidates)
 
         if valuesToAdd is not None:
             for location, value in valuesToAdd.iteritems():
@@ -1358,6 +1358,50 @@ class Sudoku():
 
 
 
+    def brute(self):
+        self.initialiseIntersections()
+
+        from collections import defaultdict
+
+        previouslyTriedValues = defaultdict(set)
+
+        modifiedLocations = []
+
+        while True:
+
+            if self.isComplete() and self.isValid():
+                return
+
+            for location in self.emptyLocations():
+
+                if self.isConstant(location) or location in modifiedLocations:
+                    continue
+
+                neighbours = self.allCombinedNeighbours(location)
+
+                possibleValues = self.setOfPossibleValues - self.getValues(*neighbours)
+                possibleValues -= previouslyTriedValues[location]
+
+                if possibleValues:
+                    newValue = possibleValues.pop()
+                    self.setValue(location, newValue)
+                    previouslyTriedValues[location].add(newValue)
+                    modifiedLocations.append(location)
+                    break
+                else:
+                    if modifiedLocations:
+                        incorrectLocation = modifiedLocations[-1]
+                        self.clearLocation(incorrectLocation)
+
+                        modifiedLocations = modifiedLocations[:-1]
+                        # Atleast one of the previous locations are incorrect,
+                        # so we may need to choose a previously chosen value again
+                        del previouslyTriedValues[location]
+                        break
+                    else:
+                        # if there are no modified locations, there are no solutions.
+                        return
+
     def nakedSingle(self):
         self.initialiseIntersections()
 
@@ -1694,7 +1738,7 @@ class Sudoku():
                                       self.simpleColourCase4,
                                       self.simpleColourCase5)
 
-            for method in enumerate(simpleColouringMethods):
+            for method in simpleColouringMethods:
                 method(chain, colourOne, colourTwo, candidate)
 
         if self.changes:
@@ -1712,7 +1756,7 @@ class Sudoku():
             if not self.validConjugateChain((chain, candidate)):
                 break
 
-            candidatesToRemove = {location: candidate for location in testColour}
+            candidatesToRemove = {location: [candidate] for location in testColour}
 
             # We are looking for a contradiction, so if the prospective change
             # checks out we haven't learnt anything new.
@@ -1721,7 +1765,7 @@ class Sudoku():
 
             for correctColour in (colourOne, colourTwo):
                 if testColour != correctColour:
-                    candidatesToRemove = {location: candidate for location in correctColour}
+                    candidatesToRemove = {location: [candidate] for location in correctColour}
                     self.applyProspectiveChange(candidatesToRemove)
                     self.changes = True
                     self.addToLog(successString, candidate, [location for location in correctColour])

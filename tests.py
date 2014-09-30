@@ -89,15 +89,11 @@ def visualizer(puzzle, *groups):
 
     return wholeString
 
-easy = Sudoku("000004028406000005100030600000301000087000140000709000002010003900000507670400000")
-print easy.solve()
-print easy.log
+easy = Sudoku("009003201470002030800000074020000300000000710000794000000300000000925000000018500")
 print easy
-
-# string = "blah {0} blah {1} blah {2}"
-# blank.addToLog(string, [1,2,3], "string", set([4,5]))
-# blank.addToLog(string, [1,2,3], "string", set([4,5]))
-# print blank.log
+easy.brute()
+print easy
+print easy.isValid()
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
 # # for puzzleNo in xrange(5,11):
