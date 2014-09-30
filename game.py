@@ -109,9 +109,6 @@ class cell(GridLayout):
 
     def update(self, sudoku):
 
-        if self.location in sudoku.constants:
-            return
-
         self.clear_widgets()
 
         if self.location == sudoku.selected and sudoku.isEmpty(self.location):
@@ -120,6 +117,11 @@ class cell(GridLayout):
                 Line(rectangle=(self.pos[0], self.pos[1], self.size[0], self.size[1]))
         else:
             self.canvas.before.clear()
+
+        if sudoku.isConstant(self.location):
+            value = str(sudoku.getValue(self.location))
+            self.add_widget(Label(text=value, font_size=40, color=green))
+            return
 
         if sudoku.isModified(self.location):
             value = str(sudoku.getValue(self.location))
