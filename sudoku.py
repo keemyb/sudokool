@@ -1211,6 +1211,12 @@ class Sudoku():
 
         return False
 
+    def isFilled(self, location):
+        if self.values[location] in self.setOfPossibleValues:
+            return True
+
+        return False
+
     def isConstant(self, location):
         if location in self.constants:
             return True
