@@ -369,12 +369,9 @@ class Sudoku():
         if not self.hasIntersections:
             self.initialiseIntersections()
 
-        for location in xrange(1, self.gridSize ** 2 + 1):
+        for location in self.emptyLocations():
 
-            if not self.isEmpty(location):
-                continue
-
-            neighbours = [neighbour for neighbour in self.allCombinedNeighbours(location) if not self.isEmpty(neighbour)]
+            neighbours = self.allCombinedNeighbours(location)
 
             surroundingValues = self.getValues(*neighbours)
 
