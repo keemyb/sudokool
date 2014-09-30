@@ -1223,6 +1223,12 @@ class Sudoku():
 
         return False
 
+    def isModified(self, location):
+        if self.isConstant(location) or self.isEmpty(location):
+            return False
+
+        return True
+
     def isValidInput(self, value):
         if value in self.setOfPossibleValues:
             return True
