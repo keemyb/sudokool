@@ -1229,6 +1229,17 @@ class Sudoku():
 
         return True
 
+    def isClashing(self, location):
+        locationValue = self.getValue(location)
+
+        neighbours = self.allCombinedNeighbours(location)
+            for neighbour in neighbours:
+                neighbourValue = self.getValue(neighbour)
+                if neighbourValue == locationValue:
+                    return True
+
+        return False
+
     def isValidInput(self, value):
         if value in self.setOfPossibleValues:
             return True
