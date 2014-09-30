@@ -1739,7 +1739,7 @@ class Sudoku():
                                       self.simpleColourCase4,
                                       self.simpleColourCase5)
 
-            for method in enumerate(simpleColouringMethods):
+            for method in simpleColouringMethods:
                 method(chain, colourOne, colourTwo, candidate)
 
         if self.changes:
