@@ -236,7 +236,7 @@ class Sudoku():
                             return False
 
             if self.isEmpty(location):
-                if len(self.solvingCandidates(location)) == 0:
+                if len(self.allSolvingCandidates(location)) == 0:
                     return False
 
             if not self.isEmpty(location):
@@ -369,12 +369,9 @@ class Sudoku():
         if not self.hasIntersections:
             self.initialiseIntersections()
 
-        for location in xrange(1, self.gridSize ** 2 + 1):
+        for location in self.emptyLocations():
 
-            if not self.isEmpty(location):
-                continue
-
-            neighbours = [neighbour for neighbour in self.allCombinedNeighbours(location) if not self.isEmpty(neighbour)]
+            neighbours = self.allCombinedNeighbours(location)
 
             surroundingValues = self.getValues(*neighbours)
 
@@ -747,7 +744,7 @@ class Sudoku():
 
         for location in self.emptyLocations():
 
-            locationCandidates = self.solvingCandidates(location)
+            locationCandidates = self.allSolvingCandidates(location)
 
             for candidate in locationCandidates:
 
@@ -757,7 +754,7 @@ class Sudoku():
                     prospectiveLocation = None
 
                     for neighbour in method(location):
-                        neighbourCandidates = self.solvingCandidates(neighbour)
+                        neighbourCandidates = self.allSolvingCandidates(neighbour)
 
                         if candidate in neighbourCandidates:
                             candidateCount += 1
@@ -888,7 +885,7 @@ class Sudoku():
                          (set(secondPair) - pivot).pop()]
                 yWingLocations.insert(0, pivot.pop())
 
-                yWingCandidate = self.commonCandidates(*yWingLocations[1:])
+                yWingCandidate = self.commonSolvingCandidates(*yWingLocations[1:])
 
                 if not yWingCandidate:
                     continue
@@ -908,12 +905,12 @@ class Sudoku():
         if not alignment:
             return False
 
-        commonCandidates = self.commonCandidates(*pair)
+        commonCandidates = self.commonSolvingCandidates(*pair)
         if not commonCandidates:
             return False
 
-        firstLocationCandidates = self.solvingCandidates(pair[0])
-        secondLocationCandidates = self.solvingCandidates(pair[1])
+        firstLocationCandidates = self.allSolvingCandidates(pair[0])
+        secondLocationCandidates = self.allSolvingCandidates(pair[1])
 
         if firstLocationCandidates == secondLocationCandidates:
             return False
@@ -958,7 +955,7 @@ class Sudoku():
                 if secondArmCandidates == firstArmCandidates:
                     continue
 
-                xyzWingCandidate = self.commonCandidates(firstArm, secondArm)
+                xyzWingCandidate = self.commonSolvingCandidates(firstArm, secondArm)
 
                 arms = firstArm, secondArm
 
@@ -979,7 +976,7 @@ class Sudoku():
         pivot, nonPivot = None, None
 
         for location in pair:
-            candidates = self.solvingCandidates(location)
+            candidates = self.allSolvingCandidates(location)
             if len(candidates) == 3:
                 pivot = location
                 pivotCandidates = candidates
@@ -1003,11 +1000,11 @@ class Sudoku():
             if not alignment:
                 continue
 
-            locationOneCandidates = self.solvingCandidates(pair[0])
+            locationOneCandidates = self.allSolvingCandidates(pair[0])
             if len(locationOneCandidates) != 2:
                 continue
 
-            locationTwoCandidates = self.solvingCandidates(pair[1])
+            locationTwoCandidates = self.allSolvingCandidates(pair[1])
             if locationTwoCandidates != locationOneCandidates:
                 continue
 
@@ -1133,7 +1130,7 @@ class Sudoku():
         for location in chain:
             if not self.isEmpty(location):
                 return False
-            if len(self.solvingCandidates(location)) <= 1:
+            if len(self.allSolvingCandidates(location)) <= 1:
                 return False
             if candidate not in self.candidates[location]:
                 return False
@@ -1148,7 +1145,7 @@ class Sudoku():
             for location in yWingLocations:
                 if not self.isEmpty(location):
                     continue
-                if len(self.solvingCandidates(location)) != 2:
+                if len(self.allSolvingCandidates(location)) != 2:
                     continue
                 if yWingGroup in self.intersectionTypes["yWing"]:
                     self.intersectionTypes["yWing"].remove(yWingGroup)
@@ -1163,7 +1160,7 @@ class Sudoku():
             for location in xyzWingLocations:
                 if not self.isEmpty(location):
                     continue
-                numberOfCandidates = len(self.solvingCandidates(location))
+                numberOfCandidates = len(self.allSolvingCandidates(location))
                 if numberOfCandidates not in (2,3):
                     continue
                 if xyzWingGroup in self.intersectionTypes["xyzWing"]:
@@ -1201,7 +1198,7 @@ class Sudoku():
         for location in chain:
             if not self.isEmpty(location):
                 return False
-            if candidates != self.solvingCandidates(location):
+            if candidates != self.allSolvingCandidates(location):
                 return False
         return True
 
@@ -1214,11 +1211,23 @@ class Sudoku():
 
         return False
 
+    def isFilled(self, location):
+        if self.values[location] in self.setOfPossibleValues:
+            return True
+
+        return False
+
     def isConstant(self, location):
         if location in self.constants:
             return True
 
         return False
+
+    def isModified(self, location):
+        if self.isConstant(location) or self.isEmpty(location):
+            return False
+
+        return True
 
     def isValidInput(self, value):
         if value in self.setOfPossibleValues:
@@ -1233,13 +1242,13 @@ class Sudoku():
         return range(1, self.gridSize ** 2 + 1)
 
     def emptyLocations(self):
-        if not self.hasCandidates:
-            self.initialiseCandidates()
-
-        return self.candidates.keys()
+        return [location for location in self.locations() if self.isEmpty(location)]
 
     def filledLocations(self):
-        return [location for location in self.locations() if not self.isEmpty(location)]
+        return [location for location in self.locations() if self.isFilled(location)]
+
+    def modifiedLocations(self):
+        return [location for location in self.locations() if self.isModified(location)]
 
     def nLocations(self, unit, n):
         from itertools import combinations
@@ -1270,10 +1279,10 @@ class Sudoku():
 
         self.values[location] = 0
 
-    def solvingCandidates(self, *locations):
+    def allSolvingCandidates(self, *locations):
         return set([]).union(*[self.candidates[location] for location in locations])
 
-    def commonCandidates(self, *locations):
+    def commonSolvingCandidates(self, *locations):
         return set.intersection(*[self.candidates[location] for location in locations])
 
     def userCandidates(self, location):
@@ -1294,7 +1303,7 @@ class Sudoku():
             if not self.isValidInput(candidate):
                 raise Exception("candidate is not vaild")
 
-            if candidate in self.solvingCandidates(location):
+            if candidate in self.allSolvingCandidates(location):
                 self.candidates[location].remove(candidate)
                 removedCandidates.append(candidate)
 
@@ -1441,7 +1450,7 @@ class Sudoku():
 
                 for combination in self.nLocations(group, n):
 
-                    nakedNcandidates = self.solvingCandidates(*combination)
+                    nakedNcandidates = self.allSolvingCandidates(*combination)
 
                     if len(nakedNcandidates) != n:
                         continue
@@ -1494,8 +1503,8 @@ class Sudoku():
 
                     surroundingLocations = [location for location in group if location not in combination]
 
-                    combinationCandidates = self.solvingCandidates(*combination)
-                    surroundingCandidates = self.solvingCandidates(*surroundingLocations)
+                    combinationCandidates = self.allSolvingCandidates(*combination)
+                    surroundingCandidates = self.allSolvingCandidates(*surroundingLocations)
                     uniqueCombinationCandidates = combinationCandidates - surroundingCandidates
 
                     if len(uniqueCombinationCandidates) != n:
@@ -1512,7 +1521,7 @@ class Sudoku():
                             self.setValue(location, uniqueCombinationCandidates.pop())
 
                         if n > 1:
-                            self.addToLog(successString, removedCandidates, location, self.solvingCandidates(location), intersectionType)
+                            self.addToLog(successString, removedCandidates, location, self.allSolvingCandidates(location), intersectionType)
                         else:
                             self.addToLog(successString, location, self.getValue(location))
 
@@ -1548,9 +1557,9 @@ class Sudoku():
             combination, pointerType = pointerGroup[0], pointerGroup[1]
 
             subGridNeighbours = self.subGridNeighbours(combination[0], *combination)
-            subGridNeighbourCandidates = self.solvingCandidates(*subGridNeighbours)
+            subGridNeighbourCandidates = self.allSolvingCandidates(*subGridNeighbours)
 
-            commonPointerCandidates = self.commonCandidates(*combination)
+            commonPointerCandidates = self.commonSolvingCandidates(*combination)
             uniquePointerCandidates = set([candidate for candidate in commonPointerCandidates if candidate not in subGridNeighbourCandidates])
 
             if not uniquePointerCandidates:
@@ -1592,9 +1601,9 @@ class Sudoku():
             combination, pointerType = pointerGroup[0], pointerGroup[1]
 
             linearNeighbours = self.neighbourMethods[pointerType](combination[0], *combination)
-            linearNeighbourCandidates = self.solvingCandidates(*linearNeighbours)
+            linearNeighbourCandidates = self.allSolvingCandidates(*linearNeighbours)
 
-            commonPointerCandidates = self.commonCandidates(*combination)
+            commonPointerCandidates = self.commonSolvingCandidates(*combination)
             uniquePointerCandidates = set([candidate for candidate in commonPointerCandidates if candidate not in linearNeighbourCandidates])
 
             if not uniquePointerCandidates:
@@ -1637,15 +1646,15 @@ class Sudoku():
 
         for group in self.intersectionTypes["xWing"]:
 
-            commonXWingCandidates = self.commonCandidates(*group)
+            commonXWingCandidates = self.commonSolvingCandidates(*group)
 
             if len(commonXWingCandidates) == 0:
                 continue
 
-            rowCandidates = (self.solvingCandidates(*self.rowNeighbours(group[0], *group)) |
-                             self.solvingCandidates(*self.rowNeighbours(group[2], *group)))
-            columnCandidates = (self.solvingCandidates(*self.columnNeighbours(group[0], *group)) |
-                                self.solvingCandidates(*self.columnNeighbours(group[1], *group)))
+            rowCandidates = (self.allSolvingCandidates(*self.rowNeighbours(group[0], *group)) |
+                             self.allSolvingCandidates(*self.rowNeighbours(group[2], *group)))
+            columnCandidates = (self.allSolvingCandidates(*self.columnNeighbours(group[0], *group)) |
+                                self.allSolvingCandidates(*self.columnNeighbours(group[1], *group)))
 
             for candidate in commonXWingCandidates:
                 if (candidate not in rowCandidates or candidate not in columnCandidates):
@@ -1683,18 +1692,18 @@ class Sudoku():
 
         for group in self.intersectionTypes["swordfish"]:
 
-            commonCandidates = self.commonCandidates(*group)
+            commonCandidates = self.commonSolvingCandidates(*group)
 
             if len(commonCandidates) == 0:
                 continue
 
             rowCandidates = defaultdict(set)
             for neighbour in self.swordfishRowNeighbours(group):
-                rowCandidates[self.getRow(neighbour)].union(self.solvingCandidates(neighbour))
+                rowCandidates[self.getRow(neighbour)].union(self.allSolvingCandidates(neighbour))
 
             columnCandidates = defaultdict(set)
             for neighbour in self.swordfishColumnNeighbours(group):
-                columnCandidates[self.getColumn(neighbour)].union(self.solvingCandidates(neighbour))
+                columnCandidates[self.getColumn(neighbour)].union(self.allSolvingCandidates(neighbour))
 
             for candidate in commonCandidates:
                 inAllRows = all(candidate in candidates for candidates in rowCandidates.itervalues())
@@ -1829,7 +1838,7 @@ class Sudoku():
             if location in chain:
                 continue
 
-            if candidate not in self.solvingCandidates(location):
+            if candidate not in self.allSolvingCandidates(location):
                 continue
 
             for pair in self.nLocations(chain, 2):
