@@ -301,7 +301,7 @@ class toggleSolveMode(Button):
             else:
                 if not sudoku.isComplete():
                     sudoku.userCandidatesDict = {}
-                    sudoku.userCandidatesDict.update(sudoku.candidates)
+                    sudoku.userCandidatesDict.update(sudoku.solvingCandidatesDict)
 
                 sudoku.displaySolvingCandidates = False
 
