@@ -33,8 +33,8 @@ class Sudoku():
         self.generatePossibleValues()
         self.processData(data)
 
-        self.solvingCandidatesDict = {}
-        self.userCandidatesDict = {}
+        self.solvingCandidatesDict = {location : set([]) for location in self.locations()}
+        self.userCandidatesDict = {location : set([]) for location in self.locations()}
         self.log = []
         self.history = []
 
