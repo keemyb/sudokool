@@ -227,13 +227,8 @@ class Sudoku():
 
             if (location in xrange(1, self.gridSize ** 2 + 1, self.gridSize + 1) or
                     location in self.getSubGridStartLocations()):
-                for group in self.staticGroups.itervalues():
-                    for unit in group:
-                        if location not in unit:
-                            continue
-                        values = [self.getValue(location) for location in unit if not self.isEmpty(location)]
-                        if sorted(list(set(values))) != sorted(values):
-                            return False
+                if self.isClashing(location):
+                    return False
 
             if self.isEmpty(location):
                 if len(self.allSolvingCandidates(location)) == 0:
