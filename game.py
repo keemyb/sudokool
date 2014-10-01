@@ -167,10 +167,7 @@ class allLocationsGrid(GridLayout):
                 cell.update(sudoku)
 
             for button in self.parent.inputButtonGrid.children:
-                if sudoku.isConstant(sudoku.selected):
-                    button.disabled = True
-                else:
-                    button.disabled = False
+                button.disabled = sudoku.isConstant(sudoku.selected)
 
             return True
 
