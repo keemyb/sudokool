@@ -1299,6 +1299,7 @@ class Sudoku():
             raise Exception("value is not vaild")
 
         self.values[location] = value
+        self.changes = True
 
         if location in self.userCandidatesDict:
             del self.userCandidatesDict[location]
@@ -1314,6 +1315,7 @@ class Sudoku():
             raise Exception("location is a constant and cannot be changed")
 
         self.values[location] = 0
+        self.changes = True
 
     def allSolvingCandidates(self, *locations):
         return set([]).union(*[self.solvingCandidatesDict[location] for location in locations])
