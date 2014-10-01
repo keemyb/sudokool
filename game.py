@@ -286,10 +286,9 @@ class toggleSolveMode(Button):
                     modifiedLocations = True
 
                 if modifiedLocations:
-                    solvedPuzzle = deepcopy(sudoku)
-                    for location in solvedPuzzle.modifiedLocations():
-                        solvedPuzzle.clearLocation(location)
-                    solvedPuzzle.brute()  #solve(10, bruteForceOnFail=True)
+                    valuesString = "".join([str(sudoku.getValue(location)) if sudoku.isConstant(location) else "0" for location in sudoku.locations()])
+                    solvedPuzzle = Sudoku(valuesString)
+                    solvedPuzzle.solve(10, bruteForceOnFail=True)
 
                     for location in sudoku.modifiedLocations():
                         if sudoku.getValue(location) != solvedPuzzle.getValue(location):
