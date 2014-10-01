@@ -296,7 +296,7 @@ class Sudoku():
 
 
 
-    def prospectiveChange(self, candidatesToRemove=None, valuesToAdd=None):
+    def testProspectiveChangeange(self, candidatesToRemove=None, valuesToAdd=None, solveDepth=None):
         from copy import deepcopy
 
         prospectivePuzzle = deepcopy(self)
@@ -311,7 +311,8 @@ class Sudoku():
                 prospectivePuzzle.values[location] = value
 
         prospectivePuzzle.updatePuzzle()
-        prospectivePuzzle.solve(4)
+        if solveDepth:
+            prospectivePuzzle.solve(solveDepth)
 
         return prospectivePuzzle.isValid()
 
@@ -1813,7 +1814,7 @@ class Sudoku():
 
             # We are looking for a contradiction, so if the prospective change
             # checks out we haven't learnt anything new.
-            if self.prospectiveChange(candidatesToRemove):
+            if self.testProspectiveChange(candidatesToRemove):
                 continue
 
             for correctColour in (colourOne, colourTwo):
