@@ -6,6 +6,7 @@ from sudoku import Sudoku
 
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.listview import ListView
 
 from kivy.uix.label import Label
 from kivy.uix.button import Button
@@ -40,6 +41,7 @@ class screen(BoxLayout):
         self.solveModeButton = toggleSolveMode(sudoku)
         self.solveOneStepButton = solveStep(sudoku, 1)
         self.solveAllButton = solveAll(sudoku)
+        self.logOutView = logOutput(sudoku)
 
         self.buttonHolder = GridLayout(cols=3, size_hint_y=.1, height=20)
         self.buttonHolder.add_widget(self.valueOrCandidateButton)
@@ -54,6 +56,7 @@ class screen(BoxLayout):
         self.add_widget(self.inputButtonGrid)
         self.add_widget(self.buttonHolder)
         self.add_widget(self.buttonHolder2)
+        self.add_widget(self.logOutView)
 
 
 class cell(GridLayout):
@@ -354,7 +357,9 @@ class solveStep(Button):
 
         if self.collide_point(*touch.pos):
             if sudoku.solveMode:
+                self.parent.parent.logOutView.logStart = len(sudoku.log)
                 sudoku.solve(maxSuccessfulSolveOperations=self.step)
+                self.parent.parent.logOutView.update(sudoku)
                 for cell in self.parent.parent.locationsGrid.children:
                     cell.update(sudoku)
             return True
@@ -370,10 +375,22 @@ class solveAll(Button):
 
         if self.collide_point(*touch.pos):
             if sudoku.solveMode:
+                self.parent.parent.logOutView.logStart = len(sudoku.log)
                 sudoku.solve(bruteForceOnFail=True)
+                self.parent.parent.logOutView.update(sudoku)
                 for cell in self.parent.parent.locationsGrid.children:
                     cell.update(sudoku)
             return True
+
+class logOutput(ListView):
+    def __init__(self, sudoku, **kwargs):
+        super(logOutput, self).__init__(**kwargs)
+
+        self.logStart = len(sudoku.log)
+
+    def update(self, sudoku):
+
+        self.item_strings = sudoku.log[self.logStart:]
 
 
 class SudokuApp(App):
