@@ -207,7 +207,7 @@ class Sudoku():
             self.setOfPossibleValues.update(alphabeticalValues)
 
     def processData(self, data):
-        self.values = {location + 1 : data[location] for location in self.locations()}
+        self.values = {location: data[location - 1] for location in self.locations()}
         for location, value in self.values.iteritems():
             try:
                 # As we take in numbers via a string, we must try and turn them
@@ -221,7 +221,7 @@ class Sudoku():
                 if value not in self.setOfPossibleValues:
                     self.values[location] = 0
 
-        self.constants = [location for location in self.locations if self.isFilled(location)]
+        self.constants = [location for location in self.locations() if self.isFilled(location)]
 
 
 
