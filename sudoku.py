@@ -1234,6 +1234,8 @@ class Sudoku():
 
         neighbours = self.allCombinedNeighbours(location)
         for neighbour in neighbours:
+            if self.isEmpty(neighbour):
+                continue
             neighbourValue = self.getValue(neighbour)
             if neighbourValue == locationValue:
                 return True
@@ -1246,6 +1248,8 @@ class Sudoku():
 
         neighbours = self.allCombinedNeighbours(location)
         for neighbour in neighbours:
+            if self.isEmpty(neighbour):
+                continue
             neighbourValue = self.getValue(neighbour)
             if neighbourValue == locationValue:
                 clashes.append(neighbour)
@@ -1281,6 +1285,8 @@ class Sudoku():
 
             neighbours = self.allCombinedNeighbours(location)
             for neighbour in neighbours:
+                if self.isEmpty(neighbour):
+                    continue
                 neighbourValue = self.getValue(neighbour)
                 if locationValue == neighbourValue:
                     clashingLocations.add(location)
