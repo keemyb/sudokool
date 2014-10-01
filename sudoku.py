@@ -1346,9 +1346,6 @@ class Sudoku():
         if self.isConstant(location):
             raise Exception("location is a constant and cannot be changed")
 
-        if not self.hasSolvingCandidates(location):
-            return removedCandidates
-
         for candidate in candidates:
 
             if not self.isValidInput(candidate):
@@ -1372,10 +1369,6 @@ class Sudoku():
 
         if not self.isEmpty(location):
             self.clearLocation(location)
-
-        if not self.hasUserCandidates(location):
-            self.userCandidatesDict[location] = set([candidate])
-            return
 
         if candidate in self.userCandidatesDict[location]:
             self.userCandidatesDict[location].remove(candidate)
