@@ -221,11 +221,13 @@ class Sudoku():
 
 
     def isValid(self):
-        self.initialiseIntersections()
+        self.initialiseCandidates()
 
-        for location in xrange(1, self.gridSize ** 2 + 1):
+        for location in self.locations():
 
-            if (location in xrange(1, self.gridSize ** 2 + 1, self.gridSize + 1) or
+            # checking clashes only in diagonal locations and subgrid starts
+            # to get every locations
+            if (location % (self.unitSize() + 1) == 1 or
                     location in self.getSubGridStartLocations()):
                 if self.isClashing(location):
                     return False
@@ -233,9 +235,8 @@ class Sudoku():
             if self.isEmpty(location):
                 if len(self.allSolvingCandidates(location)) == 0:
                     return False
-
-            if not self.isEmpty(location):
-                if self.values[location] not in self.setOfPossibleValues:
+            else:
+                if self.getValue(location) not in self.setOfPossibleValues:
                     return False
 
         return True
