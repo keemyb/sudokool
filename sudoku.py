@@ -296,7 +296,7 @@ class Sudoku():
 
 
 
-    def testProspectiveChangeange(self, candidatesToRemove=None, valuesToAdd=None, solveDepth=None):
+    def testProspectiveChange(self, candidatesToRemove=None, valuesToAdd=None, solveDepth=None):
         from copy import deepcopy
 
         prospectivePuzzle = deepcopy(self)
