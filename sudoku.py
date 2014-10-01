@@ -1276,7 +1276,7 @@ class Sudoku():
     def clashingLocations(self):
         clashingLocations = set([])
 
-        for location in self.locations:
+        for location in self.locations():
             locationValue = self.getValue(location)
 
             neighbours = self.allCombinedNeighbours(location)
