@@ -289,7 +289,7 @@ class toggleSolveMode(Button):
                     solvedPuzzle = deepcopy(sudoku)
                     for location in solvedPuzzle.modifiedLocations():
                         solvedPuzzle.clearLocation(location)
-                    solvedPuzzle.solve(10, bruteForceOnFail=True)
+                    solvedPuzzle.brute()  #solve(10, bruteForceOnFail=True)
 
                     for location in sudoku.modifiedLocations():
                         if sudoku.getValue(location) != solvedPuzzle.getValue(location):
