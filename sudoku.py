@@ -1461,15 +1461,14 @@ class Sudoku():
 
         successString = "Naked Single: {0} was set to {1}"
 
-        for location, candidates in self.solvingCandidatesDict.items():
+        for location in self.emptyLocations():
+            candidates = self.allSolvingCandidates(location)
             if len(candidates) == 1:
-                candidate = candidates.pop()
+                nakedSingle = candidates.pop()
 
-                self.values[location] = candidate
-                del self.solvingCandidatesDict[location]
-                self.changes = True
+                self.setValue(location, nakedSingle)
 
-                self.addToLog(successString, location, candidate)
+                self.addToLog(successString, location, nakedSingle)
 
         if self.changes:
             self.updatePuzzle()
