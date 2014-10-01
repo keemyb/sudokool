@@ -107,6 +107,13 @@ class cell(GridLayout):
 
         self.clear_widgets()
 
+        if sudoku.isClashing(self.location):
+            with self.canvas:
+                Color(*red)
+                Rectangle(size=self.size, pos=self.pos)
+        else:
+            self.canvas.clear()
+
         if self.location == sudoku.selected and sudoku.isEmpty(self.location):
             with self.canvas.before:
                 Color(*brown)
