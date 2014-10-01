@@ -82,18 +82,16 @@ class cell(GridLayout):
         self.cols = sudoku.subGridsInRow()
 
         if sudoku.displaySolvingCandidates:
-            if sudoku.hasSolvingCandidates(location):
-                for candidate in sorted(sudoku.allSolvingCandidates(location)):
-                    candidateValue = str(candidate)
-                    candidateLabel = Label(text=candidateValue, color=red)
-                    self.add_widget(candidateLabel)
+            for candidate in sorted(sudoku.allSolvingCandidates(location)):
+                candidateValue = str(candidate)
+                candidateLabel = Label(text=candidateValue, color=red)
+                self.add_widget(candidateLabel)
 
         else:
-            if sudoku.hasUserCandidates(location):
-                for candidate in sorted(sudoku.userCandidates(location)):
-                    candidateValue = str(candidate)
-                    candidateLabel = Label(text=candidateValue, color=red)
-                    self.add_widget(candidateLabel)
+            for candidate in sorted(sudoku.userCandidates(location)):
+                candidateValue = str(candidate)
+                candidateLabel = Label(text=candidateValue, color=red)
+                self.add_widget(candidateLabel)
 
     def initUser(self, sudoku, location):
 
@@ -129,18 +127,16 @@ class cell(GridLayout):
             return
 
         if sudoku.displaySolvingCandidates:
-            if sudoku.hasSolvingCandidates(self.location):
-                for candidate in sorted(sudoku.allSolvingCandidates(self.location)):
-                    candidateValue = str(candidate)
-                    candidateLabel = Label(text=candidateValue, color=red)
-                    self.add_widget(candidateLabel)
+            for candidate in sorted(sudoku.allSolvingCandidates(self.location)):
+                candidateValue = str(candidate)
+                candidateLabel = Label(text=candidateValue, color=red)
+                self.add_widget(candidateLabel)
 
         else:
-            if sudoku.hasUserCandidates(self.location):
-                for candidate in sorted(sudoku.userCandidates(self.location)):
-                    candidateValue = str(candidate)
-                    candidateLabel = Label(text=candidateValue, color=red)
-                    self.add_widget(candidateLabel)
+            for candidate in sorted(sudoku.userCandidates(self.location)):
+                candidateValue = str(candidate)
+                candidateLabel = Label(text=candidateValue, color=red)
+                self.add_widget(candidateLabel)
 
             if sudoku.highlightOccourences:
                 if not sudoku.selected:
