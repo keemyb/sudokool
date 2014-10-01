@@ -1375,24 +1375,6 @@ class Sudoku():
         else:
             self.userCandidatesDict[location].add(candidate)
 
-    def hasSolvingCandidates(self, location):
-        if location not in self.solvingCandidatesDict:
-            return False
-
-        if not self.solvingCandidatesDict[location]:
-            return False
-
-        return True
-
-    def hasUserCandidates(self, location):
-        if location not in self.userCandidatesDict:
-            return False
-
-        if not self.userCandidatesDict[location]:
-            return False
-
-        return True
-
     def unitSize(self):
         return self.gridSize
 
