@@ -189,6 +189,9 @@ class inputButton(Button):
     def on_touch_down(self, touch):
 
         if self.collide_point(*touch.pos):
+            if sudoku.selected is None:
+                return True
+
             if not sudoku.isConstant(sudoku.selected):
 
                 if sudoku.changeValues:
