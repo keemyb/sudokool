@@ -375,6 +375,15 @@ class Sudoku():
 
         self.hasCandidates = True
 
+    def updateSolvingCandidates(self):
+
+        for location in self.candidates.iterkeys():
+
+            neighbours = self.allCombinedNeighbours(location)
+
+            surroundingValues = self.getValues(*neighbours)
+
+            self.candidates[location] -= surroundingValues
 
     def initialiseUserCandidates(self):
 
@@ -1022,7 +1031,7 @@ class Sudoku():
 
     def updatePuzzle(self):
 
-        self.updateBaseGroupCandidates()
+        self.updateSolvingCandidates()
         self.updatePointerGroups()
         self.updateXWingGroups()
         self.updateSwordfishGroups()
@@ -1032,19 +1041,6 @@ class Sudoku():
         self.updateXYZWingGroups()
         self.updateLockedPairs()
         self.updateLockedChains()
-
-    def updateBaseGroupCandidates(self):
-        for intersectionType in self.units:
-
-            for group in self.intersectionTypes[intersectionType]:
-
-                surroundingValues = self.getValues(*group)
-
-                for location in group[:]:
-                    if self.isEmpty(location):
-                        self.candidates[location] -= surroundingValues
-                    else:
-                        group.remove(location)
 
     def updatePointerGroups(self):
         # As pointer groups uses a tuple containing the pointer name and
