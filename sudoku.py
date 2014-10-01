@@ -1307,9 +1307,7 @@ class Sudoku():
 
         self.values[location] = value
         self.changes = True
-
-        if location in self.userCandidatesDict:
-            del self.userCandidatesDict[location]
+        self.solvingCandidatesDict[location].clear()
 
     def getValue(self, location):
         return self.values[location]
