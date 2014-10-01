@@ -207,15 +207,21 @@ class Sudoku():
             self.setOfPossibleValues.update(alphabeticalValues)
 
     def processData(self, data):
-        self.values = {position + 1 : data[position] for position in xrange(self.gridSize ** 2)}
+        self.values = {location + 1 : data[location] for location in self.locations()}
         for location, value in self.values.iteritems():
             try:
+                # As we take in numbers via a string, we must try and turn them
+                # back into integers again. If this can't be done it may be
+                # because either the value is not a possible values, or for
+                # sudokus larger than 9x9, that letters have to be used as values
                 self.values[location] = int(value)
             except ValueError:
+                # if the value is unacceptable, treat it as empty. This allows
+                # the user to use any delimiter that is not a value for simplicity.
                 if value not in self.setOfPossibleValues:
                     self.values[location] = 0
 
-        self.constants = [location for location in self.values if not self.isEmpty(location)]
+        self.constants = [location for location in self.locations if self.isFilled(location)]
 
 
 
