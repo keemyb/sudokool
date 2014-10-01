@@ -36,15 +36,13 @@ class screen(BoxLayout):
         self.locationsGrid = allLocationsGrid(sudoku)
         self.inputButtonGrid = inputButtonGrid(sudoku)
         self.valueOrCandidateButton = toggleValueOrCandidateEdit(sudoku)
-        self.userOrSolvingButton = toggleUserOrSolvingCandidates(sudoku)
         self.autoUpdateButton = toggleAutoUpdateCandidates(sudoku)
         self.solveModeButton = toggleSolveMode(sudoku)
         self.solveOneStepButton = solveStep(sudoku, 1)
         self.solveAllButton = solveAll(sudoku)
 
-        self.buttonHolder = GridLayout(cols=4, size_hint_y=.1, height=20)
+        self.buttonHolder = GridLayout(cols=3, size_hint_y=.1, height=20)
         self.buttonHolder.add_widget(self.valueOrCandidateButton)
-        self.buttonHolder.add_widget(self.userOrSolvingButton)
         self.buttonHolder.add_widget(self.autoUpdateButton)
         self.buttonHolder.add_widget(self.solveModeButton)
 
