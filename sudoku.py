@@ -1038,6 +1038,7 @@ class Sudoku():
 
     def updatePuzzle(self):
 
+        self.updateUnits()
         self.updateSolvingCandidates()
         self.updatePointerGroups()
         self.updateXWingGroups()
@@ -1048,6 +1049,13 @@ class Sudoku():
         self.updateXYZWingGroups()
         self.updateLockedPairs()
         self.updateLockedChains()
+
+    def updateUnits(self):
+        for intersectionType in self.units:
+            for group in self.intersectionTypes[intersectionType]:
+                for location in group[:]:
+                    if self.isFilled(location):
+                        group.remove(location)
 
     def updatePointerGroups(self):
         # As pointer groups uses a tuple containing the pointer name and
