@@ -33,8 +33,8 @@ class Sudoku():
         self.generatePossibleValues()
         self.processData(data)
 
-        self.candidates = {}
-        self.userCandidatesDict = {}
+        self.solvingCandidatesDict = {location : set([]) for location in self.locations()}
+        self.userCandidatesDict = {location : set([]) for location in self.locations()}
         self.log = []
         self.history = []
 
@@ -207,40 +207,42 @@ class Sudoku():
             self.setOfPossibleValues.update(alphabeticalValues)
 
     def processData(self, data):
-        self.values = {position + 1 : data[position] for position in xrange(self.gridSize ** 2)}
+        self.values = {location: data[location - 1] for location in self.locations()}
         for location, value in self.values.iteritems():
             try:
+                # As we take in numbers via a string, we must try and turn them
+                # back into integers again. If this can't be done it may be
+                # because either the value is not a possible values, or for
+                # sudokus larger than 9x9, that letters have to be used as values
                 self.values[location] = int(value)
             except ValueError:
+                # if the value is unacceptable, treat it as empty. This allows
+                # the user to use any delimiter that is not a value for simplicity.
                 if value not in self.setOfPossibleValues:
                     self.values[location] = 0
 
-        self.constants = [location for location in self.values if not self.isEmpty(location)]
+        self.constants = [location for location in self.locations() if self.isFilled(location)]
 
 
 
 
     def isValid(self):
-        self.initialiseIntersections()
+        self.initialiseCandidates()
 
-        for location in xrange(1, self.gridSize ** 2 + 1):
+        for location in self.locations():
 
-            if (location in xrange(1, self.gridSize ** 2 + 1, self.gridSize + 1) or
+            # checking clashes only in diagonal locations and subgrid starts
+            # to get every locations
+            if (location % (self.unitSize() + 1) == 1 or
                     location in self.getSubGridStartLocations()):
-                for group in self.staticGroups.itervalues():
-                    for unit in group:
-                        if location not in unit:
-                            continue
-                        values = [self.getValue(location) for location in unit if not self.isEmpty(location)]
-                        if sorted(list(set(values))) != sorted(values):
-                            return False
+                if self.isClashing(location):
+                    return False
 
             if self.isEmpty(location):
                 if len(self.allSolvingCandidates(location)) == 0:
                     return False
-
-            if not self.isEmpty(location):
-                if self.values[location] not in self.setOfPossibleValues:
+            else:
+                if self.getValue(location) not in self.setOfPossibleValues:
                     return False
 
         return True
@@ -294,7 +296,7 @@ class Sudoku():
 
 
 
-    def prospectiveChange(self, candidatesToRemove=None, valuesToAdd=None):
+    def testProspectiveChange(self, candidatesToRemove=None, valuesToAdd=None, solveDepth=None):
         from copy import deepcopy
 
         prospectivePuzzle = deepcopy(self)
@@ -309,7 +311,8 @@ class Sudoku():
                 prospectivePuzzle.values[location] = value
 
         prospectivePuzzle.updatePuzzle()
-        prospectivePuzzle.solve(4)
+        if solveDepth:
+            prospectivePuzzle.solve(solveDepth)
 
         return prospectivePuzzle.isValid()
 
@@ -320,7 +323,7 @@ class Sudoku():
 
         if valuesToAdd is not None:
             for location, value in valuesToAdd.iteritems():
-                del self.candidates[location]
+                del self.solvingCandidatesDict[location]
                 self.values[location] = value
 
         self.updatePuzzle()
@@ -375,10 +378,19 @@ class Sudoku():
 
             surroundingValues = self.getValues(*neighbours)
 
-            self.candidates[location] = self.setOfPossibleValues - surroundingValues
+            self.solvingCandidatesDict[location] = self.setOfPossibleValues - surroundingValues
 
         self.hasCandidates = True
 
+    def updateSolvingCandidates(self):
+
+        for location in self.solvingCandidatesDict.iterkeys():
+
+            neighbours = self.allCombinedNeighbours(location)
+
+            surroundingValues = self.getValues(*neighbours)
+
+            self.solvingCandidatesDict[location] -= surroundingValues
 
     def initialiseUserCandidates(self):
 
@@ -1026,7 +1038,8 @@ class Sudoku():
 
     def updatePuzzle(self):
 
-        self.updateBaseGroupCandidates()
+        self.updateUnits()
+        self.updateSolvingCandidates()
         self.updatePointerGroups()
         self.updateXWingGroups()
         self.updateSwordfishGroups()
@@ -1037,17 +1050,11 @@ class Sudoku():
         self.updateLockedPairs()
         self.updateLockedChains()
 
-    def updateBaseGroupCandidates(self):
+    def updateUnits(self):
         for intersectionType in self.units:
-
             for group in self.intersectionTypes[intersectionType]:
-
-                surroundingValues = self.getValues(*group)
-
                 for location in group[:]:
-                    if self.isEmpty(location):
-                        self.candidates[location] -= surroundingValues
-                    else:
+                    if self.isFilled(location):
                         group.remove(location)
 
     def updatePointerGroups(self):
@@ -1132,7 +1139,7 @@ class Sudoku():
                 return False
             if len(self.allSolvingCandidates(location)) <= 1:
                 return False
-            if candidate not in self.candidates[location]:
+            if candidate not in self.solvingCandidatesDict[location]:
                 return False
         return True
 
@@ -1234,6 +1241,8 @@ class Sudoku():
 
         neighbours = self.allCombinedNeighbours(location)
         for neighbour in neighbours:
+            if self.isEmpty(neighbour):
+                continue
             neighbourValue = self.getValue(neighbour)
             if neighbourValue == locationValue:
                 return True
@@ -1246,6 +1255,8 @@ class Sudoku():
 
         neighbours = self.allCombinedNeighbours(location)
         for neighbour in neighbours:
+            if self.isEmpty(neighbour):
+                continue
             neighbourValue = self.getValue(neighbour)
             if neighbourValue == locationValue:
                 clashes.append(neighbour)
@@ -1276,11 +1287,13 @@ class Sudoku():
     def clashingLocations(self):
         clashingLocations = set([])
 
-        for location in self.locations:
+        for location in self.locations():
             locationValue = self.getValue(location)
 
             neighbours = self.allCombinedNeighbours(location)
             for neighbour in neighbours:
+                if self.isEmpty(neighbour):
+                    continue
                 neighbourValue = self.getValue(neighbour)
                 if locationValue == neighbourValue:
                     clashingLocations.add(location)
@@ -1301,9 +1314,8 @@ class Sudoku():
             raise Exception("value is not vaild")
 
         self.values[location] = value
-
-        if location in self.userCandidatesDict:
-            del self.userCandidatesDict[location]
+        self.changes = True
+        self.solvingCandidatesDict[location].clear()
 
     def getValue(self, location):
         return self.values[location]
@@ -1316,12 +1328,13 @@ class Sudoku():
             raise Exception("location is a constant and cannot be changed")
 
         self.values[location] = 0
+        self.changes = True
 
     def allSolvingCandidates(self, *locations):
-        return set([]).union(*[self.candidates[location] for location in locations])
+        return set([]).union(*[self.solvingCandidatesDict[location] for location in locations])
 
     def commonSolvingCandidates(self, *locations):
-        return set.intersection(*[self.candidates[location] for location in locations])
+        return set.intersection(*[self.solvingCandidatesDict[location] for location in locations])
 
     def userCandidates(self, location):
         return self.userCandidatesDict[location]
@@ -1333,16 +1346,13 @@ class Sudoku():
         if self.isConstant(location):
             raise Exception("location is a constant and cannot be changed")
 
-        if not self.hasSolvingCandidates(location):
-            return removedCandidates
-
         for candidate in candidates:
 
             if not self.isValidInput(candidate):
                 raise Exception("candidate is not vaild")
 
             if candidate in self.allSolvingCandidates(location):
-                self.candidates[location].remove(candidate)
+                self.solvingCandidatesDict[location].remove(candidate)
                 removedCandidates.append(candidate)
 
         if removedCandidates:
@@ -1360,32 +1370,10 @@ class Sudoku():
         if not self.isEmpty(location):
             self.clearLocation(location)
 
-        if not self.hasUserCandidates(location):
-            self.userCandidatesDict[location] = set([candidate])
-            return
-
         if candidate in self.userCandidatesDict[location]:
             self.userCandidatesDict[location].remove(candidate)
         else:
             self.userCandidatesDict[location].add(candidate)
-
-    def hasSolvingCandidates(self, location):
-        if location not in self.candidates:
-            return False
-
-        if not self.candidates[location]:
-            return False
-
-        return True
-
-    def hasUserCandidates(self, location):
-        if location not in self.userCandidatesDict:
-            return False
-
-        if not self.userCandidatesDict[location]:
-            return False
-
-        return True
 
     def unitSize(self):
         return self.gridSize
@@ -1456,15 +1444,14 @@ class Sudoku():
 
         successString = "Naked Single: {0} was set to {1}"
 
-        for location, candidates in self.candidates.items():
+        for location in self.emptyLocations():
+            candidates = self.allSolvingCandidates(location)
             if len(candidates) == 1:
-                candidate = candidates.pop()
+                nakedSingle = candidates.pop()
 
-                self.values[location] = candidate
-                del self.candidates[location]
-                self.changes = True
+                self.setValue(location, nakedSingle)
 
-                self.addToLog(successString, location, candidate)
+                self.addToLog(successString, location, nakedSingle)
 
         if self.changes:
             self.updatePuzzle()
@@ -1525,10 +1512,7 @@ class Sudoku():
         self.changes = False
 
         name = "Hidden " + self.multiples[n - 1]
-        if n > 1:
-            successString = name + ": {0} has been removed from {1} as the " + name +", {2} only appears in it's {3}"
-        else:
-            successString = name + ": {0} has been set to {1}, as all other candidates have been removed"
+        successString = name + ": {0} has been removed from {1} as the " + name +", {2} only appears in this {3}"
 
         for intersectionType in self.units:
 
@@ -1539,7 +1523,7 @@ class Sudoku():
 
                 for combination in self.nLocations(group, n):
 
-                    surroundingLocations = [location for location in group if location not in combination]
+                    surroundingLocations = set(group) - set(combination)
 
                     combinationCandidates = self.allSolvingCandidates(*combination)
                     surroundingCandidates = self.allSolvingCandidates(*surroundingLocations)
@@ -1549,19 +1533,12 @@ class Sudoku():
                         continue
 
                     for location in combination:
-
                         removedCandidates = self.removeSolvingCandidates(location, *surroundingCandidates)
 
                         if not removedCandidates:
                             continue
 
-                        if n == 1:
-                            self.setValue(location, uniqueCombinationCandidates.pop())
-
-                        if n > 1:
-                            self.addToLog(successString, removedCandidates, location, self.allSolvingCandidates(location), intersectionType)
-                        else:
-                            self.addToLog(successString, location, self.getValue(location))
+                        self.addToLog(successString, removedCandidates, location, uniqueCombinationCandidates, intersectionType)
 
         if self.changes:
             self.updatePuzzle()
@@ -1807,7 +1784,7 @@ class Sudoku():
 
             # We are looking for a contradiction, so if the prospective change
             # checks out we haven't learnt anything new.
-            if self.prospectiveChange(candidatesToRemove):
+            if self.testProspectiveChange(candidatesToRemove):
                 continue
 
             for correctColour in (colourOne, colourTwo):
