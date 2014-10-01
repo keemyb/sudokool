@@ -199,8 +199,8 @@ class inputButton(Button):
                 if sudoku.autoUpdateUserCandidates:
                     sudoku.updateUserCandidates()
 
-            for cell in self.parent.parent.locationsGrid.children:
-                cell.update(sudoku)
+                for cell in self.parent.parent.locationsGrid.children:
+                    cell.update(sudoku)
 
             return True
 
