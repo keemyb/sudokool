@@ -63,11 +63,11 @@ class cell(GridLayout):
 
         self.location = location
 
-        if location in sudoku.constants:
+        if sudoku.isConstant(location):
             self.initConstant(sudoku, location)
-        elif location in sudoku.emptyLocations():
+        elif sudoku.isEmpty(location):
             self.initEmpty(sudoku, location)
-        elif location in sudoku.locations():
+        else:
             self.initUser(sudoku, location)
 
     def initConstant(self, sudoku, location):
