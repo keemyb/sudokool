@@ -28,9 +28,9 @@ def puzzleSummary(puzzle, maxLevel, printPuzzle, printChangedCandidates, printHi
 
     changedCandidatesString = ""
     if printChangedCandidates:
-        for key in postSolved.candidates.iterkeys():
-            if postSolved.candidates[key] != preSolved.candidates[key]:
-                changedCandidatesString += "\n" + str(key) + " " + str(preSolved.candidates[key]) + " " + str(postSolved.candidates[key])
+        for key in postSolved.solvingCandidatesDict.iterkeys():
+            if postSolved.solvingCandidatesDict[key] != preSolved.solvingCandidatesDict[key]:
+                changedCandidatesString += "\n" + str(key) + " " + str(preSolved.solvingCandidatesDict[key]) + " " + str(postSolved.solvingCandidatesDict[key])
 
     history = ""
     if printHistory:
