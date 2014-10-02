@@ -27,10 +27,19 @@ def factors(n):
 
 class Sudoku():
 
-    def __init__(self, data, horizontalFormat=True):
+    def __init__(self, data=None, size=None, difficulty=None, horizontalFormat=True):
+        if data is None and size is None:
+            raise ValueError("No data or size info given")
+
         self.horizontalFormat = horizontalFormat
-        self.calculateDimensions(data, horizontalFormat)
+        self.calculateDimensions(data, size, horizontalFormat)
         self.generatePossibleValues()
+
+        generateSudoku = False
+        if data is None:
+            data = "0"*self.unitSize()**2
+            generateSudoku = True
+
         self.processData(data)
 
         self.solvingCandidatesDict = {location : set([]) for location in self.locations()}
@@ -99,6 +108,9 @@ class Sudoku():
             self.remotePairs,
             ]
 
+        if generateSudoku:
+            self.generateSudoku(difficulty)
+
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return other.values == self.values
@@ -161,17 +173,21 @@ class Sudoku():
 
         return string
 
-    def calculateDimensions(self, data, horizontalFormat):
+    def calculateDimensions(self, data, size, horizontalFormat):
         # gridSize is the (nearest) square root of the length of the data.
         # It is the nearest square as we cannot guarantee how many values will be
         # provided
-        self.gridSize = int(len(data) ** 0.5)
+        if data is not None:
+            self.gridSize = int(len(data) ** 0.5)
+        else:
+            self.gridSize = size
 
         # If the amount of values provided is not a square number the puzzle will be invalid.
         # The amount of values is compared to self.gridSize, the nearest square of the number
         # of values provided.
-        if len(data) != self.gridSize ** 2:
-            raise Exception("Incorrect number of values provided.")
+        if data is not None:
+            if len(data) != self.gridSize ** 2:
+                raise Exception("Incorrect number of values provided.")
 
         #if the gridSize is prime subGrids will equal either rows or columns
         #problems will ensue.
@@ -205,6 +221,159 @@ class Sudoku():
             self.setOfPossibleValues = set(xrange(1, 10))
             alphabeticalValues = set([chr(num + 55) for num in xrange(10, self.gridSize + 1)])
             self.setOfPossibleValues.update(alphabeticalValues)
+
+    def generateMask(self, difficulty=None):
+        from random import random
+        from random import shuffle
+
+        rotate = random() > 0.5
+
+        if difficulty is None:
+            difficulty = 0.5
+
+        valuesInHardPuzzle = 26
+        valuesInEasyPuzzle = 32
+
+        variableValues = valuesInEasyPuzzle - valuesInHardPuzzle
+
+        valuesToUse = valuesInHardPuzzle + variableValues * (1-difficulty)
+
+        firstRowIndices = range(1, self.unitSize()/2 + 1)
+        firstQuadrantIndices = firstRowIndices[:]
+
+        for row in xrange(1, self.unitSize()/2):
+            for index in firstRowIndices:
+                firstQuadrantIndices.append(index + row * self.unitSize())
+
+        selectedMiddleLocations = []
+        if self.unitSize() % 2 == 1:
+            middleStripIndices = range(self.unitSize()/2 + 1, (self.unitSize()**2 - 1)/2 + 2, self.unitSize())
+            shuffle(middleStripIndices)
+            for i in xrange(2):
+                selectedMiddleLocations.append(middleStripIndices[i])
+
+        selectedQuadrantLocations = []
+        shuffle(firstQuadrantIndices)
+        while len(selectedQuadrantLocations) < ((valuesToUse - len(selectedMiddleLocations)) / 4.0):
+            newLocation = firstQuadrantIndices[0]
+            firstQuadrantIndices.remove(newLocation)
+            selectedQuadrantLocations.append(newLocation)
+
+        if rotate and (self.unitSize() % 2 == 1):
+            mask = selectedQuadrantLocations + selectedMiddleLocations
+
+            for location in mask[:]:
+                mask += self.rotate090(location)
+
+        else:
+            mask = selectedQuadrantLocations
+            if self.unitSize() % 2 == 1:
+                xOffset = self.unitSize() / 2 + 1
+                yOffset = (self.unitSize() / 2 + 1) * self.unitSize()
+
+            else:
+                xOffset = self.unitSize() / 2
+                yOffset = (self.unitSize() ** 2) / 2
+
+            offsets = xOffset, yOffset, xOffset + yOffset
+
+            for location in mask[:]:
+                for offset in offsets:
+                    mask.append(location + offset)
+
+            mask += selectedMiddleLocations
+            for location in selectedMiddleLocations:
+                mask += self.rotate090(location)
+
+        return mask
+
+    def rotate090(self, location, center=None):
+        if center is None:
+            center = (self.unitSize()**2 - 1)/2 + 1
+        newLocations = []
+
+        centerCoordinates = (self.getColumn(center), self.getRow(center))
+
+        coordinates = (self.getColumn(location) - centerCoordinates[1],
+                       self.getRow(location) - centerCoordinates[0])
+        coordinates090 = (-coordinates[1], coordinates[0])
+        coordinates180 = (-coordinates090[1], coordinates090[0])
+        coordinates270 = (-coordinates180[1], coordinates180[0])
+
+        for coordinates in (coordinates090, coordinates180, coordinates270):
+            xDifference = coordinates[0]
+            yDifference = coordinates[1] * self.unitSize()
+            newLocation = center + xDifference + yDifference
+            newLocations.append(newLocation)
+
+        return newLocations
+
+    def generateSudoku(self, difficulty):
+        from collections import defaultdict
+        from random import sample
+
+        while True:
+
+            mask = self.generateMask(difficulty)
+
+            previouslyTriedValues = defaultdict(set)
+
+            modifiedLocations = []
+
+            while True:
+
+                if all(self.isFilled(location) for location in mask):
+                    self.brute()
+                    if self.isComplete():
+                        for location in self.locations():
+                            if location not in mask:
+                                self.clearLocation(location)
+                        valuesString = "".join([str(self.getValue(location)) if self.isFilled(location) else "0" for location in self.locations()])
+                        self.__init__(valuesString)
+                        return
+                    else:
+                        for location in self.locations():
+                            self.clearLocation(location)
+                        break
+
+                for location in mask:
+
+                    if location in modifiedLocations:
+                        continue
+
+                    neighbours = self.allCombinedNeighbours(location)
+
+                    possibleValues = self.setOfPossibleValues - self.getValues(*neighbours)
+                    possibleValues -= previouslyTriedValues[location]
+
+                    if possibleValues:
+                        if len(modifiedLocations) % 2 == 0:
+                            newValue = sample(possibleValues,1)[0]
+                        else:
+                            newValue = possibleValues.pop()
+                        self.setValue(location, newValue)
+                        previouslyTriedValues[location].add(newValue)
+                        modifiedLocations.append(location)
+                        break
+                    else:
+                        superBreak = False
+
+                        if modifiedLocations:
+                            incorrectLocation = modifiedLocations[-1]
+                            self.clearLocation(incorrectLocation)
+
+                            modifiedLocations = modifiedLocations[:-1]
+                            # Atleast one of the previous locations are incorrect,
+                            # so we may need to choose a previously chosen value again
+                            del previouslyTriedValues[location]
+                            break
+                        else:
+                            # if there are no modified locations, there are no solutions.
+                            superBreak = True
+
+                        if superBreak:
+                            break
+
 
     def processData(self, data):
         self.values = {location: data[location - 1] for location in self.locations()}
