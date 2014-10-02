@@ -95,3 +95,4 @@ target/
 
 # sftp configuration file
 sftp-config.json
+newfile.txt
