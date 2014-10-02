@@ -231,8 +231,8 @@ class Sudoku():
         if difficulty is None:
             difficulty = 0.5
 
-        valuesInHardPuzzle = 17
-        valuesInEasyPuzzle = 27
+        valuesInHardPuzzle = 26
+        valuesInEasyPuzzle = 32
 
         variableValues = valuesInEasyPuzzle - valuesInHardPuzzle
 
