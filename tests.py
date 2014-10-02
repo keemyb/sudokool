@@ -94,7 +94,7 @@ print easy
 
 blank = Sudoku(size=9)
 print blank
-blank.brute()
+blank.solve(bruteForceOnFail=True)
 print blank
 
 # for puzzleNo in [6,7,42,47,48,49,50]:

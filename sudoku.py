@@ -226,6 +226,7 @@ class Sudoku():
         self.initialiseIntersections()
 
         from collections import defaultdict
+        from random import sample
 
         mask = [1,11,21,61,71,81,57,65,73,9,17,25,28,29,30,39,48,40,42,34,43,52,53,54]
 
@@ -249,7 +250,10 @@ class Sudoku():
                 possibleValues -= previouslyTriedValues[location]
 
                 if possibleValues:
-                    newValue = possibleValues.pop()
+                    if len(modifiedLocations) % 2 == 0:
+                        newValue = sample(possibleValues,1)[0]
+                    else:
+                        newValue = possibleValues.pop()
                     self.setValue(location, newValue)
                     previouslyTriedValues[location].add(newValue)
                     modifiedLocations.append(location)
