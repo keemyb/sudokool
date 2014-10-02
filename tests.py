@@ -94,6 +94,8 @@ print easy
 
 blank = Sudoku(size=9)
 print blank
+blank.brute()
+print blank
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
 # # for puzzleNo in xrange(5,11):

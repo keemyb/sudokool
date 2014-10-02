@@ -108,6 +108,9 @@ class Sudoku():
             self.remotePairs,
             ]
 
+        if generateSudoku:
+            self.generateSudoku()
+
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return other.values == self.values
@@ -218,6 +221,53 @@ class Sudoku():
             self.setOfPossibleValues = set(xrange(1, 10))
             alphabeticalValues = set([chr(num + 55) for num in xrange(10, self.gridSize + 1)])
             self.setOfPossibleValues.update(alphabeticalValues)
+
+    def generateSudoku(self):
+        self.initialiseIntersections()
+
+        from collections import defaultdict
+
+        mask = [1,11,21,61,71,81,57,65,73,9,17,25,28,29,30,39,48,40,42,34,43,52,53,54]
+
+        previouslyTriedValues = defaultdict(set)
+
+        modifiedLocations = []
+
+        while True:
+
+            if all(self.isFilled(location) for location in mask) and self.isValid():
+                return
+
+            for location in self.emptyLocations():
+
+                if location in modifiedLocations or location not in mask:
+                    continue
+
+                neighbours = self.allCombinedNeighbours(location)
+
+                possibleValues = self.setOfPossibleValues - self.getValues(*neighbours)
+                possibleValues -= previouslyTriedValues[location]
+
+                if possibleValues:
+                    newValue = possibleValues.pop()
+                    self.setValue(location, newValue)
+                    previouslyTriedValues[location].add(newValue)
+                    modifiedLocations.append(location)
+                    break
+                else:
+                    if modifiedLocations:
+                        incorrectLocation = modifiedLocations[-1]
+                        self.clearLocation(incorrectLocation)
+
+                        modifiedLocations = modifiedLocations[:-1]
+                        # Atleast one of the previous locations are incorrect,
+                        # so we may need to choose a previously chosen value again
+                        del previouslyTriedValues[location]
+                        break
+                    else:
+                        # if there are no modified locations, there are no solutions.
+                        return
+
 
     def processData(self, data):
         self.values = {location: data[location - 1] for location in self.locations()}
