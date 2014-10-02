@@ -222,13 +222,99 @@ class Sudoku():
             alphabeticalValues = set([chr(num + 55) for num in xrange(10, self.gridSize + 1)])
             self.setOfPossibleValues.update(alphabeticalValues)
 
+    def generateMask(self, difficulty=None):
+        from random import random
+        from random import shuffle
+
+        rotate = random() > 0.5
+
+        if difficulty is None:
+            difficulty = 0.5
+
+        valuesInHardPuzzle = 17
+        valuesInEasyPuzzle = 27
+
+        variableValues = valuesInEasyPuzzle - valuesInHardPuzzle
+
+        valuesToUse = valuesInHardPuzzle + variableValues * (1-difficulty)
+
+        firstRowIndices = range(1, self.unitSize()/2 + 1)
+        firstQuadrantIndices = firstRowIndices[:]
+
+        for row in xrange(1, self.unitSize()/2):
+            for index in firstRowIndices:
+                firstQuadrantIndices.append(index + row * self.unitSize())
+
+        selectedMiddleLocations = []
+        if self.unitSize() % 2 == 1:
+            middleStripIndices = range(self.unitSize()/2 + 1, (self.unitSize()**2 - 1)/2 + 2, self.unitSize())
+            shuffle(middleStripIndices)
+            for i in xrange(2):
+                selectedMiddleLocations.append(middleStripIndices[i])
+
+        selectedQuadrantLocations = []
+        shuffle(firstQuadrantIndices)
+        while len(selectedQuadrantLocations) < ((valuesToUse - len(selectedMiddleLocations)) / 4.0):
+            newLocation = firstQuadrantIndices[0]
+            firstQuadrantIndices.remove(newLocation)
+            selectedQuadrantLocations.append(newLocation)
+
+        if rotate and (self.unitSize() % 2 == 1):
+            mask = selectedQuadrantLocations + selectedMiddleLocations
+
+            for location in mask[:]:
+                mask += self.rotate090(location)
+
+        else:
+            mask = selectedQuadrantLocations
+            if self.unitSize() % 2 == 1:
+                xOffset = self.unitSize() / 2 + 1
+                yOffset = (self.unitSize() / 2 + 1) * self.unitSize()
+
+            else:
+                xOffset = self.unitSize() / 2
+                yOffset = (self.unitSize() ** 2) / 2
+
+            offsets = xOffset, yOffset, xOffset + yOffset
+
+            for location in mask[:]:
+                for offset in offsets:
+                    mask.append(location + offset)
+
+            mask += selectedMiddleLocations
+            for location in selectedMiddleLocations:
+                mask += self.rotate090(location)
+
+        return mask
+
+    def rotate090(self, location, center=None):
+        if center is None:
+            center = (self.unitSize()**2 - 1)/2 + 1
+        newLocations = []
+
+        centerCoordinates = (self.getColumn(center), self.getRow(center))
+
+        coordinates = (self.getColumn(location) - centerCoordinates[1],
+                       self.getRow(location) - centerCoordinates[0])
+        coordinates090 = (-coordinates[1], coordinates[0])
+        coordinates180 = (-coordinates090[1], coordinates090[0])
+        coordinates270 = (-coordinates180[1], coordinates180[0])
+
+        for coordinates in (coordinates090, coordinates180, coordinates270):
+            xDifference = coordinates[0]
+            yDifference = coordinates[1] * self.unitSize()
+            newLocation = center + xDifference + yDifference
+            newLocations.append(newLocation)
+
+        return newLocations
+
     def generateSudoku(self):
         self.initialiseIntersections()
 
         from collections import defaultdict
         from random import sample
 
-        mask = [1,11,21,61,71,81,57,65,73,9,17,25,28,29,30,39,48,40,42,34,43,52,53,54]
+        mask = self.generateMask()
 
         previouslyTriedValues = defaultdict(set)
 
