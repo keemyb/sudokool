@@ -90,13 +90,33 @@ def visualizer(puzzle, *groups):
     return wholeString
 
 # easy = Sudoku("009003201470002030800000074020000300000000710000794000000300000000925000000018500")
-# print easy
+# print easy.history
 
-blank = Sudoku(size=9)
-print blank
-blank.solve()
-print blank
-print blank.log
+# blank = Sudoku(size=9)
+# print blank
+# print blank.history
+
+with open("newfile.txt", "w") as results:
+    for i in xrange(1):
+        newPuzzle = Sudoku(size=9)
+        results.write(str(i)+"\n")
+        results.write(str(newPuzzle))
+        results.write(str(newPuzzle.intersectionTypes))
+        valuesString = "".join([str(newPuzzle.getValue(location)) if newPuzzle.isFilled(location) else "0" for location in newPuzzle.locations()])
+        results.write(str(valuesString)+"\n")
+        newPuzzle.solve()
+        results.write(str(newPuzzle))
+        results.write(str(newPuzzle.log))
+        results.write("\n"*3)
+
+
+# blank.solve()
+# print blank
+# print blank.log
+# blank.solve()
+# print blank
+# print blank
+# print blank.log
 # blank = Sudoku(size=8)
 # # print blank.generateMask()
 # blank.solve(bruteForceOnFail=True)

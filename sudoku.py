@@ -309,54 +309,70 @@ class Sudoku():
         return newLocations
 
     def generateSudoku(self):
-        self.initialiseIntersections()
-
         from collections import defaultdict
         from random import sample
 
-        mask = self.generateMask()
-
-        previouslyTriedValues = defaultdict(set)
-
-        modifiedLocations = []
-
         while True:
 
-            if all(self.isFilled(location) for location in mask) and self.isValid():
-                return
+            mask = self.generateMask()
 
-            for location in self.emptyLocations():
+            previouslyTriedValues = defaultdict(set)
 
-                if location in modifiedLocations or location not in mask:
-                    continue
+            modifiedLocations = []
 
-                neighbours = self.allCombinedNeighbours(location)
+            while True:
 
-                possibleValues = self.setOfPossibleValues - self.getValues(*neighbours)
-                possibleValues -= previouslyTriedValues[location]
-
-                if possibleValues:
-                    if len(modifiedLocations) % 2 == 0:
-                        newValue = sample(possibleValues,1)[0]
+                if all(self.isFilled(location) for location in mask):
+                    self.brute()
+                    if self.isComplete():
+                        for location in self.locations():
+                            if location not in mask:
+                                self.clearLocation(location)
+                        valuesString = "".join([str(self.getValue(location)) if self.isFilled(location) else "0" for location in self.locations()])
+                        self.__init__(valuesString)
+                        return
                     else:
-                        newValue = possibleValues.pop()
-                    self.setValue(location, newValue)
-                    previouslyTriedValues[location].add(newValue)
-                    modifiedLocations.append(location)
-                    break
-                else:
-                    if modifiedLocations:
-                        incorrectLocation = modifiedLocations[-1]
-                        self.clearLocation(incorrectLocation)
+                        for location in self.locations():
+                            self.clearLocation(location)
+                        break
 
-                        modifiedLocations = modifiedLocations[:-1]
-                        # Atleast one of the previous locations are incorrect,
-                        # so we may need to choose a previously chosen value again
-                        del previouslyTriedValues[location]
+                for location in mask:
+
+                    if location in modifiedLocations:
+                        continue
+
+                    neighbours = self.allCombinedNeighbours(location)
+
+                    possibleValues = self.setOfPossibleValues - self.getValues(*neighbours)
+                    possibleValues -= previouslyTriedValues[location]
+
+                    if possibleValues:
+                        if len(modifiedLocations) % 2 == 0:
+                            newValue = sample(possibleValues,1)[0]
+                        else:
+                            newValue = possibleValues.pop()
+                        self.setValue(location, newValue)
+                        previouslyTriedValues[location].add(newValue)
+                        modifiedLocations.append(location)
                         break
                     else:
-                        # if there are no modified locations, there are no solutions.
-                        return
+                        superBreak = False
+
+                        if modifiedLocations:
+                            incorrectLocation = modifiedLocations[-1]
+                            self.clearLocation(incorrectLocation)
+
+                            modifiedLocations = modifiedLocations[:-1]
+                            # Atleast one of the previous locations are incorrect,
+                            # so we may need to choose a previously chosen value again
+                            del previouslyTriedValues[location]
+                            break
+                        else:
+                            # if there are no modified locations, there are no solutions.
+                            superBreak = True
+
+                        if superBreak:
+                            break
 
 
     def processData(self, data):
