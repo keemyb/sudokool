@@ -90,13 +90,10 @@ def visualizer(puzzle, *groups):
     return wholeString
 
 easy = Sudoku("009003201470002030800000074020000300000000710000794000000300000000925000000018500")
-# easy.setValue(1,9)
-print easy.clashingLocations()
-print easy.clashesWith(1)
 print easy
-easy.brute()
-print easy
-print easy.isValid()
+
+blank = Sudoku(size=9)
+print blank
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
 # # for puzzleNo in xrange(5,11):

@@ -27,10 +27,19 @@ def factors(n):
 
 class Sudoku():
 
-    def __init__(self, data, horizontalFormat=True):
+    def __init__(self, data=None, size=None, horizontalFormat=True):
+        if data is None and size is None:
+            raise ValueError("No data or size info given")
+
         self.horizontalFormat = horizontalFormat
-        self.calculateDimensions(data, horizontalFormat)
+        self.calculateDimensions(data, size, horizontalFormat)
         self.generatePossibleValues()
+
+        generateSudoku = False
+        if data is None:
+            data = "0"*self.unitSize()**2
+            generateSudoku = True
+
         self.processData(data)
 
         self.solvingCandidatesDict = {location : set([]) for location in self.locations()}
@@ -161,17 +170,21 @@ class Sudoku():
 
         return string
 
-    def calculateDimensions(self, data, horizontalFormat):
+    def calculateDimensions(self, data, size, horizontalFormat):
         # gridSize is the (nearest) square root of the length of the data.
         # It is the nearest square as we cannot guarantee how many values will be
         # provided
-        self.gridSize = int(len(data) ** 0.5)
+        if data is not None:
+            self.gridSize = int(len(data) ** 0.5)
+        else:
+            self.gridSize = size
 
         # If the amount of values provided is not a square number the puzzle will be invalid.
         # The amount of values is compared to self.gridSize, the nearest square of the number
         # of values provided.
-        if len(data) != self.gridSize ** 2:
-            raise Exception("Incorrect number of values provided.")
+        if data is not None:
+            if len(data) != self.gridSize ** 2:
+                raise Exception("Incorrect number of values provided.")
 
         #if the gridSize is prime subGrids will equal either rows or columns
         #problems will ensue.
