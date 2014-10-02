@@ -392,7 +392,7 @@ class logOutput(ListView):
         self.item_strings = sudoku.log[self.logStart:]
 
 
-class SudokuApp(App):
+class Sudokool(App):
 
     def build(self):
         sudoku.selected = None
@@ -438,4 +438,4 @@ bigSudoku = Sudoku(string16)
 sudoku.initialiseIntersections()
 
 if __name__ == '__main__':
-    SudokuApp().run()
+    Sudokool().run()
