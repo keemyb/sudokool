@@ -97,11 +97,10 @@ def visualizer(puzzle, *groups):
 # print blank.history
 
 with open("newfile.txt", "w") as results:
-    for i in xrange(1):
-        newPuzzle = Sudoku(size=9)
-        results.write(str(i)+"\n")
+    for i in xrange(5):
+        newPuzzle = Sudoku(size=9,)# difficulty=0.25)
+        results.write(str(i + 1)+"\n")
         results.write(str(newPuzzle))
-        results.write(str(newPuzzle.intersectionTypes))
         valuesString = "".join([str(newPuzzle.getValue(location)) if newPuzzle.isFilled(location) else "0" for location in newPuzzle.locations()])
         results.write(str(valuesString)+"\n")
         newPuzzle.solve()

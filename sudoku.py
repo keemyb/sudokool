@@ -27,7 +27,7 @@ def factors(n):
 
 class Sudoku():
 
-    def __init__(self, data=None, size=None, horizontalFormat=True):
+    def __init__(self, data=None, size=None, difficulty=None, horizontalFormat=True):
         if data is None and size is None:
             raise ValueError("No data or size info given")
 
@@ -109,7 +109,7 @@ class Sudoku():
             ]
 
         if generateSudoku:
-            self.generateSudoku()
+            self.generateSudoku(difficulty)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -308,13 +308,13 @@ class Sudoku():
 
         return newLocations
 
-    def generateSudoku(self):
+    def generateSudoku(self, difficulty):
         from collections import defaultdict
         from random import sample
 
         while True:
 
-            mask = self.generateMask()
+            mask = self.generateMask(difficulty)
 
             previouslyTriedValues = defaultdict(set)
 
