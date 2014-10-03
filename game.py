@@ -13,13 +13,13 @@ from kivy.core.window import Window
 
 from kivy.properties import BooleanProperty, NumericProperty, ObjectProperty
 
-class ModifiedCell(BoxLayout):
+class ModifiedCell(Label):
+    pass
+
+class ConstantCell(Label):
     pass
 
 class EmptyCell(GridLayout):
-    pass
-
-class ConstantCell(BoxLayout):
     pass
 
 class Candidate(Label):
@@ -72,11 +72,11 @@ class Game(ScreenManager):
 
         for cell in self.ids.playGrid.cells:
             cell.size = cellWidth, cellWidth
-            cell.text_size = [cellWidth*.8]*2
+            cell.font_size = cellWidth*.8
             if self.sudoku.isEmpty(cell.location):
                 for candidate in cell.candidates:
                     candidate.size = [candidateWidth]*2
-                    candidate.text_size = [candidateWidth*.8]*2
+                    candidate.font_size = candidateWidth*.8
 
     def cellWidth(self):
         windowWidth = min(Window.size)
@@ -92,9 +92,6 @@ class Game(ScreenManager):
 
     def setSudoku(self, size):
         self.sudoku = self.newSudoku(size)
-
-    # def getSudoku(self):
-    #     return self.sudoku
 
     def on_sudoku(self, caller, sudoku):
         self.current = "play"
@@ -121,12 +118,11 @@ class Game(ScreenManager):
             cell = ModifiedCell()
         cell.location = location
         cell.size = [self.cellWidth()]*2
+        cell.font_size = self.cellWidth()*0.8
 
-        valueLabel = Label()
-        valueLabel.text = str(self.sudoku.getValue(location))
-        valueLabel.size_hint = [1]*2
+        cell.text = str(self.sudoku.getValue(location))
+        cell.size_hint = [1]*2
 
-        cell.add_widget(valueLabel)
         return cell
 
     def newEmptyCell(self, location):
@@ -140,6 +136,7 @@ class Game(ScreenManager):
             candidateLabel = Candidate()
             candidateLabel.size = [self.candidateWidth()]*2
             candidateLabel.text = str(candidate)
+            candidateLabel.font_size = self.candidateWidth()*.8
             cell.add_widget(candidateLabel)
             cell.candidates.append(candidateLabel)
         return cell

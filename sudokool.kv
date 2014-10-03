@@ -40,18 +40,18 @@
         GridLayout:
             id: playGrid
 
-<ConstantCell@BoxLayout>:
+<ConstantCell@Label>:
     size_hint: None, None
-    canvas:
+    canvas.before:
         Color:
             rgba: [.67, .75, .57, 1]
         Rectangle:
             pos: self.pos
             size: self.size
 
-<ModifiedCell@BoxLayout>:
+<ModifiedCell@Label>:
     size_hint: None, None
-    canvas:
+    canvas.before:
         Color:
             rgba: [.69, .78, .85, 1]
         Rectangle:
