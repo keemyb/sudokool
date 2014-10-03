@@ -82,7 +82,7 @@ class Game(ScreenManager):
         cellWidth = self.cellWidth()
         candidateWidth = self.candidateWidth()
 
-        for cell in self.ids.playGrid.cells:
+        for cell in self.ids.puzzleView.cells:
             cell.size = cellWidth, cellWidth
             cell.font_size = cellWidth*.8
             if self.sudoku.isEmpty(cell.location):
@@ -90,7 +90,7 @@ class Game(ScreenManager):
                     candidate.size = [candidateWidth]*2
                     candidate.font_size = candidateWidth*.8
 
-        print "play", self.ids.playGrid.width
+        print "play", self.ids.puzzleView.width
         print "screen", self.ids.playScreenGrid.width
 
     def cellWidth(self):
@@ -112,6 +112,7 @@ class Game(ScreenManager):
         self.current = "play"
         self.initialiseGrid()
         self.initialiseInputGrid()
+        self.on_screenSizeChange(self, Window.size)
 
     def initialiseInputGrid(self):
         self.ids.buttonGrid.cols = self.sudoku.subGridsInRow()
@@ -130,8 +131,8 @@ class Game(ScreenManager):
         return button
 
     def initialiseGrid(self):
-        self.ids.playGrid.cols = self.sudoku.unitSize()
-        self.ids.playGrid.cells = []
+        self.ids.puzzleView.cols = self.sudoku.unitSize()
+        self.ids.puzzleView.cells = []
         for location in self.sudoku.locations():
             if self.sudoku.isConstant(location):
                 newCell = self.newFilledCell(location, True)
@@ -140,8 +141,8 @@ class Game(ScreenManager):
             else:
                 newCell = self.newEmptyCell(location)
 
-            self.ids.playGrid.add_widget(newCell)
-            self.ids.playGrid.cells.append(newCell)
+            self.ids.puzzleView.add_widget(newCell)
+            self.ids.puzzleView.cells.append(newCell)
 
     def newFilledCell(self, location, constant):
         if constant:

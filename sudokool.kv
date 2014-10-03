@@ -1,5 +1,5 @@
 <Game>:
-    id: MainScreen
+    id: MainSwitcher
     canvas:
         Color:
             rgba: [0,1,0,1]
@@ -21,13 +21,13 @@
                 cols: 3
                 Button:
                     text: "6"
-                    on_press: MainScreen.setSudoku(6)
+                    on_press: MainSwitcher.setSudoku(6)
                 Button:
                     text: "8"
-                    on_press: MainScreen.setSudoku(8)
+                    on_press: MainSwitcher.setSudoku(8)
                 Button:
                     text: "9"
-                    on_press: MainScreen.setSudoku(9)
+                    on_press: MainSwitcher.setSudoku(9)
 
     PlayScreen:
         name: "play"
@@ -39,11 +39,14 @@
                 size: self.size
         GridLayout:
             id: playScreenGrid
-            cols: 1
             GridLayout:
-                id: playGrid
-            GridLayout:
-                id: buttonGrid
+                id: puzzleView
+            ScreenManager:
+                id: playSolveSwitcher
+                Screen:
+                    id: playModeScreen
+                    GridLayout:
+                        id: buttonGrid
 
 <ConstantCell@Label>:
     size_hint: None, None
