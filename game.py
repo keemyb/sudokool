@@ -20,10 +20,28 @@ blue = .69, .78, .85, 1
 green = .67, .75, .57, 1
 brown = .87, .67, .49, 1
 
-class toggleValueOrCandidateChange(Button):
+class updateUserCandidates(Button):
 
     def __init__(self, MainSwitcher, **kwargs):
-        super(toggleValueOrCandidateChange, self).__init__(**kwargs)
+        super(updateUserCandidates, self).__init__(**kwargs)
+        self.MainSwitcher = MainSwitcher
+
+        self.states = {True: "Auto Update",
+                       False: "Not Auto Update"}
+
+        self.text = self.states[self.MainSwitcher.updateUserCandidates]
+
+    def on_touch_down(self, touch):
+
+        if self.collide_point(*touch.pos):
+            self.MainSwitcher.updateUserCandidates = not self.MainSwitcher.updateUserCandidates
+            self.text = self.states[self.MainSwitcher.updateUserCandidates]
+            return True
+
+class valueOrCandidateChange(Button):
+
+    def __init__(self, MainSwitcher, **kwargs):
+        super(valueOrCandidateChange, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
 
         self.states = {True: "Values",
@@ -101,7 +119,7 @@ class Game(ScreenManager):
     selected = NumericProperty(-1)
     changeValues = BooleanProperty(True)
     solveMode = BooleanProperty(False)
-    autoUpdateUserCandidates = BooleanProperty(True)
+    updateUserCandidates = BooleanProperty(True)
     highlightOccourences = BooleanProperty(True)
     highlightClashes = BooleanProperty(True)
 
@@ -112,7 +130,7 @@ class Game(ScreenManager):
         self.bind(sudoku=self.on_sudoku)
         self.bind(selected=self.on_selected)
         self.bind(highlightOccourences=self.on_highlightOccourences)
-        self.bind(autoUpdateUserCandidates=self.on_autoUpdateUserCandidates)
+        self.bind(updateUserCandidates=self.on_updateUserCandidates)
         # self.bind(solveMode=self.on_solveMode)
         # self.bind(highlightClashes=self.on_highlightClashes)
 
@@ -121,8 +139,9 @@ class Game(ScreenManager):
             self.ids.puzzleView.clear_widgets()
             self.initialisePuzzleView()
 
-    def on_autoUpdateUserCandidates(self, caller, value):
-        if self.autoUpdateUserCandidates:
+    def on_updateUserCandidates(self, caller, value):
+        if self.updateUserCandidates:
+            self.sudoku.updateUserCandidates()
             self.updateCells()
 
     def on_screenSizeChange(self, caller, size):
@@ -161,7 +180,7 @@ class Game(ScreenManager):
         else:
             if self.changeValues:
                 self.sudoku.setValue(self.selected, value)
-                if self.autoUpdateUserCandidates:
+                if self.updateUserCandidates:
                     self.sudoku.updateUserCandidates()
             else:
                 self.sudoku.toggleUserCandidate(self.selected, value)
@@ -234,15 +253,19 @@ class Game(ScreenManager):
 
     def on_sudoku(self, caller, sudoku):
         self.current = "game"
-        if self.autoUpdateUserCandidates:
+        if self.updateUserCandidates:
             self.sudoku.initialiseUserCandidates()
         self.initialisePuzzleView()
         self.initialiseInputGrid()
         self.initialiseValueOrCandidateChangeButton()
+        self.initialiseUpdateUserCandidatesButton()
         self.on_screenSizeChange(self, Window.size)
 
+    def initialiseUpdateUserCandidatesButton(self):
+        self.ids.playModeGrid.add_widget(updateUserCandidates(self))
+
     def initialiseValueOrCandidateChangeButton(self):
-        self.ids.playModeGrid.add_widget(toggleValueOrCandidateChange(self))
+        self.ids.playModeGrid.add_widget(valueOrCandidateChange(self))
 
     def initialiseInputGrid(self):
         self.ids.buttonGrid.cols = self.sudoku.subGridsInRow()
