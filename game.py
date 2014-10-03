@@ -60,12 +60,34 @@ class Game(ScreenManager):
 
     def on_screenSizeChange(self, caller, size):
         self.resizeCells()
+        self.gameScreenGridOrient()
+        if not self.solveMode:
+            self.resizePlayModeGrid()
+
+    def resizePlayModeGrid(self):
+
+        if Window.size[0] > Window.size[1]:
+            size_hint_x = None
+            size_hint_y = 1
+            width = Window.size[0] - self.ids.puzzleView.width
+            self.ids.playModeGrid.width = width
+        else:
+            size_hint_x = 1
+            size_hint_y = None
+            height = Window.size[1] - self.ids.puzzleView.height
+            self.ids.playModeGrid.height = height
+
+        self.ids.playModeGrid.size_hint = size_hint_x, size_hint_y
+
+    def gameScreenGridOrient(self):
+
         if Window.size[0] > Window.size[1]:
             cols = None
             rows = 1
         else:
             cols = 1
             rows = None
+
         self.ids.gameScreenGrid.cols = cols
         self.ids.gameScreenGrid.rows = rows
 
@@ -90,8 +112,7 @@ class Game(ScreenManager):
                     candidate.size = [candidateWidth]*2
                     candidate.font_size = candidateWidth*.8
 
-        print "play", self.ids.puzzleView.width
-        print "screen", self.ids.gameScreenGrid.width
+        self.ids.puzzleView.size = [cellWidth*self.sudoku.unitSize()]*2
 
     def cellWidth(self):
         windowWidth = min(Window.size)

@@ -41,12 +41,16 @@
             id: gameScreenGrid
             GridLayout:
                 id: puzzleView
+                size_hint: None, None
             ScreenManager:
                 id: playSolveSwitcher
                 Screen:
                     id: playModeScreen
                     GridLayout:
-                        id: buttonGrid
+                        cols: 1
+                        id: playModeGrid
+                        GridLayout:
+                            id: buttonGrid
 
 <ConstantCell@Label>:
     size_hint: None, None
@@ -85,4 +89,3 @@
             size: self.size
 
 <Input@Button>:
-    #size_hint: None, None
