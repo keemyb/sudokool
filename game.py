@@ -151,7 +151,17 @@ class Game(ScreenManager):
             self.resizePlayModeGrid()
 
     def on_selected(self, caller, selected):
+        self.enforceInputButtonState()
         self.on_highlightOccourences(caller, self.on_highlightOccourences)
+
+    def enforceInputButtonState(self):
+        if self.sudoku.isConstant(self.selected):
+            newDisabledState = True
+        else:
+            newDisabledState = False
+
+        for button in self.ids.buttonGrid.buttons:
+            button.disabled = newDisabledState
 
     def on_highlightOccourences(self, caller, value):
         for cell in self.ids.puzzleView.cells:
@@ -331,7 +341,6 @@ class Game(ScreenManager):
 
                 cell.add_widget(candidateLabel)
                 cell.candidates.append(candidateLabel)
-
 
         return cell
 
