@@ -14,6 +14,12 @@ from kivy.core.window import Window
 
 from kivy.properties import BooleanProperty, NumericProperty, ObjectProperty
 
+white = .85, .90, .93, 1
+red = .84, .29, .34, 1
+blue = .69, .78, .85, 1
+green = .67, .75, .57, 1
+brown = .87, .67, .49, 1
+
 class Input(Button):
     pass
 
@@ -21,7 +27,16 @@ class ModifiedCell(Label):
     pass
 
 class ConstantCell(Label):
-    pass
+    def __init__(self, MainSwitcher, **kwargs):
+        super(ConstantCell, self).__init__(**kwargs)
+        self.MainSwitcher = MainSwitcher
+
+    def on_touch_down(self, touch):
+
+        if self.collide_point(*touch.pos):
+            self.MainSwitcher.selected = self.location
+
+            return True
 
 class EmptyCell(GridLayout):
     pass
@@ -38,7 +53,7 @@ class SelectScreen(Screen):
 class Game(ScreenManager):
     app = ObjectProperty(None)
     sudoku = ObjectProperty(None)
-    selected = NumericProperty(0)
+    selected = NumericProperty(-1)
     changeValues = BooleanProperty(True)
     displaySolvingCandidates = BooleanProperty(False)
     solveMode = BooleanProperty(False)
@@ -51,6 +66,7 @@ class Game(ScreenManager):
         self.current = "select"
         Window.bind(size=self.on_screenSizeChange)
         self.bind(sudoku=self.on_sudoku)
+        self.bind(selected=self.on_selected)
         # self.bind(changeValues=self.on_changeValues)
         # self.bind(displaySolvingCandidates=self.on_displaySolvingCandidates)
         # self.bind(solveMode=self.on_solveMode)
@@ -63,6 +79,9 @@ class Game(ScreenManager):
         self.gameScreenGridOrient()
         if not self.solveMode:
             self.resizePlayModeGrid()
+
+    def on_selected(self, caller, selected):
+        print self.selected
 
     def resizePlayModeGrid(self):
 
@@ -170,7 +189,7 @@ class Game(ScreenManager):
 
     def newFilledCell(self, location, constant):
         if constant:
-            cell = ConstantCell()
+            cell = ConstantCell(self)
         else:
             cell = ModifiedCell()
 
@@ -199,7 +218,7 @@ class Game(ScreenManager):
 class SudokoolApp(App):
 
     def build(self):
-        self.game = Game(app=self)
+        self.game = Game()
         return self.game
 
 if __name__ == "__main__":
