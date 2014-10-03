@@ -6,7 +6,6 @@ from kivy.app import App
 
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.label import Label
-from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
 
@@ -20,6 +19,24 @@ red = .84, .29, .34, 1
 blue = .69, .78, .85, 1
 green = .67, .75, .57, 1
 brown = .87, .67, .49, 1
+
+class toggleValueOrCandidateChange(Button):
+
+    def __init__(self, MainSwitcher, **kwargs):
+        super(toggleValueOrCandidateChange, self).__init__(**kwargs)
+        self.MainSwitcher = MainSwitcher
+
+        self.states = {True: "Values",
+                       False: "Candidates"}
+
+        self.text = self.states[self.MainSwitcher.changeValues]
+
+    def on_touch_down(self, touch):
+
+        if self.collide_point(*touch.pos):
+            self.MainSwitcher.changeValues = not self.MainSwitcher.changeValues
+            self.text = self.states[self.MainSwitcher.changeValues]
+            return True
 
 class Input(Button):
     def __init__(self, MainSwitcher, **kwargs):
@@ -106,7 +123,6 @@ class Game(ScreenManager):
         if locations is None:
             self.ids.puzzleView.clear_widgets()
             self.initialisePuzzleView()
-
 
     def on_screenSizeChange(self, caller, size):
         self.resizeCells()
@@ -215,9 +231,15 @@ class Game(ScreenManager):
 
     def on_sudoku(self, caller, sudoku):
         self.current = "game"
+        if self.autoUpdateUserCandidates:
+            self.sudoku.initialiseUserCandidates()
         self.initialisePuzzleView()
         self.initialiseInputGrid()
+        self.initialiseValueOrCandidateChangeButton()
         self.on_screenSizeChange(self, Window.size)
+
+    def initialiseValueOrCandidateChangeButton(self):
+        self.ids.playModeGrid.add_widget(toggleValueOrCandidateChange(self))
 
     def initialiseInputGrid(self):
         self.ids.buttonGrid.cols = self.sudoku.subGridsInRow()
@@ -271,11 +293,19 @@ class Game(ScreenManager):
         cell.cols = self.sudoku.subGridsInRow()
         cell.candidates = []
 
-        for candidate in self.sudoku.allSolvingCandidates(location):
-            candidateLabel = self.newCandidateLabel(candidate)
+        if self.solveMode:
+            for candidate in self.sudoku.allSolvingCandidates(location):
+                candidateLabel = self.newCandidateLabel(candidate)
 
-            cell.add_widget(candidateLabel)
-            cell.candidates.append(candidateLabel)
+                cell.add_widget(candidateLabel)
+                cell.candidates.append(candidateLabel)
+        else:
+            for candidate in self.sudoku.userCandidates(location):
+                candidateLabel = self.newCandidateLabel(candidate)
+
+                cell.add_widget(candidateLabel)
+                cell.candidates.append(candidateLabel)
+
 
         return cell
 
