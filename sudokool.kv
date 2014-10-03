@@ -1,14 +1,71 @@
-<screen>:
-    orientation: 'vertical'
-
-<cell>:
-    cols: 1
-
-<allLocationsGrid>:
+<Game>:
+    id: Screen
     canvas:
         Color:
-            rgba: [1]*4
+            rgba: [0,1,0,1]
+
+    SelectScreen:
+        id: "select"
+        name: "select"
+        canvas:
+            Color:
+                rgba: [.84, .29, .34, 1]
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        GridLayout:
+            cols: 1
+            Label:
+                text: "Choose a sudoku size"
+            GridLayout:
+                cols: 3
+                Button:
+                    text: "6"
+                    on_press: Screen.setSudoku(6)
+                Button:
+                    text: "8"
+                    on_press: Screen.setSudoku(8)
+                Button:
+                    text: "9"
+                    on_press: Screen.setSudoku(9)
+
+    PlayScreen:
+        name: "play"
+        canvas:
+            Color:
+                rgba: [1,1,0,1]
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        GridLayout:
+            id: playGrid
+
+<ConstantCell@BoxLayout>:
+    size_hint: None, None
+    canvas:
+        Color:
+            rgba: [.67, .75, .57, 1]
         Rectangle:
             pos: self.pos
             size: self.size
 
+<ModifiedCell@BoxLayout>:
+    size_hint: None, None
+    canvas:
+        Color:
+            rgba: [.69, .78, .85, 1]
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<EmptyCell@GridLayout>:
+    size_hint: None, None
+
+<Candidate@Label>:
+    size_hint: None, None
+    canvas.before:
+        Color:
+            rgba: [.87, .67, .49, 1]
+        Rectangle:
+            pos: self.pos
+            size: self.size

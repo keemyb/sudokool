@@ -1,441 +1,154 @@
 import kivy
-kivy.require('1.8.0')  # replace with your current kivy version !
+kivy.require('1.8.0')
 
-from kivy.app import App
 from sudoku import Sudoku
+from kivy.app import App
 
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.listview import ListView
-
-from kivy.uix.label import Label
-from kivy.uix.button import Button
-
-from kivy.graphics import Color
-from kivy.graphics import Rectangle
-from kivy.graphics import Line
 
 from kivy.core.window import Window
-from kivy.logger import Logger
-from random import random
 
-white = .85, .90, .93, 1
-red = .84, .29, .34, 1
-blue = .69, .78, .85, 1
-green = .67, .75, .57, 1
-brown = .87, .67, .49, 1
+from kivy.properties import BooleanProperty, NumericProperty, ObjectProperty
 
-def randomColor():
-    return (random(), random(), random(), 1)
+class ModifiedCell(BoxLayout):
+    pass
 
+class EmptyCell(GridLayout):
+    pass
 
-class screen(BoxLayout):
+class ConstantCell(BoxLayout):
+    pass
 
-    def __init__(self, sudoku, **kwargs):
-        super(screen, self).__init__(**kwargs)
+class Candidate(Label):
+    pass
 
-        self.locationsGrid = allLocationsGrid(sudoku)
-        self.inputButtonGrid = inputButtonGrid(sudoku)
-        self.valueOrCandidateButton = toggleValueOrCandidateEdit(sudoku)
-        self.autoUpdateButton = toggleAutoUpdateCandidates(sudoku)
-        self.solveModeButton = toggleSolveMode(sudoku)
-        self.solveOneStepButton = solveStep(sudoku, 1)
-        self.solveAllButton = solveAll(sudoku)
-        self.logOutView = logOutput(sudoku)
+class PlayScreen(Screen):
+    pass
 
-        self.buttonHolder = GridLayout(cols=3, size_hint_y=.1, height=20)
-        self.buttonHolder.add_widget(self.valueOrCandidateButton)
-        self.buttonHolder.add_widget(self.autoUpdateButton)
-        self.buttonHolder.add_widget(self.solveModeButton)
+class SelectScreen(Screen):
+    pass
 
-        self.buttonHolder2 = GridLayout(cols=4, size_hint_y=.1, height=20)
-        self.buttonHolder2.add_widget(self.solveOneStepButton)
-        self.buttonHolder2.add_widget(self.solveAllButton)
+class Game(ScreenManager):
+    app = ObjectProperty(None)
+    sudoku = ObjectProperty(None)
+    selected = NumericProperty(0)
+    changeValues = BooleanProperty(True)
+    displaySolvingCandidates = BooleanProperty(False)
+    solveMode = BooleanProperty(False)
+    autoUpdateUserCandidates = BooleanProperty(True)
+    highlightOccourences = BooleanProperty(True)
+    highlightClashes = BooleanProperty(True)
 
-        self.add_widget(self.locationsGrid)
-        self.add_widget(self.inputButtonGrid)
-        self.add_widget(self.buttonHolder)
-        self.add_widget(self.buttonHolder2)
-        self.add_widget(self.logOutView)
+    def __init__(self, **kwargs):
+        super(Game, self).__init__(**kwargs)
+        self.current = "select"
+        Window.bind(size=self.on_screenSizeChange)
+        self.bind(sudoku=self.on_sudoku)
+        # self.bind(changeValues=self.on_changeValues)
+        # self.bind(displaySolvingCandidates=self.on_displaySolvingCandidates)
+        # self.bind(solveMode=self.on_solveMode)
+        # self.bind(autoUpdateUserCandidates=self.on_autoUpdateUserCandidates)
+        # self.bind(highlightOccourences=self.on_highlightOccourences)
+        # self.bind(highlightClashes=self.on_highlightClashes)
 
+    def on_screenSizeChange(self, caller, size):
+        self.resizeCells()
 
-class cell(GridLayout):
+    def newSudoku(self, size):
+        # sudoku = Sudoku(size=size)
+        sudoku = Sudoku("009003201470002030800000074020000300000000710000794000000300000000925000000018500")
+        sudoku.initialiseCandidates()
+        return sudoku
 
-    def __init__(self, sudoku, location, **kwargs):
-        super(cell, self).__init__(**kwargs)
-
-        self.location = location
-
-        if sudoku.isConstant(location):
-            self.initConstant(sudoku, location)
-        elif sudoku.isEmpty(location):
-            self.initEmpty(sudoku, location)
-        else:
-            self.initUser(sudoku, location)
-
-    def initConstant(self, sudoku, location):
-
-        value = str(sudoku.getValue(location))
-        self.add_widget(Label(text=value, font_size=40, color=green))
-
-    def initEmpty(self, sudoku, location):
-
-        self.cols = sudoku.subGridsInRow()
-
-        if sudoku.displaySolvingCandidates:
-            for candidate in sorted(sudoku.allSolvingCandidates(location)):
-                candidateValue = str(candidate)
-                candidateLabel = Label(text=candidateValue, color=red)
-                self.add_widget(candidateLabel)
-
-        else:
-            for candidate in sorted(sudoku.userCandidates(location)):
-                candidateValue = str(candidate)
-                candidateLabel = Label(text=candidateValue, color=red)
-                self.add_widget(candidateLabel)
-
-    def initUser(self, sudoku, location):
-
-        value = str(sudoku.getValue(location))
-        self.add_widget(Label(text=value, font_size=30, color=blue))
-
-    def on_touch_down(self, touch):
-
-        if self.collide_point(*touch.pos):
-            sudoku.selected = self.location
-
-            return True
-
-    def update(self, sudoku):
-
-        self.clear_widgets()
-
-        if sudoku.isClashing(self.location):
-            with self.canvas:
-                Color(*red)
-                Rectangle(size=self.size, pos=self.pos)
-        else:
-            self.canvas.clear()
-
-        if self.location == sudoku.selected and sudoku.isEmpty(self.location):
-            with self.canvas.before:
-                Color(*brown)
-                Line(rectangle=(self.pos[0], self.pos[1], self.size[0], self.size[1]))
-        else:
-            self.canvas.before.clear()
-
-        if sudoku.isConstant(self.location):
-            value = str(sudoku.getValue(self.location))
-            self.add_widget(Label(text=value, font_size=40, color=green))
+    def resizeCells(self):
+        if self.sudoku is None:
             return
 
-        if sudoku.isModified(self.location):
-            value = str(sudoku.getValue(self.location))
-            self.add_widget(Label(text=value, font_size=40, color=blue))
-            return
+        cellWidth = self.cellWidth()
+        candidateWidth = self.candidateWidth()
 
-        if sudoku.displaySolvingCandidates:
-            for candidate in sorted(sudoku.allSolvingCandidates(self.location)):
-                candidateValue = str(candidate)
-                candidateLabel = Label(text=candidateValue, color=red)
-                self.add_widget(candidateLabel)
+        for cell in self.ids.playGrid.cells:
+            cell.size = cellWidth, cellWidth
+            cell.text_size = [cellWidth*.8]*2
+            if self.sudoku.isEmpty(cell.location):
+                for candidate in cell.candidates:
+                    candidate.size = [candidateWidth]*2
+                    candidate.text_size = [candidateWidth*.8]*2
 
-        else:
-            for candidate in sorted(sudoku.userCandidates(self.location)):
-                candidateValue = str(candidate)
-                candidateLabel = Label(text=candidateValue, color=red)
-                self.add_widget(candidateLabel)
+    def cellWidth(self):
+        windowWidth = min(Window.size)
+        cellWidth = windowWidth/float(self.sudoku.unitSize())
 
-            if sudoku.highlightOccourences:
-                if not sudoku.selected:
-                    return
-                if not sudoku.isEmpty(sudoku.selected):
-                    if sudoku.getValue(sudoku.selected) in sudoku.userCandidates(self.location):
-                        for candidate in self.children:
-                            if candidate.text == str(sudoku.getValue(sudoku.selected)):
-                                candidate.color = brown
+        return cellWidth
 
+    def candidateWidth(self):
+        cellWidth = self.cellWidth()
+        candidateWidth = cellWidth/float(self.sudoku.subGridsInRow())
 
-class allLocationsGrid(GridLayout):
+        return candidateWidth
 
-    def __init__(self, sudoku, **kwargs):
-        super(allLocationsGrid, self).__init__(**kwargs)
+    def setSudoku(self, size):
+        self.sudoku = self.newSudoku(size)
 
-        self.cols = sudoku.unitSize()
+    # def getSudoku(self):
+    #     return self.sudoku
 
-        self.locations = []
+    def on_sudoku(self, caller, sudoku):
+        self.current = "play"
+        self.initialiseGrid()
 
-        for location in sudoku.locations():
-            newLocation = cell(sudoku, location)
-            self.locations.append(newLocation)
-            self.add_widget(newLocation)
-
-    def on_touch_up(self, touch):  # temp fix, needs to use on_touch_down method
-
-        if self.collide_point(*touch.pos):
-            for cell in self.children:
-                cell.update(sudoku)
-
-            for button in self.parent.inputButtonGrid.children:
-                button.disabled = sudoku.isConstant(sudoku.selected)
-
-            return True
-
-
-class inputButton(Button):
-
-    def __init__(self, value, **kwargs):
-        super(inputButton, self).__init__(**kwargs)
-
-        self.text = str(value)
-        self.value = value
-        self.font_size = 30
-
-    def on_touch_down(self, touch):
-
-        if self.collide_point(*touch.pos):
-            if sudoku.selected is None:
-                return True
-
-            if not sudoku.isConstant(sudoku.selected):
-
-                if sudoku.changeValues:
-                    sudoku.setValue(sudoku.selected, self.value)
-                else:
-                    sudoku.toggleUserCandidate(sudoku.selected, self.value)
-
-                if sudoku.autoUpdateUserCandidates:
-                    sudoku.updateUserCandidates()
-
-                for cell in self.parent.parent.locationsGrid.children:
-                    cell.update(sudoku)
-
-            return True
-
-
-class inputButtonGrid(GridLayout):
-
-    def __init__(self, sudoku, **kwargs):
-        super(inputButtonGrid, self).__init__(**kwargs)
-
-        self.cols = sudoku.subGridsInRow()
-
-        for value in sudoku.possibleValues():
-            newInputButton = inputButton(value)
-            self.add_widget(newInputButton)
-
-
-class toggleValueOrCandidateEdit(Button):
-
-    def __init__(self, sudoku, **kwargs):
-        super(toggleValueOrCandidateEdit, self).__init__(**kwargs)
-
-        self.states = {True: "Values",
-                       False: "Candidates"}
-
-        self.text = self.states[sudoku.changeValues]
-
-    def on_touch_down(self, touch):
-
-        if self.collide_point(*touch.pos):
-            sudoku.changeValues = not sudoku.changeValues
-            self.text = self.states[sudoku.changeValues]
-            return True
-
-
-class toggleUserOrSolvingCandidates(Button):
-
-    def __init__(self, sudoku, **kwargs):
-        super(toggleUserOrSolvingCandidates, self).__init__(**kwargs)
-
-        self.states = {True: "Solving",
-                       False: "User"}
-
-        self.text = self.states[sudoku.displaySolvingCandidates]
-
-    def on_touch_down(self, touch):
-
-        if self.collide_point(*touch.pos):
-            sudoku.displaySolvingCandidates = not sudoku.displaySolvingCandidates
-            self.text = self.states[sudoku.displaySolvingCandidates]
-            return True
-
-
-class toggleSolveMode(Button):
-
-    def __init__(self, sudoku, **kwargs):
-        super(toggleSolveMode, self).__init__(**kwargs)
-
-        self.states = {True: "Exit Solve Mode",
-                       False: "Go Solve!"}
-
-        self.text = self.states[sudoku.solveMode]
-
-    def on_touch_down(self, touch):
-        from copy import deepcopy
-
-        if self.collide_point(*touch.pos):
-            sudoku.solveMode = not sudoku.solveMode
-            self.text = self.states[sudoku.solveMode]
-
-            if sudoku.solveMode:
-                discrepancies = False
-                modifiedLocations = False
-
-                if sudoku.modifiedLocations():
-                    modifiedLocations = True
-
-                if modifiedLocations:
-                    valuesString = "".join([str(sudoku.getValue(location)) if sudoku.isConstant(location) else "0" for location in sudoku.locations()])
-                    solvedPuzzle = Sudoku(valuesString)
-                    solvedPuzzle.solve(10, bruteForceOnFail=True)
-
-                    for location in sudoku.modifiedLocations():
-                        if sudoku.getValue(location) != solvedPuzzle.getValue(location):
-                            discrepancies = True
-                            break
-
-                if discrepancies:
-                    for location in sudoku.modifiedLocations():
-                        sudoku.clearLocation(location)
-
-                sudoku.hasIntersections = False
-                sudoku.hasCandidates = False
-                sudoku.initialiseCandidates()
-
-                sudoku.displaySolvingCandidates = True
-
+    def initialiseGrid(self):
+        self.ids.playGrid.cols = self.sudoku.unitSize()
+        self.ids.playGrid.cells = []
+        for location in self.sudoku.locations():
+            if self.sudoku.isConstant(location):
+                newCell = self.newFilledCell(location, True)
+            elif self.sudoku.isModified(location):
+                newCell = self.newFilledCell(location, False)
             else:
-                if not sudoku.isComplete():
-                    sudoku.userCandidatesDict = {}
-                    sudoku.userCandidatesDict.update(sudoku.solvingCandidatesDict)
+                newCell = self.newEmptyCell(location)
 
-                sudoku.displaySolvingCandidates = False
+            self.ids.playGrid.add_widget(newCell)
+            self.ids.playGrid.cells.append(newCell)
 
-            for button in self.parent.parent.inputButtonGrid.children:
-                button.disabled = sudoku.solveMode
+    def newFilledCell(self, location, constant):
+        if constant:
+            cell = ConstantCell()
+        else:
+            cell = ModifiedCell()
+        cell.location = location
+        cell.size = [self.cellWidth()]*2
 
-            for cell in self.parent.parent.locationsGrid.children:
-                cell.update(sudoku)
+        valueLabel = Label()
+        valueLabel.text = str(self.sudoku.getValue(location))
+        valueLabel.size_hint = [1]*2
 
-            return True
+        cell.add_widget(valueLabel)
+        return cell
 
+    def newEmptyCell(self, location):
+        cell = EmptyCell()
+        cell.location = location
+        cell.size = [self.cellWidth()]*2
+        cell.cols = self.sudoku.subGridsInRow()
+        cell.candidates = []
 
-class toggleAutoUpdateCandidates(Button):
+        for candidate in self.sudoku.allSolvingCandidates(location):
+            candidateLabel = Candidate()
+            candidateLabel.size = [self.candidateWidth()]*2
+            candidateLabel.text = str(candidate)
+            cell.add_widget(candidateLabel)
+            cell.candidates.append(candidateLabel)
+        return cell
 
-    def __init__(self, sudoku, **kwargs):
-        super(toggleAutoUpdateCandidates, self).__init__(**kwargs)
-
-        self.states = {True: "Auto Update",
-                       False: "Not Auto Update"}
-
-        self.text = self.states[sudoku.autoUpdateUserCandidates]
-
-    def on_touch_down(self, touch):
-
-        if self.collide_point(*touch.pos):
-            sudoku.autoUpdateUserCandidates = not sudoku.autoUpdateUserCandidates
-            self.text = self.states[sudoku.autoUpdateUserCandidates]
-            if sudoku.autoUpdateUserCandidates:
-                sudoku.updateUserCandidates()
-                for cell in self.parent.parent.locationsGrid.children:
-                    cell.update(sudoku)
-            return True
-
-
-class solveStep(Button):
-
-    def __init__(self, sudoku, step, **kwargs):
-        super(solveStep, self).__init__(**kwargs)
-
-        self.step = step
-
-        self.text = "Solve " + str(step) + " step"
-
-    def on_touch_down(self, touch):
-
-        if self.collide_point(*touch.pos):
-            if sudoku.solveMode:
-                self.parent.parent.logOutView.logStart = len(sudoku.log)
-                sudoku.solve(maxSuccessfulSolveOperations=self.step)
-                self.parent.parent.logOutView.update(sudoku)
-                for cell in self.parent.parent.locationsGrid.children:
-                    cell.update(sudoku)
-            return True
-
-class solveAll(Button):
-
-    def __init__(self, sudoku, **kwargs):
-        super(solveAll, self).__init__(**kwargs)
-
-        self.text = "Solve all"
-
-    def on_touch_down(self, touch):
-
-        if self.collide_point(*touch.pos):
-            if sudoku.solveMode:
-                self.parent.parent.logOutView.logStart = len(sudoku.log)
-                sudoku.solve(bruteForceOnFail=True)
-                self.parent.parent.logOutView.update(sudoku)
-                for cell in self.parent.parent.locationsGrid.children:
-                    cell.update(sudoku)
-            return True
-
-class logOutput(ListView):
-    def __init__(self, sudoku, **kwargs):
-        super(logOutput, self).__init__(**kwargs)
-
-        self.logStart = len(sudoku.log)
-
-    def update(self, sudoku):
-
-        self.item_strings = sudoku.log[self.logStart:]
-
-
-class Sudokool(App):
+class SudokoolApp(App):
 
     def build(self):
-        sudoku.selected = None
-        sudoku.changeValues = True
-        sudoku.displaySolvingCandidates = False
-        sudoku.solveMode = False
-        sudoku.autoUpdateUserCandidates = True
-        sudoku.highlightOccourences = True
-        if sudoku.autoUpdateUserCandidates:
-            sudoku.initialiseUserCandidates()
+        self.game = Game(app=self)
+        return self.game
 
-        return screen(sudoku)
-
-string9 = "003020600\
-900305001\
-001806400\
-008102900\
-700000008\
-006708200\
-002609500\
-800203009\
-005010300"
-sudoku = Sudoku(string9)
-
-string16 = "B07805E0300AD0CG\
-004007000C0FA002\
-A000000000043700\
-0050009F00000008\
-0400B8000E079300\
-00E37C0000FDB004\
-9F07005D03000080\
-500D0F3024A8C0G0\
-08000000B0000GD5\
-00D000000800F0E0\
-00A090F0067000BC\
-000C0AB0000E7240\
-7A090B1000500630\
-D0CEF070A0000800\
-0000E0A00D005000\
-0635G9C00B00E000"
-
-bigSudoku = Sudoku(string16)
-sudoku.initialiseIntersections()
-
-if __name__ == '__main__':
-    Sudokool().run()
+if __name__ == "__main__":
+    SudokoolApp().run()
