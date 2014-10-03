@@ -141,6 +141,9 @@ class Game(ScreenManager):
             else:
                 newCell = self.newEmptyCell(location)
 
+            newCell.location = location
+            newCell.size = [self.cellWidth()]*2
+
             self.ids.puzzleView.add_widget(newCell)
             self.ids.puzzleView.cells.append(newCell)
 
@@ -149,8 +152,7 @@ class Game(ScreenManager):
             cell = ConstantCell()
         else:
             cell = ModifiedCell()
-        cell.location = location
-        cell.size = [self.cellWidth()]*2
+
         cell.font_size = self.cellWidth()*0.8
 
         cell.text = str(self.sudoku.getValue(location))
@@ -160,8 +162,7 @@ class Game(ScreenManager):
 
     def newEmptyCell(self, location):
         cell = EmptyCell()
-        cell.location = location
-        cell.size = [self.cellWidth()]*2
+
         cell.cols = self.sudoku.subGridsInRow()
         cell.candidates = []
 
