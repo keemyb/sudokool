@@ -8,10 +8,14 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.button import Button
 
 from kivy.core.window import Window
 
 from kivy.properties import BooleanProperty, NumericProperty, ObjectProperty
+
+class Input(Button):
+    pass
 
 class ModifiedCell(Label):
     pass
@@ -56,6 +60,14 @@ class Game(ScreenManager):
 
     def on_screenSizeChange(self, caller, size):
         self.resizeCells()
+        if Window.size[0] > Window.size[1]:
+            cols = None
+            rows = 1
+        else:
+            cols = 1
+            rows = None
+        self.ids.playScreenGrid.cols = cols
+        self.ids.playScreenGrid.rows = rows
 
     def newSudoku(self, size):
         # sudoku = Sudoku(size=size)
@@ -78,6 +90,9 @@ class Game(ScreenManager):
                     candidate.size = [candidateWidth]*2
                     candidate.font_size = candidateWidth*.8
 
+        print "play", self.ids.playGrid.width
+        print "screen", self.ids.playScreenGrid.width
+
     def cellWidth(self):
         windowWidth = min(Window.size)
         cellWidth = windowWidth/float(self.sudoku.unitSize())
@@ -96,6 +111,23 @@ class Game(ScreenManager):
     def on_sudoku(self, caller, sudoku):
         self.current = "play"
         self.initialiseGrid()
+        self.initialiseInputGrid()
+
+    def initialiseInputGrid(self):
+        self.ids.buttonGrid.cols = self.sudoku.subGridsInRow()
+        self.ids.buttonGrid.buttons = []
+        for value in self.sudoku.possibleValues():
+            newInputButton = self.newInputButton(value)
+
+            self.ids.buttonGrid.add_widget(newInputButton)
+            self.ids.buttonGrid.buttons.append(newInputButton)
+
+    def newInputButton(self, value):
+        button = Input()
+        button.text = str(value)
+        button.value = value
+        button.font_size = button.size[0]*0.8
+        return button
 
     def initialiseGrid(self):
         self.ids.playGrid.cols = self.sudoku.unitSize()
@@ -121,7 +153,7 @@ class Game(ScreenManager):
         cell.font_size = self.cellWidth()*0.8
 
         cell.text = str(self.sudoku.getValue(location))
-        cell.size_hint = [1]*2
+        # cell.size_hint = [1]*2
 
         return cell
 

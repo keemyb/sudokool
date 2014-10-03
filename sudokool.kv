@@ -38,7 +38,12 @@
                 pos: self.pos
                 size: self.size
         GridLayout:
-            id: playGrid
+            id: playScreenGrid
+            cols: 1
+            GridLayout:
+                id: playGrid
+            GridLayout:
+                id: buttonGrid
 
 <ConstantCell@Label>:
     size_hint: None, None
@@ -60,6 +65,12 @@
 
 <EmptyCell@GridLayout>:
     size_hint: None, None
+    canvas.before:
+        Color:
+            rgba: [.5, .5, .49, 1]
+        Rectangle:
+            pos: self.pos
+            size: self.size
 
 <Candidate@Label>:
     size_hint: None, None
@@ -69,3 +80,6 @@
         Rectangle:
             pos: self.pos
             size: self.size
+
+<Input@Button>:
+    #size_hint: None, None
