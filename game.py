@@ -29,7 +29,7 @@ class EmptyCell(GridLayout):
 class Candidate(Label):
     pass
 
-class PlayScreen(Screen):
+class GameScreen(Screen):
     pass
 
 class SelectScreen(Screen):
@@ -66,8 +66,8 @@ class Game(ScreenManager):
         else:
             cols = 1
             rows = None
-        self.ids.playScreenGrid.cols = cols
-        self.ids.playScreenGrid.rows = rows
+        self.ids.gameScreenGrid.cols = cols
+        self.ids.gameScreenGrid.rows = rows
 
     def newSudoku(self, size):
         # sudoku = Sudoku(size=size)
@@ -91,7 +91,7 @@ class Game(ScreenManager):
                     candidate.font_size = candidateWidth*.8
 
         print "play", self.ids.puzzleView.width
-        print "screen", self.ids.playScreenGrid.width
+        print "screen", self.ids.gameScreenGrid.width
 
     def cellWidth(self):
         windowWidth = min(Window.size)
@@ -109,7 +109,7 @@ class Game(ScreenManager):
         self.sudoku = self.newSudoku(size)
 
     def on_sudoku(self, caller, sudoku):
-        self.current = "play"
+        self.current = "game"
         self.initialiseGrid()
         self.initialiseInputGrid()
         self.on_screenSizeChange(self, Window.size)

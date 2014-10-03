@@ -29,8 +29,8 @@
                     text: "9"
                     on_press: MainSwitcher.setSudoku(9)
 
-    PlayScreen:
-        name: "play"
+    GameScreen:
+        name: "game"
         canvas:
             Color:
                 rgba: [1,1,0,1]
@@ -38,7 +38,7 @@
                 pos: self.pos
                 size: self.size
         GridLayout:
-            id: playScreenGrid
+            id: gameScreenGrid
             GridLayout:
                 id: puzzleView
             ScreenManager:
