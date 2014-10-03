@@ -110,7 +110,7 @@ class Game(ScreenManager):
 
     def on_sudoku(self, caller, sudoku):
         self.current = "game"
-        self.initialiseGrid()
+        self.initialisePuzzleView()
         self.initialiseInputGrid()
         self.on_screenSizeChange(self, Window.size)
 
@@ -130,7 +130,7 @@ class Game(ScreenManager):
         button.font_size = button.size[0]*0.8
         return button
 
-    def initialiseGrid(self):
+    def initialisePuzzleView(self):
         self.ids.puzzleView.cols = self.sudoku.unitSize()
         self.ids.puzzleView.cells = []
         for location in self.sudoku.locations():
