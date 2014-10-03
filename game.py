@@ -24,7 +24,16 @@ class Input(Button):
     pass
 
 class ModifiedCell(Label):
-    pass
+    def __init__(self, MainSwitcher, **kwargs):
+        super(ModifiedCell, self).__init__(**kwargs)
+        self.MainSwitcher = MainSwitcher
+
+    def on_touch_down(self, touch):
+
+        if self.collide_point(*touch.pos):
+            self.MainSwitcher.selected = self.location
+
+            return True
 
 class ConstantCell(Label):
     def __init__(self, MainSwitcher, **kwargs):
@@ -39,7 +48,16 @@ class ConstantCell(Label):
             return True
 
 class EmptyCell(GridLayout):
-    pass
+    def __init__(self, MainSwitcher, **kwargs):
+        super(EmptyCell, self).__init__(**kwargs)
+        self.MainSwitcher = MainSwitcher
+
+    def on_touch_down(self, touch):
+
+        if self.collide_point(*touch.pos):
+            self.MainSwitcher.selected = self.location
+
+            return True
 
 class Candidate(Label):
     pass
@@ -191,7 +209,7 @@ class Game(ScreenManager):
         if constant:
             cell = ConstantCell(self)
         else:
-            cell = ModifiedCell()
+            cell = ModifiedCell(self)
 
         cell.font_size = self.cellWidth()*0.8
 
@@ -201,7 +219,7 @@ class Game(ScreenManager):
         return cell
 
     def newEmptyCell(self, location):
-        cell = EmptyCell()
+        cell = EmptyCell(self)
 
         cell.cols = self.sudoku.subGridsInRow()
         cell.candidates = []
