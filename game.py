@@ -102,6 +102,12 @@ class Game(ScreenManager):
         # self.bind(autoUpdateUserCandidates=self.on_autoUpdateUserCandidates)
         # self.bind(highlightClashes=self.on_highlightClashes)
 
+    def updateCells(self, locations=None):
+        if locations is None:
+            self.ids.puzzleView.clear_widgets()
+            self.initialisePuzzleView()
+
+
     def on_screenSizeChange(self, caller, size):
         self.resizeCells()
         self.gameScreenGridOrient()
@@ -140,6 +146,7 @@ class Game(ScreenManager):
                 self.sudoku.setValue(self.selected, value)
             else:
                 self.sudoku.toggleUserCandidate(self.selected, value)
+            self.updateCells()
 
     def resizePlayModeGrid(self):
 
