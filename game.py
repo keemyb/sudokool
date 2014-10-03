@@ -136,7 +136,10 @@ class Game(ScreenManager):
         elif self.sudoku.isConstant(self.selected):
             return
         else:
-            self.sudoku.setValue(self.selected, value)
+            if self.changeValues:
+                self.sudoku.setValue(self.selected, value)
+            else:
+                self.sudoku.toggleUserCandidate(self.selected, value)
 
     def resizePlayModeGrid(self):
 
