@@ -14,7 +14,8 @@ from kivy.core.window import Window
 
 from kivy.properties import BooleanProperty, NumericProperty, ObjectProperty
 
-white = .85, .90, .93, 1
+superWhite = .92, .97, 1, 1
+offWhite = .85, .90, .93, 1
 red = .84, .29, .34, 1
 blue = .69, .78, .85, 1
 green = .67, .75, .57, 1
@@ -85,11 +86,11 @@ class Game(ScreenManager):
         Window.bind(size=self.on_screenSizeChange)
         self.bind(sudoku=self.on_sudoku)
         self.bind(selected=self.on_selected)
+        self.bind(highlightOccourences=self.on_highlightOccourences)
         # self.bind(changeValues=self.on_changeValues)
         # self.bind(displaySolvingCandidates=self.on_displaySolvingCandidates)
         # self.bind(solveMode=self.on_solveMode)
         # self.bind(autoUpdateUserCandidates=self.on_autoUpdateUserCandidates)
-        # self.bind(highlightOccourences=self.on_highlightOccourences)
         # self.bind(highlightClashes=self.on_highlightClashes)
 
     def on_screenSizeChange(self, caller, size):
@@ -99,7 +100,26 @@ class Game(ScreenManager):
             self.resizePlayModeGrid()
 
     def on_selected(self, caller, selected):
-        print self.selected
+        self.on_highlightOccourences(caller, self.on_highlightOccourences)
+
+    def on_highlightOccourences(self, caller, value):
+        for cell in self.ids.puzzleView.cells:
+            if self.sudoku.isFilled(cell.location):
+                cell.color = superWhite
+            else:
+                for candidate in cell.candidates:
+                    candidate.color = superWhite
+
+        if self.highlightOccourences and self.sudoku.isFilled(self.selected):
+            for cell in self.ids.puzzleView.cells:
+                if self.sudoku.isFilled(cell.location):
+                    if (cell.value == self.sudoku.getValue(self.selected) and
+                            cell.location != self.selected):
+                        cell.color = blue
+                else:
+                    for candidate in cell.candidates:
+                        if candidate.value == self.sudoku.getValue(self.selected):
+                            candidate.color = blue
 
     def resizePlayModeGrid(self):
 
@@ -213,8 +233,8 @@ class Game(ScreenManager):
 
         cell.font_size = self.cellWidth()*0.8
 
-        cell.text = str(self.sudoku.getValue(location))
-        # cell.size_hint = [1]*2
+        cell.value = self.sudoku.getValue(location)
+        cell.text = str(cell.value)
 
         return cell
 
@@ -226,9 +246,12 @@ class Game(ScreenManager):
 
         for candidate in self.sudoku.allSolvingCandidates(location):
             candidateLabel = Candidate()
-            candidateLabel.size = [self.candidateWidth()]*2
             candidateLabel.text = str(candidate)
+            candidateLabel.value = candidate
+
+            candidateLabel.size = [self.candidateWidth()]*2
             candidateLabel.font_size = self.candidateWidth()*.8
+
             cell.add_widget(candidateLabel)
             cell.candidates.append(candidateLabel)
         return cell
