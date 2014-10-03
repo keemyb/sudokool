@@ -112,14 +112,18 @@ class Game(ScreenManager):
         self.bind(sudoku=self.on_sudoku)
         self.bind(selected=self.on_selected)
         self.bind(highlightOccourences=self.on_highlightOccourences)
+        self.bind(autoUpdateUserCandidates=self.on_autoUpdateUserCandidates)
         # self.bind(solveMode=self.on_solveMode)
-        # self.bind(autoUpdateUserCandidates=self.on_autoUpdateUserCandidates)
         # self.bind(highlightClashes=self.on_highlightClashes)
 
     def updateCells(self, locations=None):
         if locations is None:
             self.ids.puzzleView.clear_widgets()
             self.initialisePuzzleView()
+
+    def on_autoUpdateUserCandidates(self, caller, value):
+        if self.autoUpdateUserCandidates:
+            self.updateCells()
 
     def on_screenSizeChange(self, caller, size):
         self.resizeCells()
@@ -157,6 +161,8 @@ class Game(ScreenManager):
         else:
             if self.changeValues:
                 self.sudoku.setValue(self.selected, value)
+                if self.autoUpdateUserCandidates:
+                    self.sudoku.updateUserCandidates()
             else:
                 self.sudoku.toggleUserCandidate(self.selected, value)
             self.updateCells()
