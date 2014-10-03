@@ -160,7 +160,7 @@ class Game(ScreenManager):
         else:
             newDisabledState = False
 
-        for button in self.ids.buttonGrid.buttons:
+        for button in self.ids.inputsGrid.buttons:
             button.disabled = newDisabledState
 
     def on_highlightOccourences(self, caller, value):
@@ -278,13 +278,13 @@ class Game(ScreenManager):
         self.ids.playModeGrid.add_widget(valueOrCandidateChange(self))
 
     def initialiseInputGrid(self):
-        self.ids.buttonGrid.cols = self.sudoku.subGridsInRow()
-        self.ids.buttonGrid.buttons = []
+        self.ids.inputsGrid.cols = self.sudoku.subGridsInRow()
+        self.ids.inputsGrid.buttons = []
         for value in self.sudoku.possibleValues():
             newInputButton = self.newInputButton(value)
 
-            self.ids.buttonGrid.add_widget(newInputButton)
-            self.ids.buttonGrid.buttons.append(newInputButton)
+            self.ids.inputsGrid.add_widget(newInputButton)
+            self.ids.inputsGrid.buttons.append(newInputButton)
 
     def newInputButton(self, value):
         button = Input(self)
