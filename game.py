@@ -22,7 +22,16 @@ green = .67, .75, .57, 1
 brown = .87, .67, .49, 1
 
 class Input(Button):
-    pass
+    def __init__(self, MainSwitcher, **kwargs):
+        super(Input, self).__init__(**kwargs)
+        self.MainSwitcher = MainSwitcher
+
+    def on_touch_down(self, touch):
+
+        if self.collide_point(*touch.pos):
+            self.MainSwitcher.setValue(self.value)
+
+            return True
 
 class ModifiedCell(Label):
     def __init__(self, MainSwitcher, **kwargs):
@@ -121,6 +130,14 @@ class Game(ScreenManager):
                         if candidate.value == self.sudoku.getValue(self.selected):
                             candidate.color = blue
 
+    def setValue(self, value):
+        if self.selected < 1:
+            return
+        elif self.sudoku.isConstant(self.selected):
+            return
+        else:
+            self.sudoku.setValue(self.selected, value)
+
     def resizePlayModeGrid(self):
 
         if Window.size[0] > Window.size[1]:
@@ -202,7 +219,7 @@ class Game(ScreenManager):
             self.ids.buttonGrid.buttons.append(newInputButton)
 
     def newInputButton(self, value):
-        button = Input()
+        button = Input(self)
         button.text = str(value)
         button.value = value
         button.font_size = button.size[0]*0.8
