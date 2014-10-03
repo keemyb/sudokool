@@ -245,16 +245,22 @@ class Game(ScreenManager):
         cell.candidates = []
 
         for candidate in self.sudoku.allSolvingCandidates(location):
-            candidateLabel = Candidate()
-            candidateLabel.text = str(candidate)
-            candidateLabel.value = candidate
-
-            candidateLabel.size = [self.candidateWidth()]*2
-            candidateLabel.font_size = self.candidateWidth()*.8
+            candidateLabel = self.newCandidateLabel(candidate)
 
             cell.add_widget(candidateLabel)
             cell.candidates.append(candidateLabel)
+
         return cell
+
+    def newCandidateLabel(self, candidate):
+        candidateLabel = Candidate()
+        candidateLabel.text = str(candidate)
+        candidateLabel.value = candidate
+
+        candidateLabel.size = [self.candidateWidth()]*2
+        candidateLabel.font_size = self.candidateWidth()*.8
+
+        return candidateLabel
 
 class SudokoolApp(App):
 
