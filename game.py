@@ -97,9 +97,9 @@ class SolveAll(Button):
 
             return True
 
-class solveMode(Button):
+class SolveMode(Button):
     def __init__(self, MainSwitcher, **kwargs):
-        super(solveMode, self).__init__(**kwargs)
+        super(SolveMode, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
 
         self.states = {True: "Exit Solve Mode",
@@ -452,8 +452,8 @@ class Game(ScreenManager):
     def initialiseSolveModeButton(self):
         self.solveModeButtons = []
 
-        solveModeForPlay = solveMode(self)
-        solveModeForSolve = solveMode(self)
+        solveModeForPlay = SolveMode(self)
+        solveModeForSolve = SolveMode(self)
 
         self.ids.miscPlayButtons.add_widget(solveModeForPlay)
         self.ids.miscSolveButtons.add_widget(solveModeForSolve)
