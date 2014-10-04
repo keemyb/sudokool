@@ -75,10 +75,10 @@ class SolveStep(Button):
 
             return True
 
-class solveAll(Button):
+class SolveAll(Button):
 
     def __init__(self, MainSwitcher, **kwargs):
-        super(solveAll, self).__init__(**kwargs)
+        super(SolveAll, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
 
         self.text = "Solve all"
@@ -443,7 +443,7 @@ class Game(ScreenManager):
         self.solveButtons = []
 
         solveOneStep = SolveStep(self, 1)
-        solveAllSteps = solveAll(self)
+        solveAllSteps = SolveAll(self)
 
         for button in (solveOneStep, solveAllSteps):
             self.ids.miscSolveButtons.add_widget(button)
