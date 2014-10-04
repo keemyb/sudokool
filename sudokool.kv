@@ -34,7 +34,7 @@
         name: "game"
         canvas:
             Color:
-                rgba: [1,1,0,1]
+                rgba: .85, .90, .93, 1
             Rectangle:
                 pos: self.pos
                 size: self.size
@@ -70,6 +70,12 @@
                             rows: 1
 
 <logOutput@ListView>:
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
 
 
 <solveStep@Button>:
