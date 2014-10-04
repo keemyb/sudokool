@@ -116,10 +116,10 @@ class SolveMode(Button):
     def updateText(self):
         self.text = self.states[self.MainSwitcher.solveMode]
 
-class updateUserCandidates(Button):
+class UpdateUserCandidates(Button):
 
     def __init__(self, MainSwitcher, **kwargs):
-        super(updateUserCandidates, self).__init__(**kwargs)
+        super(UpdateUserCandidates, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
 
         self.states = {True: "Update Candidates",
@@ -462,7 +462,7 @@ class Game(ScreenManager):
             self.solveModeButtons.append(button)
 
     def initialiseUpdateUserCandidatesButton(self):
-        self.ids.miscPlayButtons.add_widget(updateUserCandidates(self))
+        self.ids.miscPlayButtons.add_widget(UpdateUserCandidates(self))
 
     def initialiseValueOrCandidateChangeButton(self):
         self.ids.miscPlayButtons.add_widget(valueOrCandidateChange(self))
