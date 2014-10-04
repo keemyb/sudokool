@@ -85,7 +85,7 @@ class solveMode(Button):
         self.MainSwitcher = MainSwitcher
 
         self.states = {True: "Exit Solve Mode",
-                       False: "Go Solve!"}
+                       False: "Enter Solve Mode"}
 
         self.text = self.states[self.MainSwitcher.solveMode]
 
@@ -104,8 +104,8 @@ class updateUserCandidates(Button):
         super(updateUserCandidates, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
 
-        self.states = {True: "Auto Update",
-                       False: "Not Auto Update"}
+        self.states = {True: "Update Candidates",
+                       False: "Don't Update Candidates"}
 
         self.text = self.states[self.MainSwitcher.updateUserCandidates]
 
