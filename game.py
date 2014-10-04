@@ -337,16 +337,13 @@ class Game(ScreenManager):
         self.ids.playModeGrid.size_hint = size_hint_x, size_hint_y
 
     def miscButtonsOrient(self):
-
-        if Window.size[0] > Window.size[1]:
-            cols = None
-            rows = 1
-        else:
-            cols = 1
-            rows = None
+        cols = 1
+        rows = None
 
         self.ids.miscPlayButtons.cols = cols
         self.ids.miscPlayButtons.rows = rows
+        self.ids.miscSolveButtons.cols = cols
+        self.ids.miscSolveButtons.rows = rows
 
     def gameScreenGridOrient(self):
 
