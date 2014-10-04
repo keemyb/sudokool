@@ -57,8 +57,10 @@
                         id: playModeGrid
                         GridLayout:
                             id: inputsGrid
-                        GridLayout:
-                            id: miscPlayButtons
+                        AnchorLayout:
+                            anchor_y: "bottom"
+                            GridLayout:
+                                id: miscPlayButtons
 
                 SolveModeScreen:
                     id: solveModeScreen
@@ -68,9 +70,10 @@
                         id: solveModeGrid
                         BoxLayout:
                             id: logSpace
-                        GridLayout:
-                            id: miscSolveButtons
-                            rows: 1
+                        AnchorLayout:
+                            anchor_y: "bottom"
+                            GridLayout:
+                                id: miscSolveButtons
 
 <logOutput@ListView>:
     canvas.before:

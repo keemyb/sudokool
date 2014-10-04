@@ -342,6 +342,7 @@ class Game(ScreenManager):
 
         self.ids.miscPlayButtons.cols = cols
         self.ids.miscPlayButtons.rows = rows
+
         self.ids.miscSolveButtons.cols = cols
         self.ids.miscSolveButtons.rows = rows
 
