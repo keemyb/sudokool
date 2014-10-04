@@ -102,6 +102,12 @@
 
 <ConstantCell@Label>:
     size_hint: None, None
+
+    defaultBackColour: palette().rgba("green")
+    defaultTextColour: palette().rgba("superWhite")
+
+    color: palette().rgba("superWhite")
+
     canvas.before:
         Color:
             rgba: palette().rgba("green")
@@ -111,6 +117,12 @@
 
 <ModifiedCell@Label>:
     size_hint: None, None
+
+    defaultColour: palette().rgba("blue")
+    defaultTextColour: palette().rgba("superWhite")
+
+    color: palette().rgba("superWhite")
+
     canvas.before:
         Color:
             rgba: palette().rgba("blue")
@@ -120,6 +132,9 @@
 
 <EmptyCell@GridLayout>:
     size_hint: None, None
+
+    defaultColour: palette().rgba("black")
+
     canvas.before:
         Color:
             rgba: palette().rgba("black")
@@ -129,6 +144,12 @@
 
 <Candidate@Label>:
     size_hint: None, None
+
+    defaultColour: palette().rgba("brown")
+    defaultTextColour: palette().rgba("superWhite")
+
+    color: palette().rgba("superWhite")
+
     canvas.before:
         Color:
             rgba: palette().rgba("brown")
