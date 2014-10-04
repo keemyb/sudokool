@@ -103,11 +103,11 @@
 <ConstantCell@Label>:
     size_hint: None, None
 
-    color: palette().rgba("superWhite")
+    color: palette().rgba("constantText")
 
     canvas.before:
         Color:
-            rgba: palette().rgba("green")
+            rgba: palette().rgba("cellBack")
         Rectangle:
             pos: self.pos
             size: self.size
@@ -115,11 +115,11 @@
 <ModifiedCell@Label>:
     size_hint: None, None
 
-    color: palette().rgba("superWhite")
+    color: palette().rgba("modifiedText")
 
     canvas.before:
         Color:
-            rgba: palette().rgba("blue")
+            rgba: palette().rgba("cellBack")
         Rectangle:
             pos: self.pos
             size: self.size
@@ -129,7 +129,7 @@
 
     canvas.before:
         Color:
-            rgba: palette().rgba("black")
+            rgba: palette().rgba("emptyBack")
         Rectangle:
             pos: self.pos
             size: self.size
@@ -137,11 +137,11 @@
 <Candidate@Label>:
     size_hint: None, None
 
-    color: palette().rgba("superWhite")
+    color: palette().rgba("candidateText")
 
     canvas.before:
         Color:
-            rgba: palette().rgba("brown")
+            rgba: palette().rgba("candidateBack")
         Rectangle:
             pos: self.pos
             size: self.size

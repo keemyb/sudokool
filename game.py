@@ -27,6 +27,17 @@ class ColourPalette():
         self.colours["green"] = .67, .75, .57, 1
         self.colours["brown"] = .87, .67, .49, 1
         self.colours["black"] = 0, 0, 0, 1
+        self.colours["gold"] = .5, .42, .26, 1
+
+        self.colours["cellBack"] = self.colours["offWhite"]
+        self.colours["emptyBack"] = self.colours["cellBack"]
+        self.colours["candidateBack"] = self.colours["brown"]
+
+        self.colours["constantText"] = self.colours["green"]
+        self.colours["modifiedText"] = self.colours["blue"]
+        self.colours["candidateText"] = self.colours["superWhite"]
+
+        self.colours["occourenceText"] = self.colours["gold"]
 
     def rgba(self, colour):
         return self.colours[colour]
@@ -303,21 +314,21 @@ class Game(ScreenManager):
     def on_highlightOccourences(self, caller, value):
         for cell in self.ids.puzzleView.cells:
             if self.sudoku.isFilled(cell.location):
-                cell.color = self.palette.rgba("superWhite")
+                cell.color = cell.defaultTextColour
             else:
                 for candidate in cell.candidates:
-                    candidate.color = self.palette.rgba("superWhite")
+                    candidate.color = candidate.defaultTextColour
 
         if self.highlightOccourences and self.sudoku.isFilled(self.selected):
             for cell in self.ids.puzzleView.cells:
                 if self.sudoku.isFilled(cell.location):
                     if (cell.value == self.sudoku.getValue(self.selected) and
                             cell.location != self.selected):
-                        cell.color = self.palette.rgba("blue")
+                        cell.color = self.palette.rgba("occourenceText")
                 else:
                     for candidate in cell.candidates:
                         if candidate.value == self.sudoku.getValue(self.selected):
-                            candidate.color = self.palette.rgba("blue")
+                            candidate.color = self.palette.rgba("occourenceText")
 
     def setValue(self, value):
         if self.selected < 1:
@@ -499,12 +510,12 @@ class Game(ScreenManager):
     def newFilledCell(self, location, constant):
         if constant:
             cell = ConstantCell(self)
-            cell.defaultBackColour = self.palette.rgba("green")
+            cell.defaultTextColour = self.palette.rgba("constantText")
         else:
             cell = ModifiedCell(self)
-            cell.defaultBackColour = self.palette.rgba("back")
+            cell.defaultTextColour = self.palette.rgba("modifiedText")
 
-        cell.defaultTextColour = self.palette.rgba("superWhite")
+        cell.defaultBackColour = self.palette.rgba("cellBack")
 
         cell.font_size = self.cellWidth()*0.8
 
@@ -521,7 +532,7 @@ class Game(ScreenManager):
         cell.cols = cols
         cell.candidates = []
 
-        cell.defaultBackColour = self.palette.rgba("black")
+        cell.defaultBackColour = self.palette.rgba("emptyBack")
 
         if self.solveMode:
             for candidate in self.sudoku.allSolvingCandidates(location):
@@ -546,8 +557,8 @@ class Game(ScreenManager):
         candidateLabel.size = [self.candidateWidth()]*2
         candidateLabel.font_size = self.candidateWidth()*.8
 
-        candidateLabel.defaultBackColour = self.palette.rgba("brown")
-        candidateLabel.defaultTextColour = self.palette.rgba("superWhite")
+        candidateLabel.defaultBackColour = self.palette.rgba("candidateBack")
+        candidateLabel.defaultTextColour = self.palette.rgba("candidateText")
 
         return candidateLabel
 
