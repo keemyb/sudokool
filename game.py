@@ -361,8 +361,10 @@ class Game(ScreenManager):
         self.ids.gameScreenGrid.rows = rows
 
     def newSudoku(self, size):
-        # sudoku = Sudoku(size=size)
-        sudoku = Sudoku("009003201470002030800000074020000300000000710000794000000300000000925000000018500")
+        if size < 9:
+            sudoku = Sudoku(size=size)
+        else:
+            sudoku = Sudoku("009003201470002030800000074020000300000000710000794000000300000000925000000018500")
         sudoku.initialiseCandidates()
         return sudoku
 
