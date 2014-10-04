@@ -16,13 +16,6 @@ from kivy.core.window import Window
 
 from kivy.properties import BooleanProperty, NumericProperty, ObjectProperty
 
-superWhite = .92, .97, 1, 1
-offWhite = .85, .90, .93, 1
-red = .84, .29, .34, 1
-blue = .69, .78, .85, 1
-green = .67, .75, .57, 1
-brown = .87, .67, .49, 1
-
 class ColourPalette():
     def __init__(self):
         self.colours = {}
@@ -227,6 +220,7 @@ class Game(ScreenManager):
 
     def __init__(self, **kwargs):
         super(Game, self).__init__(**kwargs)
+        self.palette = ColourPalette()
         self.current = "select"
         Window.bind(size=self.on_screenSizeChange)
         self.bind(sudoku=self.on_sudoku)
@@ -309,21 +303,21 @@ class Game(ScreenManager):
     def on_highlightOccourences(self, caller, value):
         for cell in self.ids.puzzleView.cells:
             if self.sudoku.isFilled(cell.location):
-                cell.color = superWhite
+                cell.color = self.palette.rgba("superWhite")
             else:
                 for candidate in cell.candidates:
-                    candidate.color = superWhite
+                    candidate.color = self.palette.rgba("superWhite")
 
         if self.highlightOccourences and self.sudoku.isFilled(self.selected):
             for cell in self.ids.puzzleView.cells:
                 if self.sudoku.isFilled(cell.location):
                     if (cell.value == self.sudoku.getValue(self.selected) and
                             cell.location != self.selected):
-                        cell.color = blue
+                        cell.color = self.palette.rgba("blue")
                 else:
                     for candidate in cell.candidates:
                         if candidate.value == self.sudoku.getValue(self.selected):
-                            candidate.color = blue
+                            candidate.color = self.palette.rgba("blue")
 
     def setValue(self, value):
         if self.selected < 1:
@@ -469,7 +463,7 @@ class Game(ScreenManager):
 
     def initialiseInputGrid(self):
         cols = max(self.sudoku.subGridsInRow(), self.sudoku.subGridsInColumn())
-        
+
         self.ids.inputsGrid.cols = cols
         self.ids.inputsGrid.buttons = []
         for value in self.sudoku.possibleValues():
