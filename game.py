@@ -41,9 +41,9 @@ class ColourPalette():
     def rgb(self, colour):
         return self.colours[colour][:-1]
 
-class logOutput(ListView):
+class LogOutput(ListView):
     def __init__(self, MainSwitcher, **kwargs):
-        super(logOutput, self).__init__(**kwargs)
+        super(LogOutput, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
 
         self.logStart = len(self.MainSwitcher.sudoku.log)
@@ -433,7 +433,7 @@ class Game(ScreenManager):
         self.on_screenSizeChange(self, Window.size)
 
     def initialiseLogOutput(self):
-        newlogOutput = logOutput(self)
+        newlogOutput = LogOutput(self)
 
         self.logOutput = newlogOutput
 
