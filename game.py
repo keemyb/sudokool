@@ -499,8 +499,12 @@ class Game(ScreenManager):
     def newFilledCell(self, location, constant):
         if constant:
             cell = ConstantCell(self)
+            cell.defaultBackColour = self.palette.rgba("green")
         else:
             cell = ModifiedCell(self)
+            cell.defaultBackColour = self.palette.rgba("back")
+
+        cell.defaultTextColour = self.palette.rgba("superWhite")
 
         cell.font_size = self.cellWidth()*0.8
 
@@ -516,6 +520,8 @@ class Game(ScreenManager):
 
         cell.cols = cols
         cell.candidates = []
+
+        cell.defaultBackColour = self.palette.rgba("black")
 
         if self.solveMode:
             for candidate in self.sudoku.allSolvingCandidates(location):
@@ -539,6 +545,9 @@ class Game(ScreenManager):
 
         candidateLabel.size = [self.candidateWidth()]*2
         candidateLabel.font_size = self.candidateWidth()*.8
+
+        candidateLabel.defaultBackColour = self.palette.rgba("brown")
+        candidateLabel.defaultTextColour = self.palette.rgba("superWhite")
 
         return candidateLabel
 
