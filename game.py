@@ -4,7 +4,10 @@ kivy.require('1.8.0')
 from sudoku import Sudoku
 from kivy.app import App
 
+from kivy.core.window import Window
 from kivy.uix.screenmanager import ScreenManager, Screen
+
+from kivy.properties import BooleanProperty, NumericProperty, ObjectProperty
 
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.listview import ListView
@@ -12,9 +15,7 @@ from kivy.uix.listview import ListView
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 
-from kivy.core.window import Window
-
-from kivy.properties import BooleanProperty, NumericProperty, ObjectProperty
+from kivy.graphics import Color
 
 class ColourPalette():
     def __init__(self):
@@ -315,9 +316,13 @@ class Game(ScreenManager):
         for cell in self.ids.puzzleView.cells:
             if self.sudoku.isFilled(cell.location):
                 cell.color = cell.defaultTextColour
+                with cell.canvas.before:
+                    Color(*cell.defaultBackColour)
             else:
                 for candidate in cell.candidates:
                     candidate.color = candidate.defaultTextColour
+                    with cell.canvas.before:
+                        Color(*cell.defaultBackColour)
 
     def on_highlightOccourences(self, caller, value):
         self.resetCellColours()
