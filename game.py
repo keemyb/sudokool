@@ -149,6 +149,7 @@ class Game(ScreenManager):
         self.gameScreenGridOrient()
         if not self.solveMode:
             self.resizePlayModeGrid()
+            self.miscButtonsOrient()
 
     def on_selected(self, caller, selected):
         self.enforceInputButtonState()
@@ -211,6 +212,18 @@ class Game(ScreenManager):
 
         self.ids.playModeGrid.size_hint = size_hint_x, size_hint_y
 
+    def miscButtonsOrient(self):
+
+        if Window.size[0] > Window.size[1]:
+            cols = None
+            rows = 1
+        else:
+            cols = 1
+            rows = None
+
+        self.ids.miscButtons.cols = cols
+        self.ids.miscButtons.rows = rows
+
     def gameScreenGridOrient(self):
 
         if Window.size[0] > Window.size[1]:
@@ -272,10 +285,10 @@ class Game(ScreenManager):
         self.on_screenSizeChange(self, Window.size)
 
     def initialiseUpdateUserCandidatesButton(self):
-        self.ids.playModeGrid.add_widget(updateUserCandidates(self))
+        self.ids.miscButtons.add_widget(updateUserCandidates(self))
 
     def initialiseValueOrCandidateChangeButton(self):
-        self.ids.playModeGrid.add_widget(valueOrCandidateChange(self))
+        self.ids.miscButtons.add_widget(valueOrCandidateChange(self))
 
     def initialiseInputGrid(self):
         self.ids.inputsGrid.cols = self.sudoku.subGridsInRow()
