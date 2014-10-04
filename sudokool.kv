@@ -5,7 +5,7 @@
             rgba: [0,1,0,1]
 
     SelectScreen:
-        id: "select"
+        id: selectScreen
         name: "select"
         canvas:
             Color:
@@ -30,6 +30,7 @@
                     on_press: MainSwitcher.setSudoku(9)
 
     GameScreen:
+        id: gameScreen
         name: "game"
         canvas:
             Color:
@@ -44,16 +45,32 @@
                 size_hint: None, None
             ScreenManager:
                 id: playSolveSwitcher
-                Screen:
+
+                PlayModeScreen:
                     id: playModeScreen
+                    name: "playMode"
                     GridLayout:
                         cols: 1
                         id: playModeGrid
                         GridLayout:
                             id: inputsGrid
                         GridLayout:
-                            id: miscButtons
+                            id: miscPlayButtons
+
+                SolveModeScreen:
+                    id: solveModeScreen
+                    name: "solveMode"
+                    GridLayout:
+                        cols: 1
+                        id: solveModeGrid
+                        ListView:
+                            id: logHolder
+                        GridLayout:
+                            id: miscSolveButtons
                             rows: 1
+
+<solveMode@Button>:
+
 
 <valueOrCandidateChange@Button>:
 

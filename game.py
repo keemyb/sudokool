@@ -20,6 +20,22 @@ blue = .69, .78, .85, 1
 green = .67, .75, .57, 1
 brown = .87, .67, .49, 1
 
+class solveMode(Button):
+    def __init__(self, MainSwitcher, **kwargs):
+        super(solveMode, self).__init__(**kwargs)
+        self.MainSwitcher = MainSwitcher
+
+        self.states = {True: "Exit Solve Mode",
+                       False: "Go Solve!"}
+
+        self.text = self.states[self.MainSwitcher.solveMode]
+
+    def on_touch_down(self, touch):
+
+        if self.collide_point(*touch.pos):
+            self.MainSwitcher.solveMode = not self.MainSwitcher.solveMode
+            self.text = self.states[self.MainSwitcher.solveMode]
+
 class updateUserCandidates(Button):
 
     def __init__(self, MainSwitcher, **kwargs):
@@ -107,6 +123,12 @@ class EmptyCell(GridLayout):
 class Candidate(Label):
     pass
 
+class PlayModeScreen(Screen):
+    pass
+
+class SolveModeScreen(Screen):
+    pass
+
 class GameScreen(Screen):
     pass
 
@@ -131,7 +153,7 @@ class Game(ScreenManager):
         self.bind(selected=self.on_selected)
         self.bind(highlightOccourences=self.on_highlightOccourences)
         self.bind(updateUserCandidates=self.on_updateUserCandidates)
-        # self.bind(solveMode=self.on_solveMode)
+        self.bind(solveMode=self.on_solveMode)
         # self.bind(highlightClashes=self.on_highlightClashes)
 
     def updateCells(self, locations=None):
@@ -154,6 +176,12 @@ class Game(ScreenManager):
     def on_selected(self, caller, selected):
         self.enforceInputButtonState()
         self.on_highlightOccourences(caller, self.on_highlightOccourences)
+
+    def on_solveMode(self, caller, selected):
+        if self.solveMode:
+            self.ids.playSolveSwitcher.current = "solveMode"
+        else:
+            self.ids.playSolveSwitcher.current = "playMode"
 
     def enforceInputButtonState(self):
         if self.sudoku.isConstant(self.selected):
@@ -221,8 +249,8 @@ class Game(ScreenManager):
             cols = 1
             rows = None
 
-        self.ids.miscButtons.cols = cols
-        self.ids.miscButtons.rows = rows
+        self.ids.miscPlayButtons.cols = cols
+        self.ids.miscPlayButtons.rows = rows
 
     def gameScreenGridOrient(self):
 
@@ -282,13 +310,17 @@ class Game(ScreenManager):
         self.initialiseInputGrid()
         self.initialiseValueOrCandidateChangeButton()
         self.initialiseUpdateUserCandidatesButton()
+        self.initialiseSolveModeButton()
         self.on_screenSizeChange(self, Window.size)
 
+    def initialiseSolveModeButton(self):
+        self.ids.miscPlayButtons.add_widget(solveMode(self))
+
     def initialiseUpdateUserCandidatesButton(self):
-        self.ids.miscButtons.add_widget(updateUserCandidates(self))
+        self.ids.miscPlayButtons.add_widget(updateUserCandidates(self))
 
     def initialiseValueOrCandidateChangeButton(self):
-        self.ids.miscButtons.add_widget(valueOrCandidateChange(self))
+        self.ids.miscPlayButtons.add_widget(valueOrCandidateChange(self))
 
     def initialiseInputGrid(self):
         self.ids.inputsGrid.cols = self.sudoku.subGridsInRow()
