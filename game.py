@@ -52,10 +52,10 @@ class LogOutput(ListView):
 
         self.item_strings = self.MainSwitcher.sudoku.log[self.logStart:]
 
-class solveStep(Button):
+class SolveStep(Button):
 
     def __init__(self, MainSwitcher, step, **kwargs):
-        super(solveStep, self).__init__(**kwargs)
+        super(SolveStep, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
 
         self.step = step
@@ -442,7 +442,7 @@ class Game(ScreenManager):
     def initialiseSolveButtons(self):
         self.solveButtons = []
 
-        solveOneStep = solveStep(self, 1)
+        solveOneStep = SolveStep(self, 1)
         solveAllSteps = solveAll(self)
 
         for button in (solveOneStep, solveAllSteps):
