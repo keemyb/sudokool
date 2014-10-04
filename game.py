@@ -20,6 +20,41 @@ blue = .69, .78, .85, 1
 green = .67, .75, .57, 1
 brown = .87, .67, .49, 1
 
+class solveStep(Button):
+
+    def __init__(self, MainSwitcher, step, **kwargs):
+        super(solveStep, self).__init__(**kwargs)
+        self.MainSwitcher = MainSwitcher
+
+        self.step = step
+        self.text = "Solve " + str(step) + " step"
+
+    def on_touch_down(self, touch):
+
+        if self.collide_point(*touch.pos):
+            if self.MainSwitcher.sudoku.solveMode:
+                self.MainSwitcher.sudoku.solve(maxSuccessfulSolveOperations=self.step)
+                self.MainSwitcher.updateCells()
+
+            return True
+
+class solveAll(Button):
+
+    def __init__(self, MainSwitcher, **kwargs):
+        super(solveAll, self).__init__(**kwargs)
+        self.MainSwitcher = MainSwitcher
+
+        self.text = "Solve all"
+
+    def on_touch_down(self, touch):
+
+        if self.collide_point(*touch.pos):
+            if self.MainSwitcher.sudoku.solveMode:
+                self.MainSwitcher.sudoku.solve(bruteForceOnFail=True)
+                self.MainSwitcher.updateCells()
+
+            return True
+
 class solveMode(Button):
     def __init__(self, MainSwitcher, **kwargs):
         super(solveMode, self).__init__(**kwargs)
@@ -34,7 +69,10 @@ class solveMode(Button):
 
         if self.collide_point(*touch.pos):
             self.MainSwitcher.solveMode = not self.MainSwitcher.solveMode
-            self.text = self.states[self.MainSwitcher.solveMode]
+            self.updateText()
+
+    def updateText(self):
+        self.text = self.states[self.MainSwitcher.solveMode]
 
 class updateUserCandidates(Button):
 
@@ -178,10 +216,44 @@ class Game(ScreenManager):
         self.on_highlightOccourences(caller, self.on_highlightOccourences)
 
     def on_solveMode(self, caller, selected):
+        self.enforceSolveModeText()
+
         if self.solveMode:
+            discrepancies = False
+            modifiedLocations = False
+
+            if self.sudoku.modifiedLocations():
+                modifiedLocations = True
+
+            if modifiedLocations:
+                valuesString = "".join([str(self.sudoku.getValue(location)) if self.sudoku.isConstant(location) else "0" for location in self.sudoku.locations()])
+                solvedPuzzle = Sudoku(valuesString)
+                solvedPuzzle.solve(10, bruteForceOnFail=True)
+
+                for location in self.sudoku.modifiedLocations():
+                    if self.sudoku.getValue(location) != solvedPuzzle.getValue(location):
+                        discrepancies = True
+                        break
+
+            if discrepancies:
+                for location in self.sudoku.modifiedLocations():
+                    self.sudoku.clearLocation(location)
+
+            self.sudoku.hasIntersections = False
+            self.sudoku.hasCandidates = False
+            self.sudoku.initialiseCandidates()
+
             self.ids.playSolveSwitcher.current = "solveMode"
         else:
+            if not self.sudoku.isComplete():
+                self.sudoku.userCandidatesDict = {}
+                self.sudoku.userCandidatesDict.update(self.sudoku.solvingCandidatesDict)
+
             self.ids.playSolveSwitcher.current = "playMode"
+
+    def enforceSolveModeText(self):
+        for button in self.solveModeButtons:
+            button.updateText()
 
     def enforceInputButtonState(self):
         if self.sudoku.isConstant(self.selected):
@@ -310,11 +382,31 @@ class Game(ScreenManager):
         self.initialiseInputGrid()
         self.initialiseValueOrCandidateChangeButton()
         self.initialiseUpdateUserCandidatesButton()
+        self.initialiseSolveButtons()
         self.initialiseSolveModeButton()
         self.on_screenSizeChange(self, Window.size)
 
+    def initialiseSolveButtons(self):
+        self.solveButtons = []
+
+        solveOneStep = solveStep(self, 1)
+        solveAllSteps = solveAll(self)
+
+        for button in (solveOneStep, solveAllSteps):
+            self.ids.miscSolveButtons.add_widget(button)
+            self.solveButtons.append(button)
+
     def initialiseSolveModeButton(self):
-        self.ids.miscPlayButtons.add_widget(solveMode(self))
+        self.solveModeButtons = []
+
+        solveModeForPlay = solveMode(self)
+        solveModeForSolve = solveMode(self)
+
+        self.ids.miscPlayButtons.add_widget(solveModeForPlay)
+        self.ids.miscSolveButtons.add_widget(solveModeForSolve)
+
+        for button in (solveModeForPlay, solveModeForSolve):
+            self.solveModeButtons.append(button)
 
     def initialiseUpdateUserCandidatesButton(self):
         self.ids.miscPlayButtons.add_widget(updateUserCandidates(self))
