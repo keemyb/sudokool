@@ -1,4 +1,5 @@
 #: import sm kivy.uix.screenmanager
+#: import palette game.ColourPalette
 
 <Game>:
     id: MainSwitcher
@@ -11,7 +12,7 @@
         name: "select"
         canvas:
             Color:
-                rgba: [.84, .29, .34, 1]
+                rgba: palette().rgba("red")
             Rectangle:
                 pos: self.pos
                 size: self.size
@@ -36,7 +37,7 @@
         name: "game"
         canvas:
             Color:
-                rgba: .85, .90, .93, 1
+                rgba: palette().rgba("offWhite")
             Rectangle:
                 pos: self.pos
                 size: self.size
@@ -78,7 +79,7 @@
 <logOutput@ListView>:
     canvas.before:
         Color:
-            rgba: 0, 0, 0, 1
+            rgba: palette().rgba("black")
         Rectangle:
             pos: self.pos
             size: self.size
@@ -103,7 +104,7 @@
     size_hint: None, None
     canvas.before:
         Color:
-            rgba: [.67, .75, .57, 1]
+            rgba: palette().rgba("green")
         Rectangle:
             pos: self.pos
             size: self.size
@@ -112,7 +113,7 @@
     size_hint: None, None
     canvas.before:
         Color:
-            rgba: [.69, .78, .85, 1]
+            rgba: palette().rgba("blue")
         Rectangle:
             pos: self.pos
             size: self.size
@@ -121,7 +122,7 @@
     size_hint: None, None
     canvas.before:
         Color:
-            rgba: [.5, .5, .49, 1]
+            rgba: palette().rgba("black")
         Rectangle:
             pos: self.pos
             size: self.size
@@ -130,7 +131,7 @@
     size_hint: None, None
     canvas.before:
         Color:
-            rgba: [.87, .67, .49, 1]
+            rgba: palette().rgba("brown")
         Rectangle:
             pos: self.pos
             size: self.size

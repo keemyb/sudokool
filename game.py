@@ -23,6 +23,24 @@ blue = .69, .78, .85, 1
 green = .67, .75, .57, 1
 brown = .87, .67, .49, 1
 
+class ColourPalette():
+    def __init__(self):
+        self.colours = {}
+
+        self.colours["superWhite"] = .92, .97, 1, 1
+        self.colours["offWhite"] = .85, .90, .93, 1
+        self.colours["red"] = .84, .29, .34, 1
+        self.colours["blue"] = .69, .78, .85, 1
+        self.colours["green"] = .67, .75, .57, 1
+        self.colours["brown"] = .87, .67, .49, 1
+        self.colours["black"] = 0, 0, 0, 1
+
+    def rgba(self, colour):
+        return self.colours[colour]
+
+    def rgb(self, colour):
+        return self.colours[colour][:-1]
+
 class logOutput(ListView):
     def __init__(self, MainSwitcher, **kwargs):
         super(logOutput, self).__init__(**kwargs)
