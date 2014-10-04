@@ -246,6 +246,8 @@ class Game(ScreenManager):
         if locations is None:
             self.ids.puzzleView.clear_widgets()
             self.initialisePuzzleView()
+            self.resetCellColours()
+            self.enforceHighlightOccourences()
 
     def on_updateUserCandidates(self, caller, value):
         if self.updateUserCandidates:
@@ -261,7 +263,7 @@ class Game(ScreenManager):
 
     def on_selected(self, caller, selected):
         self.enforceInputButtonState()
-        self.on_highlightOccourences(caller, self.on_highlightOccourences)
+        self.updateCells()
 
     def on_solveMode(self, caller, selected):
         self.enforceSolveModeText()
@@ -325,8 +327,6 @@ class Game(ScreenManager):
                         Color(*cell.defaultBackColour)
 
     def enforceHighlightOccourences(self):
-        self.resetCellColours()
-
         if self.highlightOccourences and self.sudoku.isFilled(self.selected):
             for cell in self.ids.puzzleView.cells:
                 if self.sudoku.isFilled(cell.location):
