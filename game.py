@@ -311,13 +311,16 @@ class Game(ScreenManager):
         for button in self.ids.inputsGrid.buttons:
             button.disabled = newDisabledState
 
-    def on_highlightOccourences(self, caller, value):
+    def resetCellColours(self):
         for cell in self.ids.puzzleView.cells:
             if self.sudoku.isFilled(cell.location):
                 cell.color = cell.defaultTextColour
             else:
                 for candidate in cell.candidates:
                     candidate.color = candidate.defaultTextColour
+
+    def on_highlightOccourences(self, caller, value):
+        self.resetCellColours()
 
         if self.highlightOccourences and self.sudoku.isFilled(self.selected):
             for cell in self.ids.puzzleView.cells:
