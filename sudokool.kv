@@ -1,3 +1,5 @@
+#: import sm kivy.uix.screenmanager
+
 <Game>:
     id: MainSwitcher
     canvas:
@@ -45,6 +47,7 @@
                 size_hint: None, None
             ScreenManager:
                 id: playSolveSwitcher
+                transition: sm.FadeTransition()
 
                 PlayModeScreen:
                     id: playModeScreen
