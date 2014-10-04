@@ -324,7 +324,7 @@ class Game(ScreenManager):
                     with cell.canvas.before:
                         Color(*cell.defaultBackColour)
 
-    def on_highlightOccourences(self, caller, value):
+    def enforceHighlightOccourences(self):
         self.resetCellColours()
 
         if self.highlightOccourences and self.sudoku.isFilled(self.selected):
@@ -337,6 +337,9 @@ class Game(ScreenManager):
                     for candidate in cell.candidates:
                         if candidate.value == self.sudoku.getValue(self.selected):
                             candidate.color = self.palette.rgba("occourenceText")
+
+    def on_highlightOccourences(self, caller, value):
+        self.enforceHighlightOccourences()
 
     def setValue(self, value):
         if self.selected < 1:
