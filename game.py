@@ -134,10 +134,10 @@ class UpdateUserCandidates(Button):
             self.text = self.states[self.MainSwitcher.updateUserCandidates]
             return True
 
-class valueOrCandidateChange(Button):
+class ValueOrCandidateChange(Button):
 
     def __init__(self, MainSwitcher, **kwargs):
-        super(valueOrCandidateChange, self).__init__(**kwargs)
+        super(ValueOrCandidateChange, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
 
         self.states = {True: "Values",
@@ -465,7 +465,7 @@ class Game(ScreenManager):
         self.ids.miscPlayButtons.add_widget(UpdateUserCandidates(self))
 
     def initialiseValueOrCandidateChangeButton(self):
-        self.ids.miscPlayButtons.add_widget(valueOrCandidateChange(self))
+        self.ids.miscPlayButtons.add_widget(ValueOrCandidateChange(self))
 
     def initialiseInputGrid(self):
         cols = max(self.sudoku.subGridsInRow(), self.sudoku.subGridsInColumn())
