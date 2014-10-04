@@ -231,8 +231,8 @@ class Sudoku():
         if difficulty is None:
             difficulty = 0.5
 
-        valuesInHardPuzzle = 26
-        valuesInEasyPuzzle = 32
+        valuesInHardPuzzle = round((26/81.0) * len(self.locations()))
+        valuesInEasyPuzzle = round((32/81.0) * len(self.locations()))
 
         variableValues = valuesInEasyPuzzle - valuesInHardPuzzle
 
