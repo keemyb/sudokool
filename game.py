@@ -393,7 +393,10 @@ class Game(ScreenManager):
 
     def candidateWidth(self):
         cellWidth = self.cellWidth()
-        candidateWidth = cellWidth/float(self.sudoku.subGridsInRow())
+
+        widthDivisor = max(self.sudoku.subGridsInRow(), self.sudoku.subGridsInColumn())
+
+        candidateWidth = cellWidth/float(widthDivisor)
 
         return candidateWidth
 
@@ -449,7 +452,9 @@ class Game(ScreenManager):
         self.ids.miscPlayButtons.add_widget(valueOrCandidateChange(self))
 
     def initialiseInputGrid(self):
-        self.ids.inputsGrid.cols = self.sudoku.subGridsInRow()
+        cols = max(self.sudoku.subGridsInRow(), self.sudoku.subGridsInColumn())
+        
+        self.ids.inputsGrid.cols = cols
         self.ids.inputsGrid.buttons = []
         for value in self.sudoku.possibleValues():
             newInputButton = self.newInputButton(value)
@@ -497,7 +502,9 @@ class Game(ScreenManager):
     def newEmptyCell(self, location):
         cell = EmptyCell(self)
 
-        cell.cols = self.sudoku.subGridsInRow()
+        cols = max(self.sudoku.subGridsInRow(), self.sudoku.subGridsInColumn())
+
+        cell.cols = cols
         cell.candidates = []
 
         if self.solveMode:
