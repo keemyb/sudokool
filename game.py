@@ -5,8 +5,11 @@ from sudoku import Sudoku
 from kivy.app import App
 
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.uix.label import Label
+
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.listview import ListView
+
+from kivy.uix.label import Label
 from kivy.uix.button import Button
 
 from kivy.core.window import Window
@@ -19,6 +22,17 @@ red = .84, .29, .34, 1
 blue = .69, .78, .85, 1
 green = .67, .75, .57, 1
 brown = .87, .67, .49, 1
+
+class logOutput(ListView):
+    def __init__(self, MainSwitcher, **kwargs):
+        super(logOutput, self).__init__(**kwargs)
+        self.MainSwitcher = MainSwitcher
+
+        self.logStart = len(self.MainSwitcher.sudoku.log)
+
+    def update(self):
+
+        self.item_strings = self.MainSwitcher.sudoku.log[self.logStart:]
 
 class solveStep(Button):
 
@@ -33,7 +47,12 @@ class solveStep(Button):
 
         if self.collide_point(*touch.pos):
             if self.MainSwitcher.sudoku.solveMode:
+                self.MainSwitcher.logOutput.logStart = len(self.MainSwitcher.sudoku.log)
+
                 self.MainSwitcher.sudoku.solve(maxSuccessfulSolveOperations=self.step)
+
+                self.MainSwitcher.logOutput.update()
+
                 self.MainSwitcher.updateCells()
 
             return True
@@ -50,7 +69,12 @@ class solveAll(Button):
 
         if self.collide_point(*touch.pos):
             if self.MainSwitcher.sudoku.solveMode:
+                self.MainSwitcher.logOutput.logStart = len(self.MainSwitcher.sudoku.log)
+
                 self.MainSwitcher.sudoku.solve(bruteForceOnFail=True)
+
+                self.MainSwitcher.logOutput.update()
+
                 self.MainSwitcher.updateCells()
 
             return True
@@ -382,9 +406,17 @@ class Game(ScreenManager):
         self.initialiseInputGrid()
         self.initialiseValueOrCandidateChangeButton()
         self.initialiseUpdateUserCandidatesButton()
+        self.initialiseLogOutput()
         self.initialiseSolveButtons()
         self.initialiseSolveModeButton()
         self.on_screenSizeChange(self, Window.size)
+
+    def initialiseLogOutput(self):
+        newlogOutput = logOutput(self)
+
+        self.logOutput = newlogOutput
+
+        self.ids.logSpace.add_widget(newlogOutput)
 
     def initialiseSolveButtons(self):
         self.solveButtons = []
