@@ -16,6 +16,7 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 
 from kivy.graphics import Color
+from kivy.graphics import Rectangle
 
 class ColourPalette():
     def __init__(self):
@@ -246,7 +247,6 @@ class Game(ScreenManager):
         if locations is None:
             self.ids.puzzleView.clear_widgets()
             self.initialisePuzzleView()
-            self.resetCellColours()
             self.enforceHighlightOccourences()
 
     def on_updateUserCandidates(self, caller, value):
@@ -313,18 +313,6 @@ class Game(ScreenManager):
 
         for button in self.ids.inputsGrid.buttons:
             button.disabled = newDisabledState
-
-    def resetCellColours(self):
-        for cell in self.ids.puzzleView.cells:
-            if self.sudoku.isFilled(cell.location):
-                cell.color = cell.defaultTextColour
-                with cell.canvas.before:
-                    Color(*cell.defaultBackColour)
-            else:
-                for candidate in cell.candidates:
-                    candidate.color = candidate.defaultTextColour
-                    with cell.canvas.before:
-                        Color(*cell.defaultBackColour)
 
     def enforceHighlightOccourences(self):
         if self.highlightOccourences and self.sudoku.isFilled(self.selected):
@@ -397,6 +385,7 @@ class Game(ScreenManager):
             sudoku = Sudoku(size=size)
         else:
             sudoku = Sudoku("009003201470002030800000074020000300000000710000794000000300000000925000000018500")
+            # sudoku = Sudoku(size=size)
         sudoku.initialiseCandidates()
         return sudoku
 
@@ -410,6 +399,7 @@ class Game(ScreenManager):
         for cell in self.ids.puzzleView.cells:
             cell.size = cellWidth, cellWidth
             cell.font_size = cellWidth*.8
+
             if self.sudoku.isEmpty(cell.location):
                 for candidate in cell.candidates:
                     candidate.size = [candidateWidth]*2
@@ -503,7 +493,12 @@ class Game(ScreenManager):
 
     def initialisePuzzleView(self):
         self.ids.puzzleView.cols = self.sudoku.unitSize()
+
+        self.ids.puzzleView.size_hint = None, None
+        self.ids.puzzleView.size = [self.cellWidth()*self.sudoku.unitSize()]*2
+
         self.ids.puzzleView.cells = []
+
         for location in self.sudoku.locations():
             if self.sudoku.isConstant(location):
                 newCell = self.newFilledCell(location, True)
@@ -513,20 +508,19 @@ class Game(ScreenManager):
                 newCell = self.newEmptyCell(location)
 
             newCell.location = location
+            newCell.size_hint = None, None
             newCell.size = [self.cellWidth()]*2
 
             self.ids.puzzleView.add_widget(newCell)
             self.ids.puzzleView.cells.append(newCell)
 
+        self.resizeCells()
+
     def newFilledCell(self, location, constant):
         if constant:
             cell = ConstantCell(self)
-            cell.defaultTextColour = self.palette.rgba("constantText")
         else:
             cell = ModifiedCell(self)
-            cell.defaultTextColour = self.palette.rgba("modifiedText")
-
-        cell.defaultBackColour = self.palette.rgba("cellBack")
 
         cell.font_size = self.cellWidth()*0.8
 
@@ -543,35 +537,30 @@ class Game(ScreenManager):
         cell.cols = cols
         cell.candidates = []
 
-        cell.defaultBackColour = self.palette.rgba("emptyBack")
-
         if self.solveMode:
             for candidate in self.sudoku.allSolvingCandidates(location):
-                candidateLabel = self.newCandidateLabel(candidate)
+                candidateCell = self.newCandidateCell(candidate)
 
-                cell.add_widget(candidateLabel)
-                cell.candidates.append(candidateLabel)
+                cell.add_widget(candidateCell)
+                cell.candidates.append(candidateCell)
         else:
             for candidate in self.sudoku.userCandidates(location):
-                candidateLabel = self.newCandidateLabel(candidate)
+                candidateCell = self.newCandidateCell(candidate)
 
-                cell.add_widget(candidateLabel)
-                cell.candidates.append(candidateLabel)
+                cell.add_widget(candidateCell)
+                cell.candidates.append(candidateCell)
 
         return cell
 
-    def newCandidateLabel(self, candidate):
-        candidateLabel = Candidate()
-        candidateLabel.text = str(candidate)
-        candidateLabel.value = candidate
+    def newCandidateCell(self, candidate):
+        candidateCell = Candidate()
+        candidateCell.text = str(candidate)
+        candidateCell.value = candidate
 
-        candidateLabel.size = [self.candidateWidth()]*2
-        candidateLabel.font_size = self.candidateWidth()*.8
+        candidateCell.size = [self.candidateWidth()]*2
+        candidateCell.font_size = self.candidateWidth()*.8
 
-        candidateLabel.defaultBackColour = self.palette.rgba("candidateBack")
-        candidateLabel.defaultTextColour = self.palette.rgba("candidateText")
-
-        return candidateLabel
+        return candidateCell
 
 class SudokoolApp(App):
 

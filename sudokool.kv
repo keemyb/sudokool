@@ -37,7 +37,7 @@
         name: "game"
         canvas:
             Color:
-                rgba: palette().rgba("offWhite")
+                rgba: palette().rgba("red")
             Rectangle:
                 pos: self.pos
                 size: self.size
@@ -45,7 +45,7 @@
             id: gameScreenGrid
             GridLayout:
                 id: puzzleView
-                size_hint: None, None
+
             ScreenManager:
                 id: playSolveSwitcher
                 transition: sm.FadeTransition()
