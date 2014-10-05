@@ -188,8 +188,9 @@ class ModifiedCell(Label):
             return True
 
     def update(self):
-        if self.highlightOccourences:
-            if self.MainSwitcher.selected == self.location:
+        if self.MainSwitcher.highlightOccourences:
+            if (self.MainSwitcher.sudoku.getValue(self.MainSwitcher.selected) ==
+                self.value):
                 self.color = self.MainSwitcher.palette.rgba("occourenceText")
             else:
                 self.color = self.MainSwitcher.palette.rgba("modifiedText")
@@ -209,8 +210,9 @@ class ConstantCell(Label):
             return True
 
     def update(self):
-        if self.highlightOccourences:
-            if self.MainSwitcher.selected == self.location:
+        if self.MainSwitcher.highlightOccourences:
+            if (self.MainSwitcher.sudoku.getValue(self.MainSwitcher.selected) ==
+                self.value):
                 self.color = self.MainSwitcher.palette.rgba("occourenceText")
             else:
                 self.color = self.MainSwitcher.palette.rgba("constantText")
@@ -230,15 +232,16 @@ class EmptyCell(GridLayout):
             return True
 
     def update(self):
-        if self.highlightOccourences:
+        if self.MainSwitcher.highlightOccourences:
             for candidate in self.candidates:
-                if self.MainSwitcher.selected == self.location:
-                    self.color = self.MainSwitcher.palette.rgba("occourenceText")
+                if (self.MainSwitcher.sudoku.getValue(self.MainSwitcher.selected) ==
+                        candidate.value):
+                    candidate.color = self.MainSwitcher.palette.rgba("occourenceText")
                 else:
-                    self.color = self.MainSwitcher.palette.rgba("modifiedText")
+                    candidate.color = self.MainSwitcher.palette.rgba("candidateText")
         else:
             for candidate in self.candidates:
-                self.color = self.MainSwitcher.palette.rgba("modifiedText")
+                candidate.color = self.MainSwitcher.palette.rgba("candidateText")
 
 class Candidate(Label):
     pass
@@ -300,6 +303,9 @@ class Game(ScreenManager):
 
                 self.ids.puzzleView.add_widget(cell)
                 self.ids.puzzleView.cells.append(cell)
+
+        for cell in self.ids.puzzleView.cells:
+            cell.update()
 
     def on_updateUserCandidates(self, caller, value):
         if self.updateUserCandidates:
@@ -367,7 +373,7 @@ class Game(ScreenManager):
             button.disabled = newDisabledState
 
     def on_highlightOccourences(self, caller, value):
-        pass
+        self.updateCells()
 
     def setValue(self, value):
         if self.selected < 1:
