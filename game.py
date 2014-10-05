@@ -58,6 +58,25 @@ class LogOutput(ListView):
 
         self.item_strings = self.MainSwitcher.sudoku.log[self.logStart:]
 
+class ClearLocation(Button):
+
+    def __init__(self, MainSwitcher, **kwargs):
+        super(ClearLocation, self).__init__(**kwargs)
+        self.MainSwitcher = MainSwitcher
+
+        self.text = "Clear location"
+
+    def on_touch_down(self, touch):
+
+        if self.collide_point(*touch.pos):
+            if self.MainSwitcher.sudoku.isConstant(self.MainSwitcher.selected):
+                return True
+            else:
+                self.MainSwitcher.sudoku.clearLocation(self.MainSwitcher.selected)
+                self.MainSwitcher.updateCells([self.MainSwitcher.selected])
+
+                return True
+
 class SolveStep(Button):
 
     def __init__(self, MainSwitcher, step, **kwargs):
@@ -320,6 +339,7 @@ class Game(ScreenManager):
             self.miscButtonsOrient()
 
     def on_selected(self, caller, selected):
+        self.enforceClearLocationButtonState()
         self.enforceInputButtonState()
         self.updateCells([self.selected])
 
@@ -362,6 +382,12 @@ class Game(ScreenManager):
     def enforceSolveModeText(self):
         for button in self.solveModeButtons:
             button.updateText()
+
+    def enforceClearLocationButtonState(self):
+        if self.sudoku.isConstant(self.selected):
+            self.clearLocationButton.disabled = True
+        else:
+            self.clearLocationButton.disabled = False
 
     def enforceInputButtonState(self):
         if self.sudoku.isConstant(self.selected):
@@ -490,12 +516,20 @@ class Game(ScreenManager):
             self.sudoku.initialiseUserCandidates()
         self.initialisePuzzleView()
         self.initialiseInputGrid()
+        self.initialiseClearLocationButton()
         self.initialiseValueOrCandidateChangeButton()
         self.initialiseUpdateUserCandidatesButton()
         self.initialiseLogOutput()
         self.initialiseSolveButtons()
         self.initialiseSolveModeButton()
         self.on_screenSizeChange(self, Window.size)
+
+    def initialiseClearLocationButton(self):
+        clearLocationButton = ClearLocation(self)
+
+        self.clearLocationButton = clearLocationButton
+
+        self.ids.miscPlayButtons.add_widget(clearLocationButton)
 
     def initialiseLogOutput(self):
         newlogOutput = LogOutput(self)
