@@ -258,10 +258,12 @@ class Game(ScreenManager):
             self.initialisePuzzleView()
             self.enforceHighlightOccourences()
         else:
-            from copy import copy
-            unchangedCells = [copy(cell) for cell in self.ids.puzzleView.cells if cell.location not in locations]
-            self.ids.puzzleView.cells = []
+
+            unchangedCells = [cell for cell in self.ids.puzzleView.cells if cell.location not in locations]
+
             self.ids.puzzleView.clear_widgets()
+            self.ids.puzzleView.cells = []
+
             for location in self.sudoku.locations():
                 if location not in locations:
                     cell = unchangedCells[0]
