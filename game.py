@@ -214,6 +214,9 @@ class EmptyCell(GridLayout):
 class Candidate(Label):
     pass
 
+class EmptyCandidate(Label):
+    pass
+
 class PlayModeScreen(Screen):
     pass
 
@@ -546,24 +549,26 @@ class Game(ScreenManager):
         cell.candidates = []
 
         if self.solveMode:
-            for candidate in self.sudoku.allSolvingCandidates(location):
-                candidateCell = self.newCandidateCell(candidate)
-
-                cell.add_widget(candidateCell)
-                cell.candidates.append(candidateCell)
+            candidates = self.sudoku.allSolvingCandidates(location)
         else:
-            for candidate in self.sudoku.userCandidates(location):
-                candidateCell = self.newCandidateCell(candidate)
+            candidates = self.sudoku.userCandidates(location)
 
-                cell.add_widget(candidateCell)
-                cell.candidates.append(candidateCell)
+        for value in self.sudoku.setOfPossibleValues:
+            candidateCell = self.newCandidateCell(value, candidates)
+
+            cell.add_widget(candidateCell)
+            cell.candidates.append(candidateCell)
 
         return cell
 
-    def newCandidateCell(self, candidate):
-        candidateCell = Candidate()
-        candidateCell.text = str(candidate)
-        candidateCell.value = candidate
+    def newCandidateCell(self, value, candidates):
+        if value in candidates:
+            candidateCell = Candidate()
+            candidateCell.text = str(value)
+            candidateCell.value = value
+        else:
+            candidateCell = EmptyCandidate()
+            candidateCell.value = 0
 
         candidateCell.size = self.candidateSize()
         candidateCell.font_size = self.candidateWidth() * self.padDecimal
