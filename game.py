@@ -399,19 +399,16 @@ class Game(ScreenManager):
         if self.sudoku is None:
             return
 
-        cellWidth = self.cellWidth()
-        candidateWidth = self.candidateWidth()
-
         for cell in self.ids.puzzleView.cells:
-            cell.size = cellWidth, cellWidth
-            cell.font_size = cellWidth * self.padDecimal
+            cell.size = self.cellSize()
+            cell.font_size = self.cellWidth() * self.padDecimal
 
             if self.sudoku.isEmpty(cell.location):
                 for candidate in cell.candidates:
-                    candidate.size = [candidateWidth]*2
-                    candidate.font_size = candidateWidth * self.padDecimal
+                    candidate.size = self.candidateSize()
+                    candidate.font_size = self.candidateWidth() * self.padDecimal
 
-        self.ids.puzzleView.size = [cellWidth*self.sudoku.unitSize()]*2
+        self.ids.puzzleView.size = [self.cellWidth() * self.sudoku.unitSize()] * 2
 
     def cellWidth(self):
         windowWidth = min(Window.size)
@@ -427,6 +424,12 @@ class Game(ScreenManager):
         candidateWidth = cellWidth/float(widthDivisor)
 
         return candidateWidth
+
+    def cellSize(self):
+        return [self.cellWidth()] * 2
+
+    def candidateSize(self):
+        return [self.candidateWidth()] * 2
 
     def setSudoku(self, size):
         self.sudoku = self.newSudoku(size)
@@ -501,7 +504,7 @@ class Game(ScreenManager):
         self.ids.puzzleView.cols = self.sudoku.unitSize()
 
         self.ids.puzzleView.size_hint = None, None
-        self.ids.puzzleView.size = [self.cellWidth()*self.sudoku.unitSize()]*2
+        self.ids.puzzleView.size = [self.cellWidth() * self.sudoku.unitSize()] * 2
 
         self.ids.puzzleView.cells = []
 
@@ -514,8 +517,7 @@ class Game(ScreenManager):
                 newCell = self.newEmptyCell(location)
 
             newCell.location = location
-            newCell.size_hint = None, None
-            newCell.size = [self.cellWidth()]*2
+            newCell.size = self.cellSize()
 
             self.ids.puzzleView.add_widget(newCell)
             self.ids.puzzleView.cells.append(newCell)
@@ -563,7 +565,7 @@ class Game(ScreenManager):
         candidateCell.text = str(candidate)
         candidateCell.value = candidate
 
-        candidateCell.size = [self.candidateWidth()]*2
+        candidateCell.size = self.candidateSize()
         candidateCell.font_size = self.candidateWidth() * self.padDecimal
 
         return candidateCell
