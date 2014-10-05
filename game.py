@@ -234,6 +234,7 @@ class Game(ScreenManager):
     def __init__(self, **kwargs):
         super(Game, self).__init__(**kwargs)
         self.palette = ColourPalette()
+        self.padDecimal = 0.8
         self.current = "select"
         Window.bind(size=self.on_screenSizeChange)
         self.bind(sudoku=self.on_sudoku)
@@ -398,12 +399,12 @@ class Game(ScreenManager):
 
         for cell in self.ids.puzzleView.cells:
             cell.size = cellWidth, cellWidth
-            cell.font_size = cellWidth*.8
+            cell.font_size = cellWidth * self.padDecimal
 
             if self.sudoku.isEmpty(cell.location):
                 for candidate in cell.candidates:
                     candidate.size = [candidateWidth]*2
-                    candidate.font_size = candidateWidth*.8
+                    candidate.font_size = candidateWidth * self.padDecimal
 
         self.ids.puzzleView.size = [cellWidth*self.sudoku.unitSize()]*2
 
@@ -488,7 +489,7 @@ class Game(ScreenManager):
         button = Input(self)
         button.text = str(value)
         button.value = value
-        button.font_size = button.size[0]*0.8
+        button.font_size = button.size[0] * self.padDecimal
         return button
 
     def initialisePuzzleView(self):
@@ -522,7 +523,7 @@ class Game(ScreenManager):
         else:
             cell = ModifiedCell(self)
 
-        cell.font_size = self.cellWidth()*0.8
+        cell.font_size = self.cellWidth() * self.padDecimal
 
         cell.value = self.sudoku.getValue(location)
         cell.text = str(cell.value)
@@ -558,7 +559,7 @@ class Game(ScreenManager):
         candidateCell.value = candidate
 
         candidateCell.size = [self.candidateWidth()]*2
-        candidateCell.font_size = self.candidateWidth()*.8
+        candidateCell.font_size = self.candidateWidth() * self.padDecimal
 
         return candidateCell
 
