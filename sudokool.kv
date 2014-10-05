@@ -99,6 +99,14 @@
 
 <updateUserCandidates@Button>:
 
+<ConstantCell,ModifiedCell,EmptyCell>
+    canvas.after:
+        Color:
+            rgba: palette().rgba("black")
+        Line:
+            rectangle: self.x, self.y, self.width, self.height
+            width: 1
+
 
 <ConstantCell@Label>:
     size_hint: None, None
