@@ -207,7 +207,7 @@ class ModifiedCell(Label):
             return True
 
     def update(self):
-        if self.MainSwitcher.highlightOccourences:
+        if self.MainSwitcher.highlightOccourences and self.MainSwitcher.selected > 0:
             if (self.MainSwitcher.sudoku.getValue(self.MainSwitcher.selected) ==
                 self.value):
                 self.color = self.MainSwitcher.palette.rgba("occourenceText")
@@ -229,7 +229,7 @@ class ConstantCell(Label):
             return True
 
     def update(self):
-        if self.MainSwitcher.highlightOccourences:
+        if self.MainSwitcher.highlightOccourences and self.MainSwitcher.selected > 0:
             if (self.MainSwitcher.sudoku.getValue(self.MainSwitcher.selected) ==
                 self.value):
                 self.color = self.MainSwitcher.palette.rgba("occourenceText")
@@ -251,7 +251,7 @@ class EmptyCell(GridLayout):
             return True
 
     def update(self):
-        if self.MainSwitcher.highlightOccourences:
+        if self.MainSwitcher.highlightOccourences and self.MainSwitcher.selected > 0:
             for candidate in self.candidates:
                 if (self.MainSwitcher.sudoku.getValue(self.MainSwitcher.selected) ==
                         candidate.value):
@@ -341,7 +341,10 @@ class Game(ScreenManager):
     def on_selected(self, caller, selected):
         self.enforceClearLocationButtonState()
         self.enforceInputButtonState()
-        self.updateCells([self.selected])
+        if self.selected < 1:
+            self.updateCells([])
+        else:
+            self.updateCells([self.selected])
 
     def on_solveMode(self, caller, selected):
         self.enforceSolveModeText()
@@ -349,6 +352,8 @@ class Game(ScreenManager):
         if self.solveMode:
             discrepancies = False
             modifiedLocations = False
+
+            self.selected = -1
 
             if self.sudoku.modifiedLocations():
                 modifiedLocations = True
