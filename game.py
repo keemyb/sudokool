@@ -282,7 +282,7 @@ class Game(ScreenManager):
         self.bind(highlightOccourences=self.on_highlightOccourences)
         self.bind(updateUserCandidates=self.on_updateUserCandidates)
         self.bind(solveMode=self.on_solveMode)
-        # self.bind(highlightClashes=self.on_highlightClashes)
+        self.bind(highlightClashes=self.on_highlightClashes)
 
     def updateCells(self, locations=None):
         if self.solveMode:
@@ -373,6 +373,9 @@ class Game(ScreenManager):
             button.disabled = newDisabledState
 
     def on_highlightOccourences(self, caller, value):
+        self.updateCells()
+
+    def on_highlightClashes(self, caller, value):
         self.updateCells()
 
     def setValue(self, value):
