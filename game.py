@@ -285,9 +285,7 @@ class Game(ScreenManager):
         if self.solveMode:
             self.ids.puzzleView.clear_widgets()
             self.initialisePuzzleView()
-            self.enforceHighlightOccourences()
         else:
-
             unchangedCells = [cell for cell in self.ids.puzzleView.cells if cell.location not in locations]
 
             self.ids.puzzleView.clear_widgets()
@@ -368,20 +366,8 @@ class Game(ScreenManager):
         for button in self.ids.inputsGrid.buttons:
             button.disabled = newDisabledState
 
-    def enforceHighlightOccourences(self):
-        if self.highlightOccourences and self.sudoku.isFilled(self.selected):
-            for cell in self.ids.puzzleView.cells:
-                if self.sudoku.isFilled(cell.location):
-                    if (cell.value == self.sudoku.getValue(self.selected) and
-                            cell.location != self.selected):
-                        cell.color = self.palette.rgba("occourenceText")
-                else:
-                    for candidate in cell.candidates:
-                        if candidate.value == self.sudoku.getValue(self.selected):
-                            candidate.color = self.palette.rgba("occourenceText")
-
     def on_highlightOccourences(self, caller, value):
-        self.enforceHighlightOccourences()
+        pass
 
     def setValue(self, value):
         if self.selected < 1:
