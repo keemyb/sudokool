@@ -274,8 +274,6 @@ class Game(ScreenManager):
                 self.ids.puzzleView.add_widget(cell)
                 self.ids.puzzleView.cells.append(cell)
 
-            self.resizeCells()
-
     def on_updateUserCandidates(self, caller, value):
         if self.updateUserCandidates:
             self.sudoku.updateUserCandidates()
