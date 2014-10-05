@@ -277,7 +277,7 @@ class Game(ScreenManager):
     def on_updateUserCandidates(self, caller, value):
         if self.updateUserCandidates:
             self.sudoku.updateUserCandidates()
-            self.updateCells()
+            self.updateCells(self.sudoku.locations())
 
     def on_screenSizeChange(self, caller, size):
         self.resizeCells()
