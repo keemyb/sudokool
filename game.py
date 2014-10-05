@@ -253,7 +253,7 @@ class Game(ScreenManager):
         # self.bind(highlightClashes=self.on_highlightClashes)
 
     def updateCells(self, locations=None):
-        if locations is None:
+        if self.solveMode:
             self.ids.puzzleView.clear_widgets()
             self.initialisePuzzleView()
             self.enforceHighlightOccourences()
@@ -290,7 +290,7 @@ class Game(ScreenManager):
 
     def on_selected(self, caller, selected):
         self.enforceInputButtonState()
-        self.updateCells()
+        self.updateCells([self.selected])
 
     def on_solveMode(self, caller, selected):
         self.enforceSolveModeText()
@@ -366,7 +366,13 @@ class Game(ScreenManager):
                 self.sudoku.setValue(self.selected, value)
                 if self.updateUserCandidates:
                     self.sudoku.updateUserCandidates()
-                self.updateCells()
+
+                    affectedLocations = self.sudoku.allCombinedNeighbours(self.selected)
+                    affectedLocations.add(self.selected)
+
+                    self.updateCells(affectedLocations)
+                else:
+                    self.updateCells([self.selected])
             else:
                 self.sudoku.toggleUserCandidate(self.selected, value)
                 self.updateCells([self.selected])
