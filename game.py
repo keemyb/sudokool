@@ -187,6 +187,15 @@ class ModifiedCell(Label):
 
             return True
 
+    def update(self):
+        if self.highlightOccourences:
+            if self.MainSwitcher.selected == self.location:
+                self.color = self.MainSwitcher.palette.rgba("occourenceText")
+            else:
+                self.color = self.MainSwitcher.palette.rgba("modifiedText")
+        else:
+            self.color = self.MainSwitcher.palette.rgba("modifiedText")
+
 class ConstantCell(Label):
     def __init__(self, MainSwitcher, **kwargs):
         super(ConstantCell, self).__init__(**kwargs)
@@ -199,6 +208,15 @@ class ConstantCell(Label):
 
             return True
 
+    def update(self):
+        if self.highlightOccourences:
+            if self.MainSwitcher.selected == self.location:
+                self.color = self.MainSwitcher.palette.rgba("occourenceText")
+            else:
+                self.color = self.MainSwitcher.palette.rgba("constantText")
+        else:
+            self.color = self.MainSwitcher.palette.rgba("constantText")
+
 class EmptyCell(GridLayout):
     def __init__(self, MainSwitcher, **kwargs):
         super(EmptyCell, self).__init__(**kwargs)
@@ -210,6 +228,17 @@ class EmptyCell(GridLayout):
             self.MainSwitcher.selected = self.location
 
             return True
+
+    def update(self):
+        if self.highlightOccourences:
+            for candidate in self.candidates:
+                if self.MainSwitcher.selected == self.location:
+                    self.color = self.MainSwitcher.palette.rgba("occourenceText")
+                else:
+                    self.color = self.MainSwitcher.palette.rgba("modifiedText")
+        else:
+            for candidate in self.candidates:
+                self.color = self.MainSwitcher.palette.rgba("modifiedText")
 
 class Candidate(Label):
     pass
