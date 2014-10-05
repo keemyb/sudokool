@@ -538,20 +538,25 @@ class Game(ScreenManager):
         self.ids.puzzleView.cells = []
 
         for location in self.sudoku.locations():
-            if self.sudoku.isConstant(location):
-                newCell = self.newFilledCell(location, True)
-            elif self.sudoku.isModified(location):
-                newCell = self.newFilledCell(location, False)
-            else:
-                newCell = self.newEmptyCell(location)
+            cell = self.newCell(location)
 
-            newCell.location = location
-            newCell.size = self.cellSize()
-
-            self.ids.puzzleView.add_widget(newCell)
-            self.ids.puzzleView.cells.append(newCell)
+            self.ids.puzzleView.add_widget(cell)
+            self.ids.puzzleView.cells.append(cell)
 
         self.resizeCells()
+
+    def newCell(self, location):
+        if self.sudoku.isConstant(location):
+            newCell = self.newFilledCell(location, True)
+        elif self.sudoku.isModified(location):
+            newCell = self.newFilledCell(location, False)
+        else:
+            newCell = self.newEmptyCell(location)
+
+        newCell.location = location
+        newCell.size = self.cellSize()
+
+        return newCell
 
     def newFilledCell(self, location, constant):
         if constant:
