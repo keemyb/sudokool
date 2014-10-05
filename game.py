@@ -163,6 +163,11 @@ class Input(Button):
         super(Input, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
 
+        self.bind(size=self.redraw)
+
+    def redraw(self, *args):
+        self.font_size = min(self.size[0], self.size[1]) * self.MainSwitcher.padDecimal
+
     def on_touch_down(self, touch):
 
         if self.collide_point(*touch.pos):
@@ -489,7 +494,7 @@ class Game(ScreenManager):
         button = Input(self)
         button.text = str(value)
         button.value = value
-        button.font_size = button.size[0] * self.padDecimal
+        button.font_size = min(button.size) * self.padDecimal
         return button
 
     def initialisePuzzleView(self):
