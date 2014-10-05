@@ -257,6 +257,31 @@ class Game(ScreenManager):
             self.ids.puzzleView.clear_widgets()
             self.initialisePuzzleView()
             self.enforceHighlightOccourences()
+        else:
+            from copy import copy
+            unchangedCells = [copy(cell) for cell in self.ids.puzzleView.cells if cell.location not in locations]
+            self.ids.puzzleView.cells = []
+            self.ids.puzzleView.clear_widgets()
+            for location in self.sudoku.locations():
+                if location not in locations:
+                    self.ids.puzzleView.cells.append(unchangedCells[0])
+                    self.ids.puzzleView.add_widget(unchangedCells[0])
+                    unchangedCells = unchangedCells[1:]
+                else:
+                    if self.sudoku.isConstant(location):
+                        newCell = self.newFilledCell(location, True)
+                    elif self.sudoku.isModified(location):
+                        newCell = self.newFilledCell(location, False)
+                    else:
+                        newCell = self.newEmptyCell(location)
+
+                    newCell.location = location
+                    newCell.size = self.cellSize()
+
+                    self.ids.puzzleView.add_widget(newCell)
+                    self.ids.puzzleView.cells.append(newCell)
+
+            self.resizeCells()
 
     def on_updateUserCandidates(self, caller, value):
         if self.updateUserCandidates:
@@ -348,9 +373,10 @@ class Game(ScreenManager):
                 self.sudoku.setValue(self.selected, value)
                 if self.updateUserCandidates:
                     self.sudoku.updateUserCandidates()
+                self.updateCells()
             else:
                 self.sudoku.toggleUserCandidate(self.selected, value)
-            self.updateCells()
+                self.updateCells([self.selected])
 
     def resizePlayModeGrid(self):
 
