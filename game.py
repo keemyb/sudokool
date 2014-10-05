@@ -376,6 +376,8 @@ class Game(ScreenManager):
             self.sudoku.hasCandidates = False
             self.sudoku.initialiseCandidates()
 
+            self.updateCells()
+
             self.ids.playSolveSwitcher.current = "solveMode"
         else:
             if not self.sudoku.isComplete():
