@@ -25,6 +25,7 @@ class ColourPalette():
         self.colours["superWhite"] = .92, .97, 1, 1
         self.colours["offWhite"] = .85, .90, .93, 1
         self.colours["red"] = .84, .29, .34, 1
+        self.colours["salmon"] = .91, .59, .48, 1
         self.colours["blue"] = .69, .78, .85, 1
         self.colours["green"] = .67, .75, .57, 1
         self.colours["brown"] = .87, .67, .49, 1
@@ -40,6 +41,9 @@ class ColourPalette():
         self.colours["candidateText"] = self.colours["superWhite"]
 
         self.colours["occourenceText"] = self.colours["gold"]
+
+        self.colours["clashingModifiedBack"] = self.colours["red"]
+        self.colours["clashingConstantBack"] = self.colours["salmon"]
 
     def rgba(self, colour):
         return self.colours[colour]
@@ -215,6 +219,17 @@ class ModifiedCell(Label):
                 self.color = self.MainSwitcher.palette.rgba("modifiedText")
         else:
             self.color = self.MainSwitcher.palette.rgba("modifiedText")
+
+        self.canvas.before.clear()
+        if self.MainSwitcher.highlightClashes and self.MainSwitcher.sudoku.isClashing(self.location):
+            with self.canvas.before:
+                Color(*self.MainSwitcher.palette.rgba("clashingModifiedBack"))
+        else:
+            with self.canvas.before:
+                Color(*self.MainSwitcher.palette.rgba("cellBack"))
+
+        with self.canvas.before:
+            Rectangle(size=self.size, pos=self.pos)
 
 class ConstantCell(Label):
     def __init__(self, MainSwitcher, **kwargs):
