@@ -4,7 +4,10 @@ kivy.require('1.8.0')
 from sudoku import Sudoku
 from kivy.app import App
 
+from kivy.core.window import Window
 from kivy.uix.screenmanager import ScreenManager, Screen
+
+from kivy.properties import BooleanProperty, NumericProperty, ObjectProperty
 
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.listview import ListView
@@ -12,20 +15,45 @@ from kivy.uix.listview import ListView
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 
-from kivy.core.window import Window
+from kivy.graphics import Color
+from kivy.graphics import Rectangle
 
-from kivy.properties import BooleanProperty, NumericProperty, ObjectProperty
+class ColourPalette():
+    def __init__(self):
+        self.colours = {}
 
-superWhite = .92, .97, 1, 1
-offWhite = .85, .90, .93, 1
-red = .84, .29, .34, 1
-blue = .69, .78, .85, 1
-green = .67, .75, .57, 1
-brown = .87, .67, .49, 1
+        self.colours["superWhite"] = .92, .97, 1, 1
+        self.colours["offWhite"] = .85, .90, .93, 1
+        self.colours["red"] = .84, .29, .34, 1
+        self.colours["salmon"] = .91, .59, .48, 1
+        self.colours["blue"] = .69, .78, .85, 1
+        self.colours["green"] = .67, .75, .57, 1
+        self.colours["brown"] = .87, .67, .49, 1
+        self.colours["black"] = 0, 0, 0, 1
+        self.colours["gold"] = .5, .42, .26, 1
 
-class logOutput(ListView):
+        self.colours["cellBack"] = self.colours["offWhite"]
+        self.colours["emptyBack"] = self.colours["cellBack"]
+        self.colours["candidateBack"] = self.colours["brown"]
+
+        self.colours["constantText"] = self.colours["green"]
+        self.colours["modifiedText"] = self.colours["blue"]
+        self.colours["candidateText"] = self.colours["superWhite"]
+
+        self.colours["occourenceText"] = self.colours["gold"]
+
+        self.colours["clashingModifiedBack"] = self.colours["red"]
+        self.colours["clashingConstantBack"] = self.colours["salmon"]
+
+    def rgba(self, colour):
+        return self.colours[colour]
+
+    def rgb(self, colour):
+        return self.colours[colour][:-1]
+
+class LogOutput(ListView):
     def __init__(self, MainSwitcher, **kwargs):
-        super(logOutput, self).__init__(**kwargs)
+        super(LogOutput, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
 
         self.logStart = len(self.MainSwitcher.sudoku.log)
@@ -34,10 +62,29 @@ class logOutput(ListView):
 
         self.item_strings = self.MainSwitcher.sudoku.log[self.logStart:]
 
-class solveStep(Button):
+class ClearLocation(Button):
+
+    def __init__(self, MainSwitcher, **kwargs):
+        super(ClearLocation, self).__init__(**kwargs)
+        self.MainSwitcher = MainSwitcher
+
+        self.text = "Clear location"
+
+    def on_touch_down(self, touch):
+
+        if self.collide_point(*touch.pos):
+            if self.MainSwitcher.sudoku.isConstant(self.MainSwitcher.selected):
+                return True
+            else:
+                self.MainSwitcher.sudoku.clearLocation(self.MainSwitcher.selected)
+                self.MainSwitcher.updateCells([self.MainSwitcher.selected])
+
+                return True
+
+class SolveStep(Button):
 
     def __init__(self, MainSwitcher, step, **kwargs):
-        super(solveStep, self).__init__(**kwargs)
+        super(SolveStep, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
 
         self.step = step
@@ -57,10 +104,10 @@ class solveStep(Button):
 
             return True
 
-class solveAll(Button):
+class SolveAll(Button):
 
     def __init__(self, MainSwitcher, **kwargs):
-        super(solveAll, self).__init__(**kwargs)
+        super(SolveAll, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
 
         self.text = "Solve all"
@@ -79,13 +126,13 @@ class solveAll(Button):
 
             return True
 
-class solveMode(Button):
+class SolveMode(Button):
     def __init__(self, MainSwitcher, **kwargs):
-        super(solveMode, self).__init__(**kwargs)
+        super(SolveMode, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
 
         self.states = {True: "Exit Solve Mode",
-                       False: "Go Solve!"}
+                       False: "Enter Solve Mode"}
 
         self.text = self.states[self.MainSwitcher.solveMode]
 
@@ -98,14 +145,14 @@ class solveMode(Button):
     def updateText(self):
         self.text = self.states[self.MainSwitcher.solveMode]
 
-class updateUserCandidates(Button):
+class UpdateUserCandidates(Button):
 
     def __init__(self, MainSwitcher, **kwargs):
-        super(updateUserCandidates, self).__init__(**kwargs)
+        super(UpdateUserCandidates, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
 
-        self.states = {True: "Auto Update",
-                       False: "Not Auto Update"}
+        self.states = {True: "Update Candidates",
+                       False: "Don't Update Candidates"}
 
         self.text = self.states[self.MainSwitcher.updateUserCandidates]
 
@@ -116,10 +163,10 @@ class updateUserCandidates(Button):
             self.text = self.states[self.MainSwitcher.updateUserCandidates]
             return True
 
-class valueOrCandidateChange(Button):
+class ValueOrCandidateChange(Button):
 
     def __init__(self, MainSwitcher, **kwargs):
-        super(valueOrCandidateChange, self).__init__(**kwargs)
+        super(ValueOrCandidateChange, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
 
         self.states = {True: "Values",
@@ -138,6 +185,11 @@ class Input(Button):
     def __init__(self, MainSwitcher, **kwargs):
         super(Input, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
+
+        self.bind(size=self.redraw)
+
+    def redraw(self, *args):
+        self.font_size = min(self.size[0], self.size[1]) * self.MainSwitcher.padDecimal
 
     def on_touch_down(self, touch):
 
@@ -158,6 +210,27 @@ class ModifiedCell(Label):
 
             return True
 
+    def update(self):
+        if self.MainSwitcher.highlightOccourences and self.MainSwitcher.selected > 0:
+            if (self.MainSwitcher.sudoku.getValue(self.MainSwitcher.selected) ==
+                self.value):
+                self.color = self.MainSwitcher.palette.rgba("occourenceText")
+            else:
+                self.color = self.MainSwitcher.palette.rgba("modifiedText")
+        else:
+            self.color = self.MainSwitcher.palette.rgba("modifiedText")
+
+        self.canvas.before.clear()
+        if self.MainSwitcher.highlightClashes and self.MainSwitcher.sudoku.isClashing(self.location):
+            with self.canvas.before:
+                Color(*self.MainSwitcher.palette.rgba("clashingModifiedBack"))
+        else:
+            with self.canvas.before:
+                Color(*self.MainSwitcher.palette.rgba("cellBack"))
+
+        with self.canvas.before:
+            Rectangle(size=self.size, pos=self.pos)
+
 class ConstantCell(Label):
     def __init__(self, MainSwitcher, **kwargs):
         super(ConstantCell, self).__init__(**kwargs)
@@ -169,6 +242,16 @@ class ConstantCell(Label):
             self.MainSwitcher.selected = self.location
 
             return True
+
+    def update(self):
+        if self.MainSwitcher.highlightOccourences and self.MainSwitcher.selected > 0:
+            if (self.MainSwitcher.sudoku.getValue(self.MainSwitcher.selected) ==
+                self.value):
+                self.color = self.MainSwitcher.palette.rgba("occourenceText")
+            else:
+                self.color = self.MainSwitcher.palette.rgba("constantText")
+        else:
+            self.color = self.MainSwitcher.palette.rgba("constantText")
 
 class EmptyCell(GridLayout):
     def __init__(self, MainSwitcher, **kwargs):
@@ -182,7 +265,22 @@ class EmptyCell(GridLayout):
 
             return True
 
+    def update(self):
+        if self.MainSwitcher.highlightOccourences and self.MainSwitcher.selected > 0:
+            for candidate in self.candidates:
+                if (self.MainSwitcher.sudoku.getValue(self.MainSwitcher.selected) ==
+                        candidate.value):
+                    candidate.color = self.MainSwitcher.palette.rgba("occourenceText")
+                else:
+                    candidate.color = self.MainSwitcher.palette.rgba("candidateText")
+        else:
+            for candidate in self.candidates:
+                candidate.color = self.MainSwitcher.palette.rgba("candidateText")
+
 class Candidate(Label):
+    pass
+
+class EmptyCandidate(Label):
     pass
 
 class PlayModeScreen(Screen):
@@ -209,6 +307,8 @@ class Game(ScreenManager):
 
     def __init__(self, **kwargs):
         super(Game, self).__init__(**kwargs)
+        self.palette = ColourPalette()
+        self.padDecimal = 0.8
         self.current = "select"
         Window.bind(size=self.on_screenSizeChange)
         self.bind(sudoku=self.on_sudoku)
@@ -216,17 +316,35 @@ class Game(ScreenManager):
         self.bind(highlightOccourences=self.on_highlightOccourences)
         self.bind(updateUserCandidates=self.on_updateUserCandidates)
         self.bind(solveMode=self.on_solveMode)
-        # self.bind(highlightClashes=self.on_highlightClashes)
+        self.bind(highlightClashes=self.on_highlightClashes)
 
     def updateCells(self, locations=None):
-        if locations is None:
+        if self.solveMode:
             self.ids.puzzleView.clear_widgets()
             self.initialisePuzzleView()
+        else:
+            unchangedCells = [cell for cell in self.ids.puzzleView.cells if cell.location not in locations]
+
+            self.ids.puzzleView.clear_widgets()
+            self.ids.puzzleView.cells = []
+
+            for location in self.sudoku.locations():
+                if location not in locations:
+                    cell = unchangedCells[0]
+                    unchangedCells = unchangedCells[1:]
+                else:
+                    cell = self.newCell(location)
+
+                self.ids.puzzleView.add_widget(cell)
+                self.ids.puzzleView.cells.append(cell)
+
+        for cell in self.ids.puzzleView.cells:
+            cell.update()
 
     def on_updateUserCandidates(self, caller, value):
         if self.updateUserCandidates:
             self.sudoku.updateUserCandidates()
-            self.updateCells()
+            self.updateCells(self.sudoku.locations())
 
     def on_screenSizeChange(self, caller, size):
         self.resizeCells()
@@ -236,8 +354,12 @@ class Game(ScreenManager):
             self.miscButtonsOrient()
 
     def on_selected(self, caller, selected):
+        self.enforceClearLocationButtonState()
         self.enforceInputButtonState()
-        self.on_highlightOccourences(caller, self.on_highlightOccourences)
+        if self.selected < 1:
+            self.updateCells([])
+        else:
+            self.updateCells([self.selected])
 
     def on_solveMode(self, caller, selected):
         self.enforceSolveModeText()
@@ -245,6 +367,8 @@ class Game(ScreenManager):
         if self.solveMode:
             discrepancies = False
             modifiedLocations = False
+
+            self.selected = -1
 
             if self.sudoku.modifiedLocations():
                 modifiedLocations = True
@@ -267,6 +391,8 @@ class Game(ScreenManager):
             self.sudoku.hasCandidates = False
             self.sudoku.initialiseCandidates()
 
+            self.updateCells()
+
             self.ids.playSolveSwitcher.current = "solveMode"
         else:
             if not self.sudoku.isComplete():
@@ -279,6 +405,12 @@ class Game(ScreenManager):
         for button in self.solveModeButtons:
             button.updateText()
 
+    def enforceClearLocationButtonState(self):
+        if self.sudoku.isConstant(self.selected):
+            self.clearLocationButton.disabled = True
+        else:
+            self.clearLocationButton.disabled = False
+
     def enforceInputButtonState(self):
         if self.sudoku.isConstant(self.selected):
             newDisabledState = True
@@ -289,23 +421,10 @@ class Game(ScreenManager):
             button.disabled = newDisabledState
 
     def on_highlightOccourences(self, caller, value):
-        for cell in self.ids.puzzleView.cells:
-            if self.sudoku.isFilled(cell.location):
-                cell.color = superWhite
-            else:
-                for candidate in cell.candidates:
-                    candidate.color = superWhite
+        self.updateCells()
 
-        if self.highlightOccourences and self.sudoku.isFilled(self.selected):
-            for cell in self.ids.puzzleView.cells:
-                if self.sudoku.isFilled(cell.location):
-                    if (cell.value == self.sudoku.getValue(self.selected) and
-                            cell.location != self.selected):
-                        cell.color = blue
-                else:
-                    for candidate in cell.candidates:
-                        if candidate.value == self.sudoku.getValue(self.selected):
-                            candidate.color = blue
+    def on_highlightClashes(self, caller, value):
+        self.updateCells()
 
     def setValue(self, value):
         if self.selected < 1:
@@ -317,9 +436,16 @@ class Game(ScreenManager):
                 self.sudoku.setValue(self.selected, value)
                 if self.updateUserCandidates:
                     self.sudoku.updateUserCandidates()
+
+                    affectedLocations = self.sudoku.allCombinedNeighbours(self.selected)
+                    affectedLocations.add(self.selected)
+
+                    self.updateCells(affectedLocations)
+                else:
+                    self.updateCells([self.selected])
             else:
                 self.sudoku.toggleUserCandidate(self.selected, value)
-            self.updateCells()
+                self.updateCells([self.selected])
 
     def resizePlayModeGrid(self):
 
@@ -337,16 +463,14 @@ class Game(ScreenManager):
         self.ids.playModeGrid.size_hint = size_hint_x, size_hint_y
 
     def miscButtonsOrient(self):
-
-        if Window.size[0] > Window.size[1]:
-            cols = None
-            rows = 1
-        else:
-            cols = 1
-            rows = None
+        cols = 1
+        rows = None
 
         self.ids.miscPlayButtons.cols = cols
         self.ids.miscPlayButtons.rows = rows
+
+        self.ids.miscSolveButtons.cols = cols
+        self.ids.miscSolveButtons.rows = rows
 
     def gameScreenGridOrient(self):
 
@@ -365,6 +489,7 @@ class Game(ScreenManager):
             sudoku = Sudoku(size=size)
         else:
             sudoku = Sudoku("009003201470002030800000074020000300000000710000794000000300000000925000000018500")
+            # sudoku = Sudoku(size=size)
         sudoku.initialiseCandidates()
         return sudoku
 
@@ -372,18 +497,16 @@ class Game(ScreenManager):
         if self.sudoku is None:
             return
 
-        cellWidth = self.cellWidth()
-        candidateWidth = self.candidateWidth()
-
         for cell in self.ids.puzzleView.cells:
-            cell.size = cellWidth, cellWidth
-            cell.font_size = cellWidth*.8
+            cell.size = self.cellSize()
+            cell.font_size = self.cellWidth() * self.padDecimal
+
             if self.sudoku.isEmpty(cell.location):
                 for candidate in cell.candidates:
-                    candidate.size = [candidateWidth]*2
-                    candidate.font_size = candidateWidth*.8
+                    candidate.size = self.candidateSize()
+                    candidate.font_size = self.candidateWidth() * self.padDecimal
 
-        self.ids.puzzleView.size = [cellWidth*self.sudoku.unitSize()]*2
+        self.ids.puzzleView.size = [self.cellWidth() * self.sudoku.unitSize()] * 2
 
     def cellWidth(self):
         windowWidth = min(Window.size)
@@ -400,6 +523,12 @@ class Game(ScreenManager):
 
         return candidateWidth
 
+    def cellSize(self):
+        return [self.cellWidth()] * 2
+
+    def candidateSize(self):
+        return [self.candidateWidth()] * 2
+
     def setSudoku(self, size):
         self.sudoku = self.newSudoku(size)
 
@@ -409,6 +538,7 @@ class Game(ScreenManager):
             self.sudoku.initialiseUserCandidates()
         self.initialisePuzzleView()
         self.initialiseInputGrid()
+        self.initialiseClearLocationButton()
         self.initialiseValueOrCandidateChangeButton()
         self.initialiseUpdateUserCandidatesButton()
         self.initialiseLogOutput()
@@ -416,8 +546,15 @@ class Game(ScreenManager):
         self.initialiseSolveModeButton()
         self.on_screenSizeChange(self, Window.size)
 
+    def initialiseClearLocationButton(self):
+        clearLocationButton = ClearLocation(self)
+
+        self.clearLocationButton = clearLocationButton
+
+        self.ids.miscPlayButtons.add_widget(clearLocationButton)
+
     def initialiseLogOutput(self):
-        newlogOutput = logOutput(self)
+        newlogOutput = LogOutput(self)
 
         self.logOutput = newlogOutput
 
@@ -426,8 +563,8 @@ class Game(ScreenManager):
     def initialiseSolveButtons(self):
         self.solveButtons = []
 
-        solveOneStep = solveStep(self, 1)
-        solveAllSteps = solveAll(self)
+        solveOneStep = SolveStep(self, 1)
+        solveAllSteps = SolveAll(self)
 
         for button in (solveOneStep, solveAllSteps):
             self.ids.miscSolveButtons.add_widget(button)
@@ -436,8 +573,8 @@ class Game(ScreenManager):
     def initialiseSolveModeButton(self):
         self.solveModeButtons = []
 
-        solveModeForPlay = solveMode(self)
-        solveModeForSolve = solveMode(self)
+        solveModeForPlay = SolveMode(self)
+        solveModeForSolve = SolveMode(self)
 
         self.ids.miscPlayButtons.add_widget(solveModeForPlay)
         self.ids.miscSolveButtons.add_widget(solveModeForSolve)
@@ -446,14 +583,14 @@ class Game(ScreenManager):
             self.solveModeButtons.append(button)
 
     def initialiseUpdateUserCandidatesButton(self):
-        self.ids.miscPlayButtons.add_widget(updateUserCandidates(self))
+        self.ids.miscPlayButtons.add_widget(UpdateUserCandidates(self))
 
     def initialiseValueOrCandidateChangeButton(self):
-        self.ids.miscPlayButtons.add_widget(valueOrCandidateChange(self))
+        self.ids.miscPlayButtons.add_widget(ValueOrCandidateChange(self))
 
     def initialiseInputGrid(self):
         cols = max(self.sudoku.subGridsInRow(), self.sudoku.subGridsInColumn())
-        
+
         self.ids.inputsGrid.cols = cols
         self.ids.inputsGrid.buttons = []
         for value in self.sudoku.possibleValues():
@@ -466,25 +603,37 @@ class Game(ScreenManager):
         button = Input(self)
         button.text = str(value)
         button.value = value
-        button.font_size = button.size[0]*0.8
+        button.font_size = min(button.size) * self.padDecimal
         return button
 
     def initialisePuzzleView(self):
         self.ids.puzzleView.cols = self.sudoku.unitSize()
+
+        self.ids.puzzleView.size_hint = None, None
+        self.ids.puzzleView.size = [self.cellWidth() * self.sudoku.unitSize()] * 2
+
         self.ids.puzzleView.cells = []
+
         for location in self.sudoku.locations():
-            if self.sudoku.isConstant(location):
-                newCell = self.newFilledCell(location, True)
-            elif self.sudoku.isModified(location):
-                newCell = self.newFilledCell(location, False)
-            else:
-                newCell = self.newEmptyCell(location)
+            cell = self.newCell(location)
 
-            newCell.location = location
-            newCell.size = [self.cellWidth()]*2
+            self.ids.puzzleView.add_widget(cell)
+            self.ids.puzzleView.cells.append(cell)
 
-            self.ids.puzzleView.add_widget(newCell)
-            self.ids.puzzleView.cells.append(newCell)
+        self.resizeCells()
+
+    def newCell(self, location):
+        if self.sudoku.isConstant(location):
+            newCell = self.newFilledCell(location, True)
+        elif self.sudoku.isModified(location):
+            newCell = self.newFilledCell(location, False)
+        else:
+            newCell = self.newEmptyCell(location)
+
+        newCell.location = location
+        newCell.size = self.cellSize()
+
+        return newCell
 
     def newFilledCell(self, location, constant):
         if constant:
@@ -492,7 +641,7 @@ class Game(ScreenManager):
         else:
             cell = ModifiedCell(self)
 
-        cell.font_size = self.cellWidth()*0.8
+        cell.font_size = self.cellWidth() * self.padDecimal
 
         cell.value = self.sudoku.getValue(location)
         cell.text = str(cell.value)
@@ -508,29 +657,31 @@ class Game(ScreenManager):
         cell.candidates = []
 
         if self.solveMode:
-            for candidate in self.sudoku.allSolvingCandidates(location):
-                candidateLabel = self.newCandidateLabel(candidate)
-
-                cell.add_widget(candidateLabel)
-                cell.candidates.append(candidateLabel)
+            candidates = self.sudoku.allSolvingCandidates(location)
         else:
-            for candidate in self.sudoku.userCandidates(location):
-                candidateLabel = self.newCandidateLabel(candidate)
+            candidates = self.sudoku.userCandidates(location)
 
-                cell.add_widget(candidateLabel)
-                cell.candidates.append(candidateLabel)
+        for value in self.sudoku.setOfPossibleValues:
+            candidateCell = self.newCandidateCell(value, candidates)
+
+            cell.add_widget(candidateCell)
+            cell.candidates.append(candidateCell)
 
         return cell
 
-    def newCandidateLabel(self, candidate):
-        candidateLabel = Candidate()
-        candidateLabel.text = str(candidate)
-        candidateLabel.value = candidate
+    def newCandidateCell(self, value, candidates):
+        if value in candidates:
+            candidateCell = Candidate()
+            candidateCell.text = str(value)
+            candidateCell.value = value
+        else:
+            candidateCell = EmptyCandidate()
+            candidateCell.value = 0
 
-        candidateLabel.size = [self.candidateWidth()]*2
-        candidateLabel.font_size = self.candidateWidth()*.8
+        candidateCell.size = self.candidateSize()
+        candidateCell.font_size = self.candidateWidth() * self.padDecimal
 
-        return candidateLabel
+        return candidateCell
 
 class SudokoolApp(App):
 

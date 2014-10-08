@@ -1,3 +1,6 @@
+#: import sm kivy.uix.screenmanager
+#: import palette game.ColourPalette
+
 <Game>:
     id: MainSwitcher
     canvas:
@@ -9,7 +12,7 @@
         name: "select"
         canvas:
             Color:
-                rgba: [.84, .29, .34, 1]
+                rgba: palette().rgba("red")
             Rectangle:
                 pos: self.pos
                 size: self.size
@@ -34,7 +37,7 @@
         name: "game"
         canvas:
             Color:
-                rgba: .85, .90, .93, 1
+                rgba: palette().rgba("red")
             Rectangle:
                 pos: self.pos
                 size: self.size
@@ -42,9 +45,10 @@
             id: gameScreenGrid
             GridLayout:
                 id: puzzleView
-                size_hint: None, None
+
             ScreenManager:
                 id: playSolveSwitcher
+                transition: sm.FadeTransition()
 
                 PlayModeScreen:
                     id: playModeScreen
@@ -54,8 +58,10 @@
                         id: playModeGrid
                         GridLayout:
                             id: inputsGrid
-                        GridLayout:
-                            id: miscPlayButtons
+                        AnchorLayout:
+                            anchor_y: "bottom"
+                            GridLayout:
+                                id: miscPlayButtons
 
                 SolveModeScreen:
                     id: solveModeScreen
@@ -65,14 +71,15 @@
                         id: solveModeGrid
                         BoxLayout:
                             id: logSpace
-                        GridLayout:
-                            id: miscSolveButtons
-                            rows: 1
+                        AnchorLayout:
+                            anchor_y: "bottom"
+                            GridLayout:
+                                id: miscSolveButtons
 
 <logOutput@ListView>:
     canvas.before:
         Color:
-            rgba: 0, 0, 0, 1
+            rgba: palette().rgba("black")
         Rectangle:
             pos: self.pos
             size: self.size
@@ -92,39 +99,67 @@
 
 <updateUserCandidates@Button>:
 
+<ConstantCell,ModifiedCell,EmptyCell>
+    canvas.after:
+        Color:
+            rgba: palette().rgba("black")
+        Line:
+            rectangle: self.x, self.y, self.width, self.height
+            width: 1
+
 
 <ConstantCell@Label>:
     size_hint: None, None
+
+    color: palette().rgba("constantText")
+
     canvas.before:
         Color:
-            rgba: [.67, .75, .57, 1]
+            rgba: palette().rgba("cellBack")
         Rectangle:
             pos: self.pos
             size: self.size
 
 <ModifiedCell@Label>:
     size_hint: None, None
+
+    color: palette().rgba("modifiedText")
+
     canvas.before:
         Color:
-            rgba: [.69, .78, .85, 1]
+            rgba: palette().rgba("cellBack")
         Rectangle:
             pos: self.pos
             size: self.size
 
 <EmptyCell@GridLayout>:
     size_hint: None, None
+
     canvas.before:
         Color:
-            rgba: [.5, .5, .49, 1]
+            rgba: palette().rgba("emptyBack")
         Rectangle:
             pos: self.pos
             size: self.size
 
 <Candidate@Label>:
     size_hint: None, None
+
+    color: palette().rgba("candidateText")
+
     canvas.before:
         Color:
-            rgba: [.87, .67, .49, 1]
+            rgba: palette().rgba("candidateBack")
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<EmptyCandidate@Label>:
+    size_hint: None, None
+
+    canvas.before:
+        Color:
+            rgba: palette().rgba("cellBack")
         Rectangle:
             pos: self.pos
             size: self.size
