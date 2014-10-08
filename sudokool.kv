@@ -1,0 +1,167 @@
+#: import sm kivy.uix.screenmanager
+#: import palette game.ColourPalette
+
+<Game>:
+    id: MainSwitcher
+    canvas:
+        Color:
+            rgba: [0,1,0,1]
+
+    SelectScreen:
+        id: selectScreen
+        name: "select"
+        canvas:
+            Color:
+                rgba: palette().rgba("red")
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        GridLayout:
+            cols: 1
+            Label:
+                text: "Choose a sudoku size"
+            GridLayout:
+                cols: 3
+                Button:
+                    text: "6"
+                    on_press: MainSwitcher.setSudoku(6)
+                Button:
+                    text: "8"
+                    on_press: MainSwitcher.setSudoku(8)
+                Button:
+                    text: "9"
+                    on_press: MainSwitcher.setSudoku(9)
+
+    GameScreen:
+        id: gameScreen
+        name: "game"
+        canvas:
+            Color:
+                rgba: palette().rgba("red")
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        GridLayout:
+            id: gameScreenGrid
+            GridLayout:
+                id: puzzleView
+
+            ScreenManager:
+                id: playSolveSwitcher
+                transition: sm.FadeTransition()
+
+                PlayModeScreen:
+                    id: playModeScreen
+                    name: "playMode"
+                    GridLayout:
+                        cols: 1
+                        id: playModeGrid
+                        GridLayout:
+                            id: inputsGrid
+                        AnchorLayout:
+                            anchor_y: "bottom"
+                            GridLayout:
+                                id: miscPlayButtons
+
+                SolveModeScreen:
+                    id: solveModeScreen
+                    name: "solveMode"
+                    GridLayout:
+                        cols: 1
+                        id: solveModeGrid
+                        BoxLayout:
+                            id: logSpace
+                        AnchorLayout:
+                            anchor_y: "bottom"
+                            GridLayout:
+                                id: miscSolveButtons
+
+<logOutput@ListView>:
+    canvas.before:
+        Color:
+            rgba: palette().rgba("black")
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+
+<solveStep@Button>:
+
+
+<solveAll@Button>:
+
+
+<solveMode@Button>:
+
+
+<valueOrCandidateChange@Button>:
+
+
+<updateUserCandidates@Button>:
+
+<ConstantCell,ModifiedCell,EmptyCell>
+    canvas.after:
+        Color:
+            rgba: palette().rgba("black")
+        Line:
+            rectangle: self.x, self.y, self.width, self.height
+            width: 1
+
+
+<ConstantCell@Label>:
+    size_hint: None, None
+
+    color: palette().rgba("constantText")
+
+    canvas.before:
+        Color:
+            rgba: palette().rgba("cellBack")
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<ModifiedCell@Label>:
+    size_hint: None, None
+
+    color: palette().rgba("modifiedText")
+
+    canvas.before:
+        Color:
+            rgba: palette().rgba("cellBack")
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<EmptyCell@GridLayout>:
+    size_hint: None, None
+
+    canvas.before:
+        Color:
+            rgba: palette().rgba("emptyBack")
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<Candidate@Label>:
+    size_hint: None, None
+
+    color: palette().rgba("candidateText")
+
+    canvas.before:
+        Color:
+            rgba: palette().rgba("candidateBack")
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<EmptyCandidate@Label>:
+    size_hint: None, None
+
+    canvas.before:
+        Color:
+            rgba: palette().rgba("cellBack")
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<Input@Button>:
