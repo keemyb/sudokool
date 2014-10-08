@@ -1486,9 +1486,20 @@ class Sudoku():
         if not self.isValidInput(value):
             raise Exception("value is not vaild")
 
+        removedValue = 0
+        removedCandidates = []
+
+        if self.isModified(location):
+            removedValue = self.getValue(location)
+        else:
+            removedCandidates = list(self.allSolvingCandidates(location))
+
         self.values[location] = value
-        self.changes = True
+        self.userCandidatesDict[location].clear()
         self.solvingCandidatesDict[location].clear()
+
+        if removedValue or removedCandidates:
+            self.changes = True
 
     def getValue(self, location):
         return self.values[location]
