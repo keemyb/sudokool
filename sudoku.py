@@ -1487,18 +1487,28 @@ class Sudoku():
             raise Exception("value is not vaild")
 
         removedValue = 0
-        removedCandidates = []
+        removedSolvingCandidates = []
+        removedUserCandidates = []
 
         if self.isModified(location):
             removedValue = self.getValue(location)
         else:
-            removedCandidates = list(self.allSolvingCandidates(location))
+            removedSolvingCandidates = list(self.allSolvingCandidates(location))
+            removedUserCandidates = self.userCandidates(location)
 
         self.values[location] = value
         self.userCandidatesDict[location].clear()
         self.solvingCandidatesDict[location].clear()
 
-        if removedValue or removedCandidates:
+        if removedValue:
+            self.addInverseActionToUndoStack(self.setValue, location, removedValue)
+        else:
+            for candidate in removedSolvingCandidates:
+                self.addInverseActionToUndoStack(self.addSolvingCandidates, location, candidate)
+            for candidate in removedUserCandidates:
+                self.addInverseActionToUndoStack(self.toggleUserCandidates, location, candidate)
+
+        if removedValue or removedSolvingCandidates:
             self.changes = True
 
     def getValue(self, location):
