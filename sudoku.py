@@ -1496,8 +1496,19 @@ class Sudoku():
         if self.isConstant(location):
             raise Exception("location is a constant and cannot be changed")
 
+        removedValue = 0
+        removedCandidates = []
+
+        if self.isModified(location):
+            removedValue = self.getValue(location)
+        else:
+            removedCandidates = list(self.allSolvingCandidates(location))
+
         self.values[location] = 0
-        self.changes = True
+        self.userCandidatesDict[location] = set([])
+
+        if removedValue or removedCandidates:
+            self.changes = True
 
     def allSolvingCandidates(self, *locations):
         return set([]).union(*[self.solvingCandidatesDict[location] for location in locations])
