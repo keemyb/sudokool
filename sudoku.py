@@ -1382,8 +1382,8 @@ class Sudoku():
         return True
 
 
-    def addToUndoStack(self, command):
-        self.undoStack.append(command)
+    def addInverseActionToUndoStack(self, action, *args):
+        self.undoStack.append((action, args))
 
     def isEmpty(self, location):
         if self.values[location] not in self.setOfPossibleValues:
