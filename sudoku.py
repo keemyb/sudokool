@@ -47,6 +47,9 @@ class Sudoku():
         self.log = []
         self.history = []
 
+        self.undoStack = []
+        self.redoStack = []
+
         self.solveMode = False
         self.changes = False
         self.hasCandidates = False
