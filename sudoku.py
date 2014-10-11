@@ -1554,17 +1554,25 @@ class Sudoku():
 
     def addSolvingCandidates(self, location, *candidates):
 
+        addedCandidates = []
+
         if self.isConstant(location):
             raise Exception("location is a constant and cannot be changed")
 
         for candidate in candidates:
+
             if not self.isValidInput(candidate):
                 raise Exception("candidate is not vaild")
 
-            self.solvingCandidatesDict[location].add(candidate)
+            if candidate not in self.allSolvingCandidates(location):
+                self.solvingCandidatesDict[location].add(candidate)
+                addedCandidates.append(candidate)
 
-        self.changes = True
+        if addedCandidates:
+            self.addInverseActionToUndoStack(self.removeSolvingCandidates, location, addedCandidates)
+            self.changes = True
 
+        return addedCandidates
 
     def toggleUserCandidate(self, location, candidate):
         if self.isConstant(location):
