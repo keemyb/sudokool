@@ -1547,7 +1547,7 @@ class Sudoku():
                 removedCandidates.append(candidate)
 
         if removedCandidates:
-            self.addInverseActionToUndoStack(self.addSolvingCandidates, location, candidates)
+            self.addInverseActionToUndoStack(self.addSolvingCandidates, location, removedCandidates)
             self.changes = True
 
         return removedCandidates
