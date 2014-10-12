@@ -1381,6 +1381,13 @@ class Sudoku():
                 return False
         return True
 
+    def undo(self):
+        if not self.undoStack:
+            return
+
+    def redo(self):
+        if not self.redoStack:
+            return
 
     def addInverseActionToUndoStack(self, action, *args):
         self.undoStack.append((action, args))
