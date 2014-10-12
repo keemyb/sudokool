@@ -1589,6 +1589,8 @@ class Sudoku():
         else:
             self.userCandidatesDict[location].add(candidate)
 
+        self.addInverseActionToUndoStack(self.toggleUserCandidate, location, candidate)
+
     def unitSize(self):
         return self.gridSize
 
