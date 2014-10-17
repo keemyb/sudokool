@@ -1382,6 +1382,27 @@ class Sudoku():
                 return False
         return True
 
+
+
+
+    def undoable(function):
+
+        def wrapper(self, *args, **kwargs):
+
+            self.undoDepth += 1
+
+            if self.undoDepth == 1:
+                currentState = self.captureState()
+                self.addStateToUndo(currentState)
+
+            originalFunctionOutput = function(self, *args, **kwargs)
+
+            self.undoDepth -= 1
+
+            return originalFunctionOutput
+
+        return wrapper
+
     def undo(self):
         if not self.undoStack:
             return
