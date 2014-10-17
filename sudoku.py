@@ -1416,6 +1416,17 @@ class Sudoku():
         self.changes = state[5]
         self.intersectionTypes = state[6]
 
+    def addStateToUndo(self, state):
+
+        self.undoStack.append(state)
+
+        if self.redoStack:
+            self.redoStack = []
+
+    def addStateToRedo(self, state):
+
+        self.redoStack.append(state)
+
     def isEmpty(self, location):
         if self.values[location] not in self.setOfPossibleValues:
             return True
