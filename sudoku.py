@@ -1386,9 +1386,25 @@ class Sudoku():
         if not self.undoStack:
             return
 
+        currentState = self.captureState()
+        self.addStateToRedo(currentState)
+
+        undoState = self.undoStack[-1]
+        self.restoreState(undoState)
+
+        self.undoStack = self.undoStack[:-1]
+
     def redo(self):
         if not self.redoStack:
             return
+
+        currentState = self.captureState()
+        self.addStateToUndo(currentState)
+
+        redoState = self.redoStack[-1]
+        self.restoreState(redoState)
+
+        self.redoStack = self.redoStack[:-1]
 
     def addInverseActionToUndoStack(self, action, *args):
         # self.undoStack.append((action, args))
