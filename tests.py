@@ -89,24 +89,40 @@ def visualizer(puzzle, *groups):
 
     return wholeString
 
-# easy = Sudoku("009003201470002030800000074020000300000000710000794000000300000000925000000018500")
-# print easy.history
+easy = Sudoku("009003201470002030800000074020000300000000710000794000000300000000925000000018500")
+print easy.solve()
+print easy
+easy.undo()
+print easy
+easy.undo()
+print easy
+
+# easy.setValue(1,1)
+# print easy
+# easy.undo()
+# print easy
+# easy.setValue(2,1)
+# print easy.redoStack
+# easy.redo()
+# print easy
+# print easy.undoStack
+# print easy.redoStack
 
 # blank = Sudoku(size=9)
 # print blank
 # print blank.history
 
-with open("newfile.txt", "w") as results:
-    for i in xrange(5):
-        newPuzzle = Sudoku(size=9,)# difficulty=0.25)
-        results.write(str(i + 1)+"\n")
-        results.write(str(newPuzzle))
-        valuesString = "".join([str(newPuzzle.getValue(location)) if newPuzzle.isFilled(location) else "0" for location in newPuzzle.locations()])
-        results.write(str(valuesString)+"\n")
-        newPuzzle.solve()
-        results.write(str(newPuzzle))
-        results.write(str(newPuzzle.log))
-        results.write("\n"*3)
+# with open("newfile.txt", "w") as results:
+#     for i in xrange(5):
+#         newPuzzle = Sudoku(size=9,)# difficulty=0.25)
+#         results.write(str(i + 1)+"\n")
+#         results.write(str(newPuzzle))
+#         valuesString = "".join([str(newPuzzle.getValue(location)) if newPuzzle.isFilled(location) else "0" for location in newPuzzle.locations()])
+#         results.write(str(valuesString)+"\n")
+#         newPuzzle.solve()
+#         results.write(str(newPuzzle))
+#         results.write(str(newPuzzle.log))
+#         results.write("\n"*3)
 
 
 # blank.solve()

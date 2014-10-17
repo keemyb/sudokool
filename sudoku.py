@@ -1558,6 +1558,7 @@ class Sudoku():
 
         return combinations(unit, n)
 
+    @undoable
     def setValue(self, location, value):
         if self.isConstant(location):
             raise Exception("location is a constant and cannot be changed")
@@ -1596,6 +1597,7 @@ class Sudoku():
     def getValues(self, *locations):
         return set([self.values[location] for location in locations])
 
+    @undoable
     def clearLocation(self, location):
 
         return self.setValue(location, 0)
@@ -1609,6 +1611,7 @@ class Sudoku():
     def userCandidates(self, location):
         return self.userCandidatesDict[location]
 
+    @undoable
     def removeSolvingCandidates(self, location, *candidates):
 
         removedCandidates = []
@@ -1631,6 +1634,7 @@ class Sudoku():
 
         return removedCandidates
 
+    @undoable
     def addSolvingCandidates(self, location, *candidates):
 
         addedCandidates = []
@@ -1653,6 +1657,7 @@ class Sudoku():
 
         return addedCandidates
 
+    @undoable
     def toggleUserCandidate(self, location, candidate):
         if self.isConstant(location):
             raise Exception("location is a constant and cannot be changed")
@@ -1687,7 +1692,7 @@ class Sudoku():
 
 
 
-
+    @undoable
     def brute(self):
         self.initialiseIntersections()
 
@@ -1732,6 +1737,10 @@ class Sudoku():
                         # if there are no modified locations, there are no solutions.
                         return
 
+
+
+
+    @undoable
     def nakedSingle(self):
         self.initialiseIntersections()
 
@@ -1753,6 +1762,7 @@ class Sudoku():
 
         return self.changes
 
+    @undoable
     def nakedN(self, n):
         self.initialiseIntersections()
 
@@ -1801,6 +1811,7 @@ class Sudoku():
 
 
 
+    @undoable
     def hiddenN(self, n):
         self.initialiseIntersections()
 
@@ -1855,6 +1866,7 @@ class Sudoku():
 
 
 
+    @undoable
     def pointingN(self, n):
         self.initialiseIntersections(("pointer", n))
 
@@ -1899,6 +1911,7 @@ class Sudoku():
 
 
 
+    @undoable
     def boxLineReductionN(self, n):
         self.initialiseIntersections(("pointer", n))
 
@@ -1942,6 +1955,7 @@ class Sudoku():
 
 
 
+    @undoable
     def xWing(self):
         self.initialiseIntersections("xWing")
 
@@ -1989,6 +2003,7 @@ class Sudoku():
 
 
 
+    @undoable
     def swordfish(self):
         self.initialiseIntersections("swordfish")
 
@@ -2042,6 +2057,7 @@ class Sudoku():
 
 
 
+    @undoable
     def simpleColouring(self):
 
         self.initialiseIntersections("conjugateChains")
@@ -2171,6 +2187,7 @@ class Sudoku():
 
 
 
+    @undoable
     def yWing(self):
         self.initialiseIntersections("yWing")
 
@@ -2203,6 +2220,10 @@ class Sudoku():
 
         return self.changes
 
+
+
+
+    @undoable
     def xyzWing(self):
         self.initialiseIntersections("xyzWing")
 
@@ -2240,6 +2261,7 @@ class Sudoku():
 
 
 
+    @undoable
     def remotePairs(self):
         self.initialiseIntersections("lockedChains")
 
