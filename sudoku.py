@@ -1564,13 +1564,11 @@ class Sudoku():
 
         removedValue = 0
         removedSolvingCandidates = []
-        removedUserCandidates = []
 
         if self.isModified(location):
             removedValue = self.getValue(location)
         else:
-            removedSolvingCandidates = list(self.allSolvingCandidates(location))
-            removedUserCandidates = self.userCandidates(location)
+            removedSolvingCandidates = self.allSolvingCandidates(location)
 
         self.values[location] = value
         self.userCandidatesDict[location].clear()
