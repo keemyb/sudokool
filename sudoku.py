@@ -1420,7 +1420,7 @@ class Sudoku():
             return
 
         currentState = self.captureState()
-        self.addStateToUndo(currentState)
+        self.addStateToUndo(currentState, True)
 
         redoState = self.redoStack[-1]
         self.restoreState(redoState)
@@ -1449,11 +1449,14 @@ class Sudoku():
         self.changes = state[5]
         self.intersectionTypes = state[6]
 
-    def addStateToUndo(self, state):
+    def addStateToUndo(self, state, fromRedo=False):
 
         self.undoStack.append(state)
 
-        if self.redoStack:
+        # If we are saving the state because we are redoing, we don't
+        # want to erase the redo stack! The only time we should do this
+        # is if the user/solver has made changes.
+        if self.redoStack and not fromRedo:
             self.redoStack = []
 
     def addStateToRedo(self, state):
