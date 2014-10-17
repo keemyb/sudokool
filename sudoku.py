@@ -49,6 +49,7 @@ class Sudoku():
 
         self.undoStack = []
         self.redoStack = []
+        self.undoDepth = 0
 
         self.solveMode = False
         self.changes = False
