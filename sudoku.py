@@ -1427,10 +1427,6 @@ class Sudoku():
 
         self.redoStack = self.redoStack[:-1]
 
-    def addInverseActionToUndoStack(self, action, *args):
-        # self.undoStack.append((action, args))
-        pass
-
     def captureState(self):
         from copy import copy
         state = []
@@ -1580,14 +1576,6 @@ class Sudoku():
         self.userCandidatesDict[location].clear()
         self.solvingCandidatesDict[location].clear()
 
-        if removedValue:
-            self.addInverseActionToUndoStack(self.setValue, location, removedValue)
-        else:
-            for candidate in removedSolvingCandidates:
-                self.addInverseActionToUndoStack(self.addSolvingCandidates, location, candidate)
-            for candidate in removedUserCandidates:
-                self.addInverseActionToUndoStack(self.toggleUserCandidates, location, candidate)
-
         if removedValue or removedSolvingCandidates:
             self.changes = True
 
@@ -1629,7 +1617,6 @@ class Sudoku():
                 removedCandidates.append(candidate)
 
         if removedCandidates:
-            self.addInverseActionToUndoStack(self.addSolvingCandidates, location, removedCandidates)
             self.changes = True
 
         return removedCandidates
@@ -1652,7 +1639,6 @@ class Sudoku():
                 addedCandidates.append(candidate)
 
         if addedCandidates:
-            self.addInverseActionToUndoStack(self.removeSolvingCandidates, location, addedCandidates)
             self.changes = True
 
         return addedCandidates
@@ -1672,8 +1658,6 @@ class Sudoku():
             self.userCandidatesDict[location].remove(candidate)
         else:
             self.userCandidatesDict[location].add(candidate)
-
-        self.addInverseActionToUndoStack(self.toggleUserCandidate, location, candidate)
 
     def unitSize(self):
         return self.gridSize
