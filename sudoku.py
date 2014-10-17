@@ -1394,6 +1394,28 @@ class Sudoku():
         # self.undoStack.append((action, args))
         pass
 
+    def captureState(self):
+        from copy import copy
+        state = []
+        state.append(copy(self.values))
+        state.append(copy(self.solvingCandidatesDict))
+        state.append(copy(self.userCandidatesDict))
+        state.append(copy(self.log))
+        state.append(copy(self.history))
+        state.append(copy(self.changes))
+        state.append(copy(self.intersectionTypes))
+
+        return state
+
+    def restoreState(self, state):
+        self.values = state[0]
+        self.solvingCandidatesDict = state[1]
+        self.userCandidatesDict = state[2]
+        self.log = state[3]
+        self.history = state[4]
+        self.changes = state[5]
+        self.intersectionTypes = state[6]
+
     def isEmpty(self, location):
         if self.values[location] not in self.setOfPossibleValues:
             return True
