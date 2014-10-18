@@ -62,6 +62,48 @@ class LogOutput(ListView):
 
         self.item_strings = self.MainSwitcher.sudoku.log[self.logStart:]
 
+class Redo(Button):
+
+    def __init__(self, MainSwitcher, step, **kwargs):
+        super(Redo, self).__init__(**kwargs)
+        self.MainSwitcher = MainSwitcher
+
+        self.type = "redo"
+
+        self.step = step
+        self.text = "Redo " + str(step) + " step"
+
+    def on_touch_down(self, touch):
+
+        if self.collide_point(*touch.pos):
+            if not self.MainSwitcher.solveMode:
+                self.MainSwitcher.sudoku.redo()
+                allLocations = self.MainSwitcher.sudoku.locations()
+                self.MainSwitcher.updateCells(allLocations)
+
+            return True
+
+class Undo(Button):
+
+    def __init__(self, MainSwitcher, step, **kwargs):
+        super(Undo, self).__init__(**kwargs)
+        self.MainSwitcher = MainSwitcher
+
+        self.type = "undo"
+
+        self.step = step
+        self.text = "Undo " + str(step) + " step"
+
+    def on_touch_down(self, touch):
+
+        if self.collide_point(*touch.pos):
+            if not self.MainSwitcher.solveMode:
+                self.MainSwitcher.sudoku.undo()
+                allLocations = self.MainSwitcher.sudoku.locations()
+                self.MainSwitcher.updateCells(allLocations)
+
+            return True
+
 class ClearLocation(Button):
 
     def __init__(self, MainSwitcher, **kwargs):
