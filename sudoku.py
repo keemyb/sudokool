@@ -1428,15 +1428,15 @@ class Sudoku():
         self.redoStack = self.redoStack[:-1]
 
     def captureState(self):
-        from copy import copy
+        from copy import copy, deepcopy
         state = []
         state.append(copy(self.values))
-        state.append(copy(self.solvingCandidatesDict))
-        state.append(copy(self.userCandidatesDict))
-        state.append(copy(self.log))
-        state.append(copy(self.history))
+        state.append(deepcopy(self.solvingCandidatesDict))
+        state.append(deepcopy(self.userCandidatesDict))
+        state.append(deepcopy(self.log))
+        state.append(deepcopy(self.history))
         state.append(copy(self.changes))
-        state.append(copy(self.intersectionTypes))
+        state.append(deepcopy(self.intersectionTypes))
 
         return state
 
