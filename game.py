@@ -318,18 +318,18 @@ class Game(ScreenManager):
         self.bind(solveMode=self.on_solveMode)
         self.bind(highlightClashes=self.on_highlightClashes)
 
-    def updateCells(self, locations=None):
+    def updateCells(self, modifiedLocations=None):
         if self.solveMode:
             self.ids.puzzleView.clear_widgets()
             self.initialisePuzzleView()
         else:
-            unchangedCells = [cell for cell in self.ids.puzzleView.cells if cell.location not in locations]
+            unchangedCells = [cell for cell in self.ids.puzzleView.cells if cell.location not in modifiedLocations]
 
             self.ids.puzzleView.clear_widgets()
             self.ids.puzzleView.cells = []
 
             for location in self.sudoku.locations():
-                if location not in locations:
+                if location not in modifiedLocations:
                     cell = unchangedCells[0]
                     unchangedCells = unchangedCells[1:]
                 else:
