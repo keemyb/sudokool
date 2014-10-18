@@ -586,7 +586,18 @@ class Game(ScreenManager):
         self.initialiseLogOutput()
         self.initialiseSolveButtons()
         self.initialiseSolveModeButton()
+        self.initialiseUndoButtons()
         self.on_screenSizeChange(self, Window.size)
+
+    def initialiseUndoButtons(self):
+        self.undoButtons = []
+
+        undoOneStep = Undo(self, 1)
+        redoOneStep = Redo(self, 1)
+
+        for button in (undoOneStep, redoOneStep):
+            self.ids.undoButtons.add_widget(button)
+            self.undoButtons.append(button)
 
     def initialiseClearLocationButton(self):
         clearLocationButton = ClearLocation(self)
