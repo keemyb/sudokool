@@ -90,12 +90,15 @@ def visualizer(puzzle, *groups):
     return wholeString
 
 easy = Sudoku("009003201470002030800000074020000300000000710000794000000300000000925000000018500")
-print easy.solve()
-print easy
-easy.undo()
-print easy
-easy.undo()
-print easy
+easy.initialiseIntersections()
+easy.solve(1)
+print easy.values
+print easy.solvingCandidatesDict
+print easy.userCandidatesDict
+print easy.log
+print easy.history
+print easy.changes
+print easy.intersectionTypes
 
 # easy.setValue(1,1)
 # print easy
