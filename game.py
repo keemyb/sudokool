@@ -361,6 +361,8 @@ class Game(ScreenManager):
         self.bind(highlightClashes=self.on_highlightClashes)
 
     def updateCells(self, modifiedLocations=None):
+        self.enforceUndoButtons()
+
         if self.solveMode:
             self.ids.puzzleView.clear_widgets()
             self.initialisePuzzleView()
@@ -461,6 +463,13 @@ class Game(ScreenManager):
 
         for button in self.ids.inputsGrid.buttons:
             button.disabled = newDisabledState
+
+    def enforceUndoButtons(self):
+        for button in self.undoButtons:
+            if button.type == "undo":
+                button.disabled = not bool(self.sudoku.undoStack)
+            elif button.type == "redo":
+                button.disabled = not bool(self.sudoku.redoStack)
 
     def on_highlightOccourences(self, caller, value):
         self.updateCells()
@@ -587,6 +596,7 @@ class Game(ScreenManager):
         self.initialiseSolveButtons()
         self.initialiseSolveModeButton()
         self.initialiseUndoButtons()
+        self.enforceUndoButtons()
         self.on_screenSizeChange(self, Window.size)
 
     def initialiseUndoButtons(self):
