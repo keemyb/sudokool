@@ -259,7 +259,7 @@ class ModifiedCell(Label):
             return True
 
     def update(self, *args):
-        self.MainSwitcher.paintValueLabel(self)
+        self.MainSwitcher.paintLabels(self)
 
         self.canvas.before.clear()
         if self.MainSwitcher.highlightClashes and self.MainSwitcher.sudoku.isClashing(self.location):
@@ -288,7 +288,7 @@ class ConstantCell(Label):
             return True
 
     def update(self, *args):
-        self.MainSwitcher.paintValueLabel(self)
+        self.MainSwitcher.paintLabels(self)
 
         self.canvas.before.clear()
         if self.MainSwitcher.highlightClashes and self.MainSwitcher.sudoku.isClashing(self.location):
@@ -317,16 +317,7 @@ class EmptyCell(GridLayout):
             return True
 
     def update(self, *args):
-        if self.MainSwitcher.highlightOccourences and self.MainSwitcher.selected > 0:
-            for candidate in self.candidates:
-                if (self.MainSwitcher.sudoku.getValue(self.MainSwitcher.selected) ==
-                        candidate.value):
-                    candidate.color = self.MainSwitcher.palette.rgba("occourenceText")
-                else:
-                    candidate.color = self.MainSwitcher.palette.rgba("candidateText")
-        else:
-            for candidate in self.candidates:
-                candidate.color = self.MainSwitcher.palette.rgba("candidateText")
+        self.MainSwitcher.paintLabels(self)
 
         self.MainSwitcher.paintNeighbourOverlay(self)
 
@@ -503,7 +494,19 @@ class Game(ScreenManager):
         with cell.canvas.after:
             Rectangle(size=cell.size, pos=cell.pos)
 
-    def paintValueLabel(self, cell):
+    def paintLabels(self, cell):
+        if self.sudoku.isEmpty(cell.location):
+            if self.highlightOccourences and self.selected > 0:
+                for candidate in cell.candidates:
+                    if candidate.value == self.sudoku.getValue(self.selected):
+                        candidate.color = self.palette.rgba("occourenceText")
+                    else:
+                        candidate.color = self.palette.rgba("candidateText")
+            else:
+                for candidate in cell.candidates:
+                    candidate.color = self.palette.rgba("candidateText")
+            return
+
         if self.sudoku.isConstant(cell.location):
             normalText = "constantText"
         else:
