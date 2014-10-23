@@ -297,6 +297,17 @@ class ConstantCell(Label):
         else:
             self.color = self.MainSwitcher.palette.rgba("constantText")
 
+        self.canvas.before.clear()
+        if self.MainSwitcher.highlightClashes and self.MainSwitcher.sudoku.isClashing(self.location):
+            with self.canvas.before:
+                Color(*self.MainSwitcher.palette.rgba("clashingConstantBack"))
+        else:
+            with self.canvas.before:
+                Color(*self.MainSwitcher.palette.rgba("cellBack"))
+
+        with self.canvas.before:
+            Rectangle(size=self.size, pos=self.pos)
+
 class EmptyCell(GridLayout):
     def __init__(self, MainSwitcher, **kwargs):
         super(EmptyCell, self).__init__(**kwargs)
