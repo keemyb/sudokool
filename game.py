@@ -17,6 +17,7 @@ from kivy.uix.button import Button
 
 from kivy.graphics import Color
 from kivy.graphics import Rectangle
+from kivy.graphics import Line
 
 class ColourPalette():
     def __init__(self):
@@ -265,6 +266,8 @@ class ModifiedCell(Label):
 
         self.MainSwitcher.paintNeighbourOverlay(self)
 
+        self.MainSwitcher.paintBorders(self)
+
 class ConstantCell(Label):
     def __init__(self, MainSwitcher, **kwargs):
         super(ConstantCell, self).__init__(**kwargs)
@@ -285,6 +288,8 @@ class ConstantCell(Label):
 
         self.MainSwitcher.paintNeighbourOverlay(self)
 
+        self.MainSwitcher.paintBorders(self)
+
 class EmptyCell(GridLayout):
     def __init__(self, MainSwitcher, **kwargs):
         super(EmptyCell, self).__init__(**kwargs)
@@ -302,6 +307,8 @@ class EmptyCell(GridLayout):
         self.MainSwitcher.paintLabels(self)
 
         self.MainSwitcher.paintNeighbourOverlay(self)
+
+        self.MainSwitcher.paintBorders(self)
 
 class Candidate(Label):
     pass
@@ -460,6 +467,11 @@ class Game(ScreenManager):
 
     def on_highlightClashes(self, caller, value):
         self.updateCells()
+
+    def paintBorders(self, cell):
+        with cell.canvas.after:
+            Color(*self.palette.rgba("black"))
+            Line(rectangle=[cell.x, cell.y, cell.width, cell.height], width=1)
 
     def paintNeighbourOverlay(self, cell):
         cell.canvas.after.clear()
