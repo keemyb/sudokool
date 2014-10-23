@@ -1244,6 +1244,7 @@ class Sudoku():
 
         self.updateUnits()
         self.updateSolvingCandidates()
+        self.updateUserCandidates()
         self.updatePointerGroups()
         self.updateXWingGroups()
         self.updateSwordfishGroups()

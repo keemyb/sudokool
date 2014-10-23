@@ -161,9 +161,12 @@ def visualizeEdges(puzzle):
 easy = Sudoku("009003201470002030800000074020000300000000710000794000000300000000925000000018500")
 # easy = Sudoku("0"*64)
 # print visualizeEdges(easy)
-easy.solve()
-print easy
+easy.initialiseUserCandidates()
+easy.setValue(42, 6)
+# easy.solve()
+# print easy
 print easy.undoStack
+print easy.userCandidatesDict[33]
 
 # easy.setValue(1,1)
 # print easy
