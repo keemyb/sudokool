@@ -1776,12 +1776,9 @@ class Sudoku():
 
 
 
-
+    @solvingMethod()
     @undoable
     def nakedSingle(self):
-        self.initialiseIntersections()
-
-        self.changes = False
 
         successString = "Naked Single: {0} was set to {1}"
 
@@ -1794,16 +1791,9 @@ class Sudoku():
 
                 self.addToLog(successString, location, nakedSingle)
 
-        if self.changes:
-            self.updatePuzzle()
-
-        return self.changes
-
+    @solvingMethod()
     @undoable
     def nakedN(self, n):
-        self.initialiseIntersections()
-
-        self.changes = False
 
         name = "Naked " + self.multiples[n - 1]
         successString = name + ": {0} have been removed from {1} as it shares a {2} with the " + name + ", {3}"
@@ -1832,11 +1822,6 @@ class Sudoku():
 
                             self.addToLog(successString, removedCandidates, location, self.alignment(*combination)[0], combination)
 
-        if self.changes:
-            self.updatePuzzle()
-
-        return self.changes
-
     def nakedTwin(self):
 
         return self.nakedN(2)
@@ -1848,11 +1833,9 @@ class Sudoku():
 
 
 
+    @solvingMethod()
     @undoable
     def hiddenN(self, n):
-        self.initialiseIntersections()
-
-        self.changes = False
 
         name = "Hidden " + self.multiples[n - 1]
         successString = name + ": {0} has been removed from {1} as the " + name +", {2} only appears in this {3}"
@@ -1883,11 +1866,6 @@ class Sudoku():
 
                         self.addToLog(successString, removedCandidates, location, uniqueCombinationCandidates, intersectionType)
 
-        if self.changes:
-            self.updatePuzzle()
-
-        return self.changes
-
     def hiddenSingle(self):
 
         return self.hiddenN(1)
@@ -1905,9 +1883,6 @@ class Sudoku():
 
     @undoable
     def pointingN(self, n):
-        self.initialiseIntersections(("pointer", n))
-
-        self.changes = False
 
         name = "Pointing " + self.multiples[n - 1]
         successString = name + ": {0} has been removed from {1}, as it shares a {2} with the " + name + " {3}"
@@ -1934,14 +1909,11 @@ class Sudoku():
 
                     self.addToLog(successString, removedCandidates, location, pointerType, combination)
 
-        if self.changes:
-            self.updatePuzzle()
-
-        return self.changes
-
+    @solvingMethod(("pointer", 2))
     def pointingPair(self):
         return self.pointingN(2)
 
+    @solvingMethod(("pointer", 3))
     def pointingTriplet(self):
         return self.pointingN(3)
 
@@ -1950,9 +1922,6 @@ class Sudoku():
 
     @undoable
     def boxLineReductionN(self, n):
-        self.initialiseIntersections(("pointer", n))
-
-        self.changes = False
 
         name = "Box Line Reduction (" + self.multiples[n - 1] + ")"
         successString = name + ": {0} has been removed from {1}, as it is part of a subGrid where {2} can only be placed along it's {3}"
@@ -1978,25 +1947,20 @@ class Sudoku():
 
                     self.addToLog(successString, removedCandidates, location, commonPointerCandidates, pointerType)
 
-        if self.changes:
-            self.updatePuzzle()
-
-        return self.changes
-
+    @solvingMethod(("pointer", 2))
     def boxLineReduction2(self):
         return self.boxLineReductionN(2)
 
+    @solvingMethod(("pointer", 3))
     def boxLineReduction3(self):
         return self.boxLineReductionN(3)
 
 
 
 
+    @solvingMethod("xWing")
     @undoable
     def xWing(self):
-        self.initialiseIntersections("xWing")
-
-        self.changes = False
 
         successString = "X-Wing: {0} has been removed from {1}, as it is in alignment with the X-Wing, {2}"
 
@@ -2032,19 +1996,12 @@ class Sudoku():
                     # Needs to be more verbose, showing where the alignment occours
                     self.addToLog(successString, removedCandidates, location, group)
 
-        if self.changes:
-            self.updatePuzzle()
-
-        return self.changes
 
 
 
-
+    @solvingMethod("swordfish")
     @undoable
     def swordfish(self):
-        self.initialiseIntersections("swordfish")
-
-        self.changes = False
 
         successString = "Swordfish: {0} has been removed from {1}, as it is in alignment with the Swordfish, {2}"
 
@@ -2086,20 +2043,12 @@ class Sudoku():
                 if removedCandidates:
                     self.addToLog(successString, removedCandidates, location, group)
 
-        if self.changes:
-            self.updatePuzzle()
-
-        return self.changes
 
 
 
-
+    @solvingMethod("conjugateChains")
     @undoable
     def simpleColouring(self):
-
-        self.initialiseIntersections("conjugateChains")
-
-        self.changes = False
 
         for chainGroup in self.intersectionTypes["conjugateChains"]:
             chain, candidate = chainGroup[0], chainGroup[1]
@@ -2112,11 +2061,6 @@ class Sudoku():
 
             for method in simpleColouringMethods:
                 method(chain, colourOne, colourTwo, candidate)
-
-        if self.changes:
-            self.updatePuzzle()
-
-        return self.changes
 
     def chainOnOff(self, chain, colourOne, colourTwo, candidate):
         """Tests to see if one colour being ON is valid, if it is invalid
@@ -2224,11 +2168,9 @@ class Sudoku():
 
 
 
+    @solvingMethod("yWing")
     @undoable
     def yWing(self):
-        self.initialiseIntersections("yWing")
-
-        self.changes = False
 
         successString = "Y-Wing: {0} has been removed from {1}, as it can be seen by {2}, part of a Y-Wing"
 
@@ -2252,19 +2194,12 @@ class Sudoku():
                 if removedCandidates:
                     self.addToLog(successString, yWingCandidate, location, (firstArm, secondArm))
 
-        if self.changes:
-            self.updatePuzzle()
-
-        return self.changes
 
 
 
-
+    @solvingMethod("xyzWing")
     @undoable
     def xyzWing(self):
-        self.initialiseIntersections("xyzWing")
-
-        self.changes = False
 
         successString = "XYZ-Wing: {0} has been removed from {1}, as it can be seen by {2}, an XYZ-Wing"
 
@@ -2290,19 +2225,12 @@ class Sudoku():
                 if removedCandidates:
                     self.addToLog(successString, xyzWingCandidate, location, xyzWingLocations)
 
-        if self.changes:
-            self.updatePuzzle()
-
-        return self.changes
 
 
 
-
+    @solvingMethod("lockedChains")
     @undoable
     def remotePairs(self):
-        self.initialiseIntersections("lockedChains")
-
-        self.changes = False
 
         successString = "Remote Pair: {0} has been removed from {1}, as it can be seen by the remote pair {2}, part of the locked chain {3}"
 
@@ -2330,8 +2258,3 @@ class Sudoku():
                     if removedCandidates:
 
                         self.addToLog(successString, removedCandidates, neighbour, remotePair, lockedChain)
-
-        if self.changes:
-            self.updatePuzzle()
-
-        return self.changes

@@ -159,8 +159,11 @@ def visualizeEdges(puzzle):
     return string
 
 easy = Sudoku("009003201470002030800000074020000300000000710000794000000300000000925000000018500")
-easy = Sudoku("0"*64)
-print visualizeEdges(easy)
+# easy = Sudoku("0"*64)
+# print visualizeEdges(easy)
+easy.solve()
+print easy
+print easy.undoStack
 
 # easy.setValue(1,1)
 # print easy
