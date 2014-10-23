@@ -51,6 +51,9 @@ class ColourPalette():
         self.colours["selectedNeighbourOverlay"] = list(self.colours["yellow"][:-1])+[.1]
         self.colours["selectedOverlay"] = list(self.colours["yellow"][:-1])+[.3]
 
+        self.colours["cellBorders"] = self.colours["black"]
+        self.colours["subGridBorders"] = self.colours["black"]
+
     def rgba(self, colour):
         return self.colours[colour]
 
@@ -469,8 +472,9 @@ class Game(ScreenManager):
         self.updateCells()
 
     def paintBorders(self, cell):
+        #Cell borders
         with cell.canvas.after:
-            Color(*self.palette.rgba("black"))
+            Color(*self.palette.rgba("cellBorders"))
             Line(rectangle=[cell.x, cell.y, cell.width, cell.height], width=1)
 
         topLeftCoords = cell.x, cell.y + cell.height
@@ -478,8 +482,9 @@ class Game(ScreenManager):
         bottomRightCoords = cell.x + cell.width, cell.y
         bottomLeftCoords = cell.x, cell.y
 
+        #Subgrid borders
         with cell.canvas.after:
-            Color(*self.palette.rgba("black"))
+            Color(*self.palette.rgba("subGridBorders"))
 
             if self.sudoku.edges[cell.location][0]:
                 Line(points=topLeftCoords+topRightCoords, width=2)
