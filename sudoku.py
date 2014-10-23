@@ -1500,8 +1500,7 @@ class Sudoku():
 
             def wrapper(self, *args, **kwargs):
 
-                for intersection in intersections:
-                    self.initialiseIntersections(intersection)
+                self.initialiseIntersections(intersections)
 
                 self.changes = False
 
