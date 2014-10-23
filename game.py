@@ -473,6 +473,23 @@ class Game(ScreenManager):
             Color(*self.palette.rgba("black"))
             Line(rectangle=[cell.x, cell.y, cell.width, cell.height], width=1)
 
+        topLeftCoords = cell.x, cell.y + cell.height
+        topRightCoords = cell.x + cell.width, cell.y + cell.height
+        bottomRightCoords = cell.x + cell.width, cell.y
+        bottomLeftCoords = cell.x, cell.y
+
+        with cell.canvas.after:
+            Color(*self.palette.rgba("black"))
+
+            if self.sudoku.edges[cell.location][0]:
+                Line(points=topLeftCoords+topRightCoords, width=2)
+            elif self.sudoku.edges[cell.location][2]:
+                Line(points=bottomLeftCoords+bottomRightCoords, width=2)
+            if self.sudoku.edges[cell.location][1]:
+                Line(points=topRightCoords+bottomRightCoords, width=2)
+            elif self.sudoku.edges[cell.location][3]:
+                Line(points=topLeftCoords+bottomLeftCoords, width=2)
+
     def paintNeighbourOverlay(self, cell):
         cell.canvas.after.clear()
         if self.selected < 1:
