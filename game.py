@@ -244,6 +244,7 @@ class ModifiedCell(Label):
     def __init__(self, MainSwitcher, **kwargs):
         super(ModifiedCell, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
+        self.bind(size=self.update, pos=self.update)
 
     def on_touch_down(self, touch):
 
@@ -252,7 +253,7 @@ class ModifiedCell(Label):
 
             return True
 
-    def update(self):
+    def update(self, *args):
         if self.MainSwitcher.highlightOccourences and self.MainSwitcher.selected > 0:
             if (self.MainSwitcher.sudoku.getValue(self.MainSwitcher.selected) ==
                 self.value):
@@ -277,6 +278,7 @@ class ConstantCell(Label):
     def __init__(self, MainSwitcher, **kwargs):
         super(ConstantCell, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
+        self.bind(size=self.update, pos=self.update)
 
     def on_touch_down(self, touch):
 
@@ -285,7 +287,7 @@ class ConstantCell(Label):
 
             return True
 
-    def update(self):
+    def update(self, *args):
         if self.MainSwitcher.highlightOccourences and self.MainSwitcher.selected > 0:
             if (self.MainSwitcher.sudoku.getValue(self.MainSwitcher.selected) ==
                 self.value):
@@ -299,6 +301,7 @@ class EmptyCell(GridLayout):
     def __init__(self, MainSwitcher, **kwargs):
         super(EmptyCell, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
+        self.bind(size=self.update, pos=self.update)
 
     def on_touch_down(self, touch):
 
@@ -307,7 +310,7 @@ class EmptyCell(GridLayout):
 
             return True
 
-    def update(self):
+    def update(self, *args):
         if self.MainSwitcher.highlightOccourences and self.MainSwitcher.selected > 0:
             for candidate in self.candidates:
                 if (self.MainSwitcher.sudoku.getValue(self.MainSwitcher.selected) ==
