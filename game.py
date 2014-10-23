@@ -47,8 +47,8 @@ class ColourPalette():
         self.colours["clashingConstantBack"] = self.colours["salmon"]
 
         self.colours["noOverlay"] = 0, 0, 0, 0
-        self.colours["selectedNeighbourOverlay"] = list(self.colours["yellow"][:-1])+[.3]
-        self.colours["selectedOverlay"] = list(self.colours["yellow"][:-1])+[.5]
+        self.colours["selectedNeighbourOverlay"] = list(self.colours["yellow"][:-1])+[.1]
+        self.colours["selectedOverlay"] = list(self.colours["yellow"][:-1])+[.3]
 
     def rgba(self, colour):
         return self.colours[colour]
