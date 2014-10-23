@@ -1494,6 +1494,28 @@ class Sudoku():
 
         self.redoStack.append(state)
 
+    def solvingMethod(*intersections):
+
+        def decorator(function):
+
+            def wrapper(self, *args, **kwargs):
+
+                for intersection in intersections:
+                    self.initialiseIntersections(intersection)
+
+                self.changes = False
+
+                function(self, *args, **kwargs)
+
+                if self.changes:
+                    self.updatePuzzle()
+
+                return self.changes
+
+            return wrapper
+
+        return decorator
+
     def isEmpty(self, location):
         if self.values[location] not in self.setOfPossibleValues:
             return True
