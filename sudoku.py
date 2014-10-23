@@ -115,6 +115,8 @@ class Sudoku():
         if generateSudoku:
             self.generateSudoku(difficulty)
 
+        self.edges = self.generateEdges()
+
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return other.values == self.values
@@ -217,6 +219,35 @@ class Sudoku():
         else:
             self.subGridsX = factor
             self.subGridsY = self.gridSize / self.subGridsX
+
+    def generateEdges(self):
+        edges = {}
+
+        for location in self.locations():
+            # The location as if it were in the first row of subgrids
+            firstSubGridRowLocation = location % (self.unitSize() * self.subGridsInRow())
+            if firstSubGridRowLocation == 0:
+                firstSubGridRowLocation = self.unitSize() * self.subGridsInRow()
+
+            subGridColumn = (self.getColumn(location) - 1) / self.subGridsInColumn() + 1
+
+            # The location as if it were in the first subgrid
+            firstSubGridLocation = firstSubGridRowLocation - ((subGridColumn - 1) * self.subGridsInColumn())
+
+            #these represent if the location shares an edge with the subgrid
+            top, right, bottom, left = (False,)*4
+            if self.getRow(firstSubGridLocation) == 1:
+                top = True
+            elif self.getRow(firstSubGridLocation) == self.subGridsInRow():
+                bottom = True
+            if self.getColumn(firstSubGridLocation) == self.subGridsInColumn():
+                right = True
+            elif self.getColumn(firstSubGridLocation) == 1:
+                left = True
+
+            edges[location] = top, right, bottom, left
+
+        return edges
 
     def generatePossibleValues(self):
         if self.gridSize <= 9:

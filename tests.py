@@ -89,16 +89,78 @@ def visualizer(puzzle, *groups):
 
     return wholeString
 
+def visualizeEdges(puzzle):
+    string = ""
+    vPipe = "="
+    hPipe = "="
+    # first line to accommodate vertical pipe and following spaces (minus one to account for last v pipe)
+    # second line for numbers (and following spaces)
+    horizontalDivider = (hPipe * ((len(vPipe) + 1) * (puzzle.subGridsX + 1) - 1) +
+                   hPipe * (puzzle.gridSize * 2) +
+                   "\n")
+
+    def isFirstLocationOnLine(location):
+        if (location - 1) % (puzzle.gridSize * puzzle.subGridsX) == 0:
+            return True
+        return False
+
+    def isFirstLocationInRowInSubGrid(location):
+        if (location - 1) % puzzle.subGridsY == 0:
+            return True
+        return False
+
+    def isLastLocationInRow(location):
+        if location % puzzle.gridSize == 0:
+            return True
+        return False
+
+    def isLastLocation(location):
+        if location == puzzle.gridSize ** 2:
+            return True
+        return False
+
+    edges = puzzle.edges
+
+    for location in puzzle.locations():
+
+        if isFirstLocationOnLine(location):
+            string += horizontalDivider
+
+        if isFirstLocationInRowInSubGrid(location):
+            string += vPipe + " "
+
+        if edges[location] == (False,)*4:
+            cornerLocation = 5
+        elif edges[location][0] and edges[location][1]:
+            cornerLocation = 9
+        elif edges[location][1] and edges[location][2]:
+            cornerLocation = 3
+        elif edges[location][2] and edges[location][3]:
+            cornerLocation = 1
+        elif edges[location][3] and edges[location][0]:
+            cornerLocation = 7
+        elif edges[location][0]:
+            cornerLocation = 8
+        elif edges[location][1]:
+            cornerLocation = 6
+        elif edges[location][2]:
+            cornerLocation = 2
+        elif edges[location][3]:
+            cornerLocation = 4
+
+        string += str(cornerLocation) + " "
+
+        if isLastLocationInRow(location):
+            string += vPipe + "\n"
+
+        if isLastLocation(location):
+            string += horizontalDivider
+
+    return string
+
 easy = Sudoku("009003201470002030800000074020000300000000710000794000000300000000925000000018500")
-easy.initialiseIntersections()
-easy.solve(1)
-print easy.values
-print easy.solvingCandidatesDict
-print easy.userCandidatesDict
-print easy.log
-print easy.history
-print easy.changes
-print easy.intersectionTypes
+easy = Sudoku("0"*64)
+print visualizeEdges(easy)
 
 # easy.setValue(1,1)
 # print easy
@@ -163,7 +225,7 @@ print easy.intersectionTypes
 # 0000E0A00D005000\
 # 0635G9C00B00E000"
 
-# puzzle16 = Sudoku(string16)
+# easy = Sudoku(string16)
 # print puzzleSummary(puzzle16, 0, True, True, True)
 
 # fileToRead = open("top95.txt", "r")
