@@ -354,6 +354,12 @@ class Game(ScreenManager):
         self.bind(solveMode=self.on_solveMode)
         self.bind(highlightClashes=self.on_highlightClashes)
 
+    def validSelection(self):
+        if self.selected in self.sudoku.locations():
+            return True
+        else:
+            return False
+
     def updateCells(self, modifiedLocations=None):
         self.enforceUndoButtons()
 
@@ -394,7 +400,7 @@ class Game(ScreenManager):
     def on_selected(self, caller, selected):
         self.enforceClearLocationButtonState()
         self.enforceInputButtonState()
-        if self.selected < 1:
+        if not self.validSelection():
             self.updateCells([])
         else:
             self.updateCells([self.selected])
@@ -497,7 +503,7 @@ class Game(ScreenManager):
 
     def paintNeighbourOverlay(self, cell):
         cell.canvas.after.clear()
-        if self.selected < 1:
+        if not self.validSelection():
             return
         if cell.location == self.selected:
             with cell.canvas.after:
@@ -514,7 +520,7 @@ class Game(ScreenManager):
 
     def paintLabels(self, cell):
         if self.sudoku.isEmpty(cell.location):
-            if self.highlightOccourences and self.selected > 0:
+            if self.highlightOccourences and self.validSelection():
                 for candidate in cell.candidates:
                     if candidate.value == self.sudoku.getValue(self.selected):
                         candidate.color = self.palette.rgba("occourenceText")
@@ -530,7 +536,7 @@ class Game(ScreenManager):
         else:
             normalText = "modifiedText"
 
-        if self.highlightOccourences and self.selected > 0:
+        if self.highlightOccourences and self.validSelection():
             if cell.value == self.sudoku.getValue(self.selected):
                 cell.color = self.palette.rgba("occourenceText")
             else:
@@ -556,7 +562,7 @@ class Game(ScreenManager):
             Rectangle(size=cell.size, pos=cell.pos)
 
     def setValue(self, value):
-        if self.selected < 1:
+        if not self.validSelection():
             return
         elif self.sudoku.isConstant(self.selected):
             return
