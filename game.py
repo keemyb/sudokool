@@ -279,19 +279,7 @@ class ModifiedCell(Label):
         with self.canvas.before:
             Rectangle(size=self.size, pos=self.pos)
 
-        self.canvas.after.clear()
-        if self.MainSwitcher.selected == self.location:
-            with self.canvas.after:
-                self.highlight = Color(*self.MainSwitcher.palette.rgba("selectedOverlay"))
-        elif self.location in self.MainSwitcher.sudoku.allCombinedNeighbours(self.MainSwitcher.selected):
-            with self.canvas.after:
-                self.highlight = Color(*self.MainSwitcher.palette.rgba("selectedNeighbourOverlay"))
-        else:
-            with self.canvas.after:
-                self.highlight = Color(*self.MainSwitcher.palette.rgba("noOverlay"))
-
-        with self.canvas.after:
-            Rectangle(size=self.size, pos=self.pos)
+        self.MainSwitcher.paintNeighbourOverlay(self)
 
 class ConstantCell(Label):
     def __init__(self, MainSwitcher, **kwargs):
@@ -327,19 +315,7 @@ class ConstantCell(Label):
         with self.canvas.before:
             Rectangle(size=self.size, pos=self.pos)
 
-        self.canvas.after.clear()
-        if self.MainSwitcher.selected == self.location:
-            with self.canvas.after:
-                self.highlight = Color(*self.MainSwitcher.palette.rgba("selectedOverlay"))
-        elif self.location in self.MainSwitcher.sudoku.allCombinedNeighbours(self.MainSwitcher.selected):
-            with self.canvas.after:
-                self.highlight = Color(*self.MainSwitcher.palette.rgba("selectedNeighbourOverlay"))
-        else:
-            with self.canvas.after:
-                self.highlight = Color(*self.MainSwitcher.palette.rgba("noOverlay"))
-
-        with self.canvas.after:
-            Rectangle(size=self.size, pos=self.pos)
+        self.MainSwitcher.paintNeighbourOverlay(self)
 
 class EmptyCell(GridLayout):
     def __init__(self, MainSwitcher, **kwargs):
@@ -366,19 +342,7 @@ class EmptyCell(GridLayout):
             for candidate in self.candidates:
                 candidate.color = self.MainSwitcher.palette.rgba("candidateText")
 
-        self.canvas.after.clear()
-        if self.MainSwitcher.selected == self.location:
-            with self.canvas.after:
-                self.highlight = Color(*self.MainSwitcher.palette.rgba("selectedOverlay"))
-        elif self.location in self.MainSwitcher.sudoku.allCombinedNeighbours(self.MainSwitcher.selected):
-            with self.canvas.after:
-                self.highlight = Color(*self.MainSwitcher.palette.rgba("selectedNeighbourOverlay"))
-        else:
-            with self.canvas.after:
-                self.highlight = Color(*self.MainSwitcher.palette.rgba("noOverlay"))
-
-        with self.canvas.after:
-            Rectangle(size=self.size, pos=self.pos)
+        self.MainSwitcher.paintNeighbourOverlay(self)
 
 class Candidate(Label):
     pass
@@ -537,6 +501,21 @@ class Game(ScreenManager):
 
     def on_highlightClashes(self, caller, value):
         self.updateCells()
+
+    def paintNeighbourOverlay(self, cell):
+        cell.canvas.after.clear()
+        if cell.location == self.selected:
+            with cell.canvas.after:
+                cell.highlight = Color(*self.palette.rgba("selectedOverlay"))
+        elif cell.location in self.sudoku.allCombinedNeighbours(self.selected):
+            with cell.canvas.after:
+                cell.highlight = Color(*self.palette.rgba("selectedNeighbourOverlay"))
+        else:
+            with cell.canvas.after:
+                cell.highlight = Color(*self.palette.rgba("noOverlay"))
+
+        with cell.canvas.after:
+            Rectangle(size=cell.size, pos=cell.pos)
 
     def setValue(self, value):
         if self.selected < 1:
