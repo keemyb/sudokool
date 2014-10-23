@@ -481,6 +481,8 @@ class Game(ScreenManager):
 
     def paintNeighbourOverlay(self, cell):
         cell.canvas.after.clear()
+        if self.selected < 1:
+            return
         if cell.location == self.selected:
             with cell.canvas.after:
                 cell.highlight = Color(*self.palette.rgba("selectedOverlay"))
