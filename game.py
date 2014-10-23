@@ -30,6 +30,7 @@ class ColourPalette():
         self.colours["green"] = .67, .75, .57, 1
         self.colours["brown"] = .87, .67, .49, 1
         self.colours["black"] = 0, 0, 0, 1
+        self.colours["yellow"] = 1, .95, 0, 1
         self.colours["gold"] = .5, .42, .26, 1
 
         self.colours["cellBack"] = self.colours["offWhite"]
@@ -44,6 +45,10 @@ class ColourPalette():
 
         self.colours["clashingModifiedBack"] = self.colours["red"]
         self.colours["clashingConstantBack"] = self.colours["salmon"]
+
+        self.colours["noOverlay"] = 0, 0, 0, 0
+        self.colours["selectedNeighbourOverlay"] = list(self.colours["yellow"][:-1])+[.3]
+        self.colours["selectedOverlay"] = list(self.colours["yellow"][:-1])+[.5]
 
     def rgba(self, colour):
         return self.colours[colour]
