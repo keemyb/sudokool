@@ -1589,11 +1589,11 @@ class Sudoku():
         return combinations(unit, n)
 
     @undoable
-    def setValue(self, location, value):
+    def setValue(self, location, value, clear=False):
         if self.isConstant(location):
             raise Exception("location is a constant and cannot be changed")
 
-        if not self.isValidInput(value):
+        if not self.isValidInput(value) and not clear:
             raise Exception("value is not vaild")
 
         removedValue = 0
@@ -1620,7 +1620,7 @@ class Sudoku():
     @undoable
     def clearLocation(self, location):
 
-        return self.setValue(location, 0)
+        return self.setValue(location, 0, clear=True)
 
     def allSolvingCandidates(self, *locations):
         return set([]).union(*[self.solvingCandidatesDict[location] for location in locations])
