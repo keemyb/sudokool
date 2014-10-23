@@ -261,16 +261,7 @@ class ModifiedCell(Label):
     def update(self, *args):
         self.MainSwitcher.paintLabels(self)
 
-        self.canvas.before.clear()
-        if self.MainSwitcher.highlightClashes and self.MainSwitcher.sudoku.isClashing(self.location):
-            with self.canvas.before:
-                Color(*self.MainSwitcher.palette.rgba("clashingModifiedBack"))
-        else:
-            with self.canvas.before:
-                Color(*self.MainSwitcher.palette.rgba("cellBack"))
-
-        with self.canvas.before:
-            Rectangle(size=self.size, pos=self.pos)
+        self.MainSwitcher.paintBackground(self)
 
         self.MainSwitcher.paintNeighbourOverlay(self)
 
@@ -290,16 +281,7 @@ class ConstantCell(Label):
     def update(self, *args):
         self.MainSwitcher.paintLabels(self)
 
-        self.canvas.before.clear()
-        if self.MainSwitcher.highlightClashes and self.MainSwitcher.sudoku.isClashing(self.location):
-            with self.canvas.before:
-                Color(*self.MainSwitcher.palette.rgba("clashingConstantBack"))
-        else:
-            with self.canvas.before:
-                Color(*self.MainSwitcher.palette.rgba("cellBack"))
-
-        with self.canvas.before:
-            Rectangle(size=self.size, pos=self.pos)
+        self.MainSwitcher.paintBackground(self)
 
         self.MainSwitcher.paintNeighbourOverlay(self)
 
@@ -521,6 +503,23 @@ class Game(ScreenManager):
                 cell.color = self.palette.rgba(normalText)
         else:
             cell.color = self.palette.rgba(normalText)
+
+    def paintBackground(self, cell):
+        if self.sudoku.isConstant(cell.location):
+            modifiedBack = "clashingConstantBack"
+        else:
+            modifiedBack = "clashingModifiedBack"
+
+        cell.canvas.before.clear()
+        if self.highlightClashes and self.sudoku.isClashing(cell.location):
+            with cell.canvas.before:
+                Color(*self.palette.rgba(modifiedBack))
+        else:
+            with cell.canvas.before:
+                Color(*self.palette.rgba("cellBack"))
+
+        with cell.canvas.before:
+            Rectangle(size=cell.size, pos=cell.pos)
 
     def setValue(self, value):
         if self.selected < 1:
