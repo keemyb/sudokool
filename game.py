@@ -259,14 +259,7 @@ class ModifiedCell(Label):
             return True
 
     def update(self, *args):
-        if self.MainSwitcher.highlightOccourences and self.MainSwitcher.selected > 0:
-            if (self.MainSwitcher.sudoku.getValue(self.MainSwitcher.selected) ==
-                self.value):
-                self.color = self.MainSwitcher.palette.rgba("occourenceText")
-            else:
-                self.color = self.MainSwitcher.palette.rgba("modifiedText")
-        else:
-            self.color = self.MainSwitcher.palette.rgba("modifiedText")
+        self.MainSwitcher.paintValueLabel(self)
 
         self.canvas.before.clear()
         if self.MainSwitcher.highlightClashes and self.MainSwitcher.sudoku.isClashing(self.location):
@@ -295,14 +288,7 @@ class ConstantCell(Label):
             return True
 
     def update(self, *args):
-        if self.MainSwitcher.highlightOccourences and self.MainSwitcher.selected > 0:
-            if (self.MainSwitcher.sudoku.getValue(self.MainSwitcher.selected) ==
-                self.value):
-                self.color = self.MainSwitcher.palette.rgba("occourenceText")
-            else:
-                self.color = self.MainSwitcher.palette.rgba("constantText")
-        else:
-            self.color = self.MainSwitcher.palette.rgba("constantText")
+        self.MainSwitcher.paintValueLabel(self)
 
         self.canvas.before.clear()
         if self.MainSwitcher.highlightClashes and self.MainSwitcher.sudoku.isClashing(self.location):
@@ -516,6 +502,20 @@ class Game(ScreenManager):
 
         with cell.canvas.after:
             Rectangle(size=cell.size, pos=cell.pos)
+
+    def paintValueLabel(self, cell):
+        if self.sudoku.isConstant(cell.location):
+            normalText = "constantText"
+        else:
+            normalText = "modifiedText"
+
+        if self.highlightOccourences and self.selected > 0:
+            if cell.value == self.sudoku.getValue(self.selected):
+                cell.color = self.palette.rgba("occourenceText")
+            else:
+                cell.color = self.palette.rgba(normalText)
+        else:
+            cell.color = self.palette.rgba(normalText)
 
     def setValue(self, value):
         if self.selected < 1:
