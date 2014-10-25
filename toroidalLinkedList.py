@@ -131,6 +131,8 @@ class toroidalLinkedList(object):
                 rowNeighbour.up.setDown(rowNeighbour.down)
                 rowNeighbour.column.size -= 1
 
+        self.size -= 1
+
     def uncover(self, Column):
         for node in Column.nodes():
             for rowNeighbour in node.rowNeighbours():
@@ -138,6 +140,8 @@ class toroidalLinkedList(object):
                 rowNeighbour.column.size += 1
 
         Column.left.setRight(Column)
+
+        self.size += 1
 
     def valid(self):
         for column in self.columns():
