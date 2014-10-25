@@ -3,8 +3,8 @@ from toroidalLinkedList import toroidalLinkedList
 
 def setupFourColumns():
     newList = toroidalLinkedList()
-    for name in ("A", "B", "C", "D"):
-        newList.addColumn(name)
+    for info in ("A", "B", "C", "D"):
+        newList.addColumn(info)
     return newList
 
 
@@ -33,7 +33,7 @@ def setupListWithRows():
 def test_AddColumn():
     newList = toroidalLinkedList()
     newList.addColumn("A")
-    return newList.head.right.name == "A"
+    return newList.head.right.info == "A"
 
 
 def test_AddNodeToColumn():
@@ -45,7 +45,7 @@ def test_AddNodeToColumn():
 def test_Cover():
     newList = setupListWithRows()
     for column in newList.columns():
-        if column.name == "B":
+        if column.info == "B":
             columnB = column
 
     newList.cover(columnB)
@@ -61,7 +61,7 @@ def test_Cover():
 def test_Uncover():
     newList = setupListWithRows()
     for column in newList.columns():
-        if column.name == "B":
+        if column.info == "B":
             columnB = column
 
     newList.cover(columnB)

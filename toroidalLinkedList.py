@@ -49,11 +49,11 @@ class HeadNode(Node):
         return
 
 class ColumnNode(Node):
-    def __init__(self, name):
+    def __init__(self, info):
         super(ColumnNode, self).__init__(None, self)
 
         self.size = 0
-        self.name = name
+        self.info = info
 
         self.setUp(self)
 
@@ -88,8 +88,8 @@ class toroidalLinkedList(object):
         self.head = HeadNode()
         self.size = 0
 
-    def addColumn(self, name):
-        newColumn = ColumnNode(name)
+    def addColumn(self, info):
+        newColumn = ColumnNode(info)
 
         lastColumn = self.lastColumn()
 
