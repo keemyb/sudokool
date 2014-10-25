@@ -116,7 +116,7 @@ class toroidalLinkedList(object):
 
     def smallestColumn(self):
         smallestColumn = self.firstColumn()
-        smallestSize = self.smallestColumn.size
+        smallestSize = smallestColumn.size
         for column in self.columns():
             if column.size < smallestSize:
                 smallestSize = column.size
