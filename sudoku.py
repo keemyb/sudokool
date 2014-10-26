@@ -1785,7 +1785,7 @@ class Sudoku():
 
         #0: locations, 1: rows, 2: columns, 3: subgrids
         for location in self.locations():
-            matrix.addColumn((0, location, None))
+            matrix.addColumn((0, location, 0))
         for intersectionID in xrange(1, 4):
             for intersectionNumber in xrange(1, self.unitSize() + 1):
                 for value in self.possibleValues():
@@ -1793,8 +1793,17 @@ class Sudoku():
 
         return matrix
 
+    def findColumn(self, matrix, intersectionID, intersectionNumber, value):
+        NoOfColumnsPerIntersection = self.unitSize() ** 2
+        columnNumber = intersectionID * NoOfColumnsPerIntersection
+        columnNumber += (intersectionNumber - 1) * self.unitSize()
+        columnNumber += value
 
+        column = matrix.firstColumn()
+        for _ in xrange(columnNumber - 1):
+            column = column.right
 
+        return column
 
 
     @solvingMethod()
