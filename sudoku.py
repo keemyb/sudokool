@@ -1777,6 +1777,7 @@ class Sudoku():
 
     def dancingLinks(self):
         matrix = self.populateSparseMatrix()
+        self.populateMatrixRows(matrix)
         return matrix
 
     def populateSparseMatrix(self):
@@ -1804,6 +1805,38 @@ class Sudoku():
             column = column.right
 
         return column
+
+    def populateMatrixRows(self, matrix):
+        matrixRowLinkPairs = ((0, 1), (1, 2), (2, 3), (3, 0))
+        for location in self.locations():
+            row = self.getRow(location)
+            column = self.getColumn(location)
+            subgrid = self.getSubGrid(location)
+
+            matrixRow = []
+
+            #locations
+            columnForRow = self.findColumn(matrix, 0, 1, location)
+            columnForRow.addData(None)
+            matrixRow.append(columnForRow.lastNode())
+
+            for value in self.possibleValues():
+                findColumnArgs = (
+                    (1, row, value),
+                    (2, column, value),
+                    (3, subgrid, value),
+                    )
+
+                for args in findColumnArgs:
+                    columnForRow = self.findColumn(matrix, *args)
+                    columnForRow.addData(None)
+                    matrixRow.append(columnForRow.lastNode())
+
+            for pair in matrixRowLinkPairs:
+                leftNode, rightNode = pair[0], pair[1]
+                matrixRow[leftNode].setRight(matrixRow[rightNode])
+
+
 
 
     @solvingMethod()
