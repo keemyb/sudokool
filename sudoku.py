@@ -1778,6 +1778,7 @@ class Sudoku():
     def dancingLinks(self):
         matrix = self.populateSparseMatrix()
         self.populateMatrixRows(matrix)
+        self.coverFilledColumns(matrix)
         return matrix
 
     def populateSparseMatrix(self):
@@ -1836,6 +1837,31 @@ class Sudoku():
                 leftNode, rightNode = pair[0], pair[1]
                 matrixRow[leftNode].setRight(matrixRow[rightNode])
 
+    def coverFilledColumns(self, matrix):
+        #every cover will shift the columns
+        covered = 0
+        for location in self.filledLocations():
+            value = self.getValue(location)
+            row = self.getRow(location)
+            column = self.getColumn(location)
+            subgrid = self.getSubGrid(location)
+
+            findColumnArgs = (
+                (0, 1, location),
+                (1, row, value),
+                (2, column, value),
+                (3, subgrid, value),
+                )
+
+            for i, args in enumerate(findColumnArgs):
+                # accounting for covered columns
+                offset = (covered / 4)
+                offset += (((covered - 1) / 4) + 1) * i
+                args = args[0:2]+(args[2] - offset,)
+                covered += 1
+                columnToCover = self.findColumn(matrix, *args)
+                print location, columnToCover.info
+                matrix.cover(columnToCover)
 
 
 
