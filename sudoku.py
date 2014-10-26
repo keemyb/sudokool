@@ -1775,6 +1775,26 @@ class Sudoku():
                         # if there are no modified locations, there are no solutions.
                         return
 
+    def dancingLinks(self):
+        matrix = self.populateSparseMatrix()
+        return matrix
+
+    def populateSparseMatrix(self):
+        from toroidalLinkedList import toroidalLinkedList
+        matrix = toroidalLinkedList()
+
+        #0: locations, 1: rows, 2: columns, 3: subgrids
+        for location in self.locations():
+            matrix.addColumn((0, location, None))
+        for intersectionID in xrange(1, 4):
+            for intersectionNumber in xrange(1, self.unitSize() + 1):
+                for value in self.possibleValues():
+                    matrix.addColumn((intersectionID, intersectionNumber, value))
+
+        return matrix
+
+
+
 
 
     @solvingMethod()
