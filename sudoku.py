@@ -1809,19 +1809,20 @@ class Sudoku():
 
     def populateMatrixRows(self, matrix):
         matrixRowLinkPairs = ((0, 1), (1, 2), (2, 3), (3, 0))
+
         for location in self.locations():
             row = self.getRow(location)
             column = self.getColumn(location)
             subgrid = self.getSubGrid(location)
 
-            matrixRow = []
-
-            #locations
-            columnForRow = self.findColumn(matrix, 0, 1, location)
-            columnForRow.addData(None)
-            matrixRow.append(columnForRow.lastNode())
-
             for value in self.possibleValues():
+                matrixRow = []
+
+                #locations
+                columnForRow = self.findColumn(matrix, 0, 1, location)
+                columnForRow.addData(None)
+                matrixRow.append(columnForRow.lastNode())
+
                 findColumnArgs = (
                     (1, row, value),
                     (2, column, value),
@@ -1833,9 +1834,11 @@ class Sudoku():
                     columnForRow.addData(None)
                     matrixRow.append(columnForRow.lastNode())
 
-            for pair in matrixRowLinkPairs:
-                leftNode, rightNode = pair[0], pair[1]
-                matrixRow[leftNode].setRight(matrixRow[rightNode])
+                for pair in matrixRowLinkPairs:
+                    leftNode, rightNode = pair[0], pair[1]
+                    matrixRow[leftNode].setRight(matrixRow[rightNode])
+
+                # print len(matrixRow)
 
     def coverFilledColumns(self, matrix):
         #every cover will shift the columns
@@ -1860,7 +1863,7 @@ class Sudoku():
                 args = args[0:2]+(args[2] - offset,)
                 covered += 1
                 columnToCover = self.findColumn(matrix, *args)
-                print location, columnToCover.info
+                # print location, columnToCover.info
                 matrix.cover(columnToCover)
 
 
