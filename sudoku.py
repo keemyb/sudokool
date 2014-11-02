@@ -1781,7 +1781,36 @@ class Sudoku():
         self.coverFilledColumns(matrix)
         solutions = []
         self.solveMatrix(matrix, solutions)
-        return solutions
+        self.interpretSolution(matrix, solutions)
+
+    def interpretSolution(self, matrix, solutions):
+        if len(self.filledLocations()) + len(solutions) != self.unitSize()**2:
+            return
+
+        solution = {}
+
+        for node in solutions:
+            while node.column.info[0] != 0: #move node in solutions to location (ID 0)
+                node = node.right
+
+            for rowNeighbour in node.rowNeighbours():
+                intersectionID = rowNeighbour.column.info[0]
+                intersectionNo = rowNeighbour.column.info[1]
+                value = rowNeighbour.column.info[2]
+
+                if intersectionID == 1:
+                    row = intersectionNo
+                elif intersectionID == 2:
+                    column = intersectionNo
+
+            location = (row - 1) * self.unitSize() + column
+
+            solution[location] = value
+
+        self.values.update(solution)
+
+
+
 
     def solveMatrix(self, matrix, solutions):
         if matrix.complete():
