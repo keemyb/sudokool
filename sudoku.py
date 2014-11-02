@@ -358,17 +358,13 @@ class Sudoku():
             while True:
 
                 if all(self.isFilled(location) for location in mask):
-                    self.brute()
+                    self.dancingLinks()
+
                     if self.isComplete():
-                        for location in self.locations():
-                            if location not in mask:
-                                self.clearLocation(location)
-                        valuesString = "".join([str(self.getValue(location)) if self.isFilled(location) else "0" for location in self.locations()])
-                        self.__init__(valuesString)
+                        self.undo()
+                        self.undoStack = []
                         return
                     else:
-                        for location in self.locations():
-                            self.clearLocation(location)
                         break
 
                 for location in mask:
@@ -494,7 +490,7 @@ class Sudoku():
         else:
             #no more methods
             if bruteForceOnFail:
-                self.brute()
+                self.dancingLinks()
             return
 
 
@@ -1774,6 +1770,151 @@ class Sudoku():
                     else:
                         # if there are no modified locations, there are no solutions.
                         return
+
+    @undoable
+    def dancingLinks(self):
+        matrix = self.populateSparseMatrix()
+        self.populateMatrixRows(matrix)
+        self.coverFilledColumns(matrix)
+        solutions = []
+        self.solveMatrix(matrix, solutions)
+        self.interpretSolution(matrix, solutions)
+
+    def interpretSolution(self, matrix, solutions):
+        if len(self.filledLocations()) + len(solutions) != self.unitSize()**2:
+            return
+
+        solution = {}
+
+        for node in solutions:
+            while node.column.info[0] != 0: #move node in solutions to location (ID 0)
+                node = node.right
+
+            for rowNeighbour in node.rowNeighbours():
+                intersectionID = rowNeighbour.column.info[0]
+                intersectionNo = rowNeighbour.column.info[1]
+                value = rowNeighbour.column.info[2]
+
+                if intersectionID == 1:
+                    row = intersectionNo
+                elif intersectionID == 2:
+                    column = intersectionNo
+
+            location = (row - 1) * self.unitSize() + column
+
+            solution[location] = value
+
+        self.values.update(solution)
+
+
+
+
+    def solveMatrix(self, matrix, solutions):
+        if matrix.complete():
+            return
+
+        columnToCover = matrix.smallestColumn()
+        matrix.cover(columnToCover)
+
+        for node in columnToCover.nodes():
+
+            for rowNeighbour in node.rowNeighbours():
+                matrix.cover(rowNeighbour.column)
+
+            solutions.append(node)
+
+            return self.solveMatrix(matrix, solutions)
+
+            solutions.pop()
+
+            for rowNeighbour in node.rowNeighbours():
+                matrix.uncover(rowNeighbour.column)
+
+        matrix.uncover(columnToCover)
+
+    def populateSparseMatrix(self):
+        from toroidalLinkedList import toroidalLinkedList
+        matrix = toroidalLinkedList()
+
+        #0: locations, 1: rows, 2: columns, 3: subgrids
+        for location in self.locations():
+            matrix.addColumn((0, location, 0))
+        for intersectionID in xrange(1, 4):
+            for intersectionNumber in xrange(1, self.unitSize() + 1):
+                for value in self.possibleValues():
+                    matrix.addColumn((intersectionID, intersectionNumber, value))
+
+        return matrix
+
+    def findColumn(self, matrix, intersectionID, intersectionNumber, value):
+        NoOfColumnsPerIntersection = self.unitSize() ** 2
+        columnNumber = intersectionID * NoOfColumnsPerIntersection
+        columnNumber += (intersectionNumber - 1) * self.unitSize()
+        columnNumber += value
+
+        column = matrix.firstColumn()
+        for _ in xrange(columnNumber - 1):
+            column = column.right
+
+        return column
+
+    def populateMatrixRows(self, matrix):
+        matrixRowLinkPairs = ((0, 1), (1, 2), (2, 3), (3, 0))
+
+        for location in self.locations():
+            row = self.getRow(location)
+            column = self.getColumn(location)
+            subgrid = self.getSubGrid(location)
+
+            for value in self.possibleValues():
+                matrixRow = []
+
+                #locations
+                columnForRow = self.findColumn(matrix, 0, 1, location)
+                columnForRow.addData(None)
+                matrixRow.append(columnForRow.lastNode())
+
+                findColumnArgs = (
+                    (1, row, value),
+                    (2, column, value),
+                    (3, subgrid, value),
+                    )
+
+                for args in findColumnArgs:
+                    columnForRow = self.findColumn(matrix, *args)
+                    columnForRow.addData(None)
+                    matrixRow.append(columnForRow.lastNode())
+
+                for pair in matrixRowLinkPairs:
+                    leftNode, rightNode = pair[0], pair[1]
+                    matrixRow[leftNode].setRight(matrixRow[rightNode])
+
+                # print len(matrixRow)
+
+    def coverFilledColumns(self, matrix):
+        columnsToCover = []
+
+        for location in self.filledLocations():
+            value = self.getValue(location)
+            row = self.getRow(location)
+            column = self.getColumn(location)
+            subgrid = self.getSubGrid(location)
+
+            findColumnArgs = (
+                (0, 1, location),
+                (1, row, value),
+                (2, column, value),
+                (3, subgrid, value),
+                )
+
+            for args in findColumnArgs:
+                # accounting for covered columns
+                columnToCover = self.findColumn(matrix, *args)
+                columnsToCover.append(columnToCover)
+
+        for columnToCover in columnsToCover:
+            matrix.cover(columnToCover)
+
 
 
 
