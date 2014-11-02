@@ -358,7 +358,7 @@ class Sudoku():
             while True:
 
                 if all(self.isFilled(location) for location in mask):
-                    self.brute()
+                    self.dancingLinks()
                     if self.isComplete():
                         for location in self.locations():
                             if location not in mask:
@@ -494,7 +494,7 @@ class Sudoku():
         else:
             #no more methods
             if bruteForceOnFail:
-                self.brute()
+                self.dancingLinks()
             return
 
 
