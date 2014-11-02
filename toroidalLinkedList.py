@@ -37,6 +37,16 @@ class Node(object):
             yield nextNeighbour
             nextNeighbour = nextNeighbour.right
 
+    def reverseRowNeighbours(self):
+        lastNeighbour = self.left
+        if lastNeighbour == self:
+            return
+
+        nextNeighbour = lastNeighbour
+        while nextNeighbour != self:
+            yield nextNeighbour
+            nextNeighbour = nextNeighbour.left
+
 class HeadNode(Node):
     def __init__(self):
         super(HeadNode, self).__init__(None, None)
