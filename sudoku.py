@@ -1775,6 +1775,7 @@ class Sudoku():
                         # if there are no modified locations, there are no solutions.
                         return
 
+    @undoable
     def dancingLinks(self):
         matrix = self.populateSparseMatrix()
         self.populateMatrixRows(matrix)
