@@ -83,6 +83,16 @@ class ColumnNode(Node):
             yield nextNode
             nextNode = nextNode.down
 
+    def nodesReverse(self):
+        lastNode = self.lastNode()
+        if lastNode == self:
+            return
+
+        nextNode = lastNode
+        while nextNode != self:
+            yield nextNode
+            nextNode = nextNode.up
+
 class toroidalLinkedList(object):
     def __init__(self):
         self.head = HeadNode()
