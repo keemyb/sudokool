@@ -1779,7 +1779,32 @@ class Sudoku():
         matrix = self.populateSparseMatrix()
         self.populateMatrixRows(matrix)
         self.coverFilledColumns(matrix)
-        return matrix
+        solutions = []
+        self.solveMatrix(matrix, solutions)
+        return solutions
+
+    def solveMatrix(self, matrix, solutions):
+        if matrix.complete():
+            return
+
+        columnToCover = matrix.smallestColumn()
+        matrix.cover(columnToCover)
+
+        for node in columnToCover.nodes():
+
+            for rowNeighbour in node.rowNeighbours():
+                matrix.cover(rowNeighbour.column)
+
+            solutions.append(node)
+
+            return self.solveMatrix(matrix, solutions)
+
+            solutions.pop()
+
+            for rowNeighbour in node.rowNeighbours():
+                matrix.uncover(rowNeighbour.column)
+
+        matrix.uncover(columnToCover)
 
     def populateSparseMatrix(self):
         from toroidalLinkedList import toroidalLinkedList
