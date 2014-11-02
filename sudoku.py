@@ -359,16 +359,12 @@ class Sudoku():
 
                 if all(self.isFilled(location) for location in mask):
                     self.dancingLinks()
+
                     if self.isComplete():
-                        for location in self.locations():
-                            if location not in mask:
-                                self.clearLocation(location)
-                        valuesString = "".join([str(self.getValue(location)) if self.isFilled(location) else "0" for location in self.locations()])
-                        self.__init__(valuesString)
+                        self.undo()
+                        self.undoStack = []
                         return
                     else:
-                        for location in self.locations():
-                            self.clearLocation(location)
                         break
 
                 for location in mask:
