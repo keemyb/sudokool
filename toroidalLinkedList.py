@@ -157,6 +157,7 @@ class toroidalLinkedList(object):
         for node in Column.nodes():
             for rowNeighbour in node.rowNeighbours():
                 rowNeighbour.up.setDown(rowNeighbour)
+                rowNeighbour.down.setUp(rowNeighbour)
                 rowNeighbour.column.size += 1
 
         Column.left.setRight(Column)
