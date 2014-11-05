@@ -160,6 +160,7 @@ class toroidalLinkedList(object):
                 rowNeighbour.column.size += 1
 
         Column.left.setRight(Column)
+        Column.right.setLeft(Column)
 
         self.size += 1
 
