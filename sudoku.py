@@ -1869,12 +1869,8 @@ class Sudoku():
             for value in self.possibleValues():
                 matrixRow = []
 
-                #locations
-                columnForRow = self.findColumn(matrix, 0, 1, location)
-                columnForRow.addData(None)
-                matrixRow.append(columnForRow.lastNode())
-
                 findColumnArgs = (
+                    (0, 1, location),
                     (1, row, value),
                     (2, column, value),
                     (3, subgrid, value),
