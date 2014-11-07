@@ -365,7 +365,10 @@ class Sudoku():
 
             for location in self.locations():
                 if location not in mask:
-                    self.clearLocation(location)
+
+                    #setting value manually to bypass undo overhead
+                    #negates the need to have constants list setup (needed by clearLocation)
+                    self.values[location] = 0
 
             maskValues = copy(self.values)
 
