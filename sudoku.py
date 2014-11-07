@@ -25,7 +25,7 @@ def factors(n):
 
 
 
-class Sudoku():
+class Sudoku(object):
 
     def __init__(self, data=None, size=None, difficulty=None, horizontalSubGrids=True):
         if data is None and size is None:
