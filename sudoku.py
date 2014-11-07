@@ -39,12 +39,10 @@ class Sudoku():
         self.redoStack = []
         self.undoDepth = 0
 
-        generateSudoku = False
-        if data is None:
-            data = "0"*self.unitSize()**2
-            generateSudoku = True
-
         self.processData(data)
+
+        if data is None:
+            self.generateSudoku(difficulty)
 
         self.solvingCandidatesDict = {location : set([]) for location in self.locations()}
         self.userCandidatesDict = {location : set([]) for location in self.locations()}
@@ -111,9 +109,6 @@ class Sudoku():
             self.xyzWing,
             self.remotePairs,
             ]
-
-        if generateSudoku:
-            self.generateSudoku(difficulty)
 
         self.edges = self.generateEdges()
 
