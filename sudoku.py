@@ -27,29 +27,32 @@ def factors(n):
 
 class Sudoku():
 
-    def __init__(self, data=None, size=None, difficulty=None, horizontalFormat=True):
+    def __init__(self, data=None, size=None, difficulty=None, horizontalSubGrids=True):
         if data is None and size is None:
             raise ValueError("No data or size info given")
 
-        self.horizontalFormat = horizontalFormat
-        self.calculateDimensions(data, size, horizontalFormat)
+        self.horizontalSubGrids = horizontalSubGrids
+        self.calculateDimensions(data, size, horizontalSubGrids)
         self.generatePossibleValues()
-
-        generateSudoku = False
-        if data is None:
-            data = "0"*self.unitSize()**2
-            generateSudoku = True
-
-        self.processData(data)
-
-        self.solvingCandidatesDict = {location : set([]) for location in self.locations()}
-        self.userCandidatesDict = {location : set([]) for location in self.locations()}
-        self.log = []
-        self.history = []
 
         self.undoStack = []
         self.redoStack = []
         self.undoDepth = 0
+
+        self.processData(data)
+
+        if data is None:
+            self.generateSudoku(difficulty)
+
+        self.constants = [location for location in self.locations() if self.isFilled(location)]
+
+        self.solvingCandidatesDict = {location : set([]) for location in self.locations()}
+        self.userCandidatesDict = {location : set([]) for location in self.locations()}
+
+        self.generateEdges()
+
+        self.log = []
+        self.history = []
 
         self.solveMode = False
         self.changes = False
@@ -111,11 +114,6 @@ class Sudoku():
             self.xyzWing,
             self.remotePairs,
             ]
-
-        if generateSudoku:
-            self.generateSudoku(difficulty)
-
-        self.edges = self.generateEdges()
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -179,7 +177,7 @@ class Sudoku():
 
         return string
 
-    def calculateDimensions(self, data, size, horizontalFormat):
+    def calculateDimensions(self, data, size, horizontalSubGrids):
         # gridSize is the (nearest) square root of the length of the data.
         # It is the nearest square as we cannot guarantee how many values will be
         # provided
@@ -211,9 +209,9 @@ class Sudoku():
         #returns highest factor less than or equal to half the gridSize.
         factor = factors(self.gridSize)
 
-        #if the horizontalFormat is True, there will be more subGrids in the X
+        #if the horizontalSubGrids is True, there will be more subGrids in the X
         #plane than the Y
-        if horizontalFormat:
+        if horizontalSubGrids:
             self.subGridsY = factor
             self.subGridsX = self.gridSize / self.subGridsY
         else:
@@ -247,7 +245,7 @@ class Sudoku():
 
             edges[location] = top, right, bottom, left
 
-        return edges
+        self.edges = edges
 
     def generatePossibleValues(self):
         if self.gridSize <= 9:
@@ -365,7 +363,10 @@ class Sudoku():
 
             for location in self.locations():
                 if location not in mask:
-                    self.clearLocation(location)
+
+                    #setting value manually to bypass undo overhead
+                    #negates the need to have constants list setup (needed by clearLocation)
+                    self.values[location] = 0
 
             maskValues = copy(self.values)
 
@@ -382,6 +383,10 @@ class Sudoku():
 
 
     def processData(self, data):
+        if data is None:
+            self.values = {location: 0 for location in self.locations()}
+            return
+
         self.values = {location: data[location - 1] for location in self.locations()}
         for location, value in self.values.iteritems():
             try:
@@ -395,8 +400,6 @@ class Sudoku():
                 # the user to use any delimiter that is not a value for simplicity.
                 if value not in self.setOfPossibleValues:
                     self.values[location] = 0
-
-        self.constants = [location for location in self.locations() if self.isFilled(location)]
 
 
 
@@ -429,7 +432,7 @@ class Sudoku():
             return True
         return False
 
-    def solve(self, maxLevel=None, maxSuccessfulSolveOperations=None, bruteForceOnFail=False):
+    def solve(self, maxLevel=None, maxSuccessfulSolveOperations=None, forceSolveOnFail=False):
 
         if maxSuccessfulSolveOperations == 0:
             return
@@ -464,7 +467,7 @@ class Sudoku():
             return self.solve(maxLevel, maxSuccessfulSolveOperations)
         else:
             #no more methods
-            if bruteForceOnFail:
+            if forceSolveOnFail:
                 self.dancingLinks()
             return
 
@@ -1433,13 +1436,13 @@ class Sudoku():
     def captureState(self):
         from copy import copy, deepcopy
         state = []
-        state.append(copy(self.values))
-        state.append(deepcopy(self.solvingCandidatesDict))
-        state.append(deepcopy(self.userCandidatesDict))
-        state.append(deepcopy(self.log))
-        state.append(deepcopy(self.history))
-        state.append(copy(self.changes))
-        state.append(deepcopy(self.intersectionTypes))
+        state.append(copy(getattr(self, "values", {})))
+        state.append(deepcopy(getattr(self, "solvingCandidatesDict", {})))
+        state.append(deepcopy(getattr(self, "userCandidatesDict", {})))
+        state.append(deepcopy(getattr(self, "log", [])))
+        state.append(deepcopy(getattr(self, "history", [])))
+        state.append(copy(getattr(self, "changes", False)))
+        state.append(deepcopy(getattr(self, "intersectionTypes", {})))
 
         return state
 
@@ -1701,50 +1704,6 @@ class Sudoku():
 
 
 
-    @undoable
-    def brute(self):
-        self.initialiseIntersections()
-
-        from collections import defaultdict
-
-        previouslyTriedValues = defaultdict(set)
-
-        modifiedLocations = []
-
-        while True:
-
-            if self.isComplete() and self.isValid():
-                return
-
-            for location in self.emptyLocations():
-
-                if self.isConstant(location) or location in modifiedLocations:
-                    continue
-
-                neighbours = self.allCombinedNeighbours(location)
-
-                possibleValues = self.setOfPossibleValues - self.getValues(*neighbours)
-                possibleValues -= previouslyTriedValues[location]
-
-                if possibleValues:
-                    newValue = possibleValues.pop()
-                    self.setValue(location, newValue)
-                    previouslyTriedValues[location].add(newValue)
-                    modifiedLocations.append(location)
-                    break
-                else:
-                    if modifiedLocations:
-                        incorrectLocation = modifiedLocations[-1]
-                        self.clearLocation(incorrectLocation)
-
-                        modifiedLocations = modifiedLocations[:-1]
-                        # Atleast one of the previous locations are incorrect,
-                        # so we may need to choose a previously chosen value again
-                        del previouslyTriedValues[location]
-                        break
-                    else:
-                        # if there are no modified locations, there are no solutions.
-                        return
 
     @undoable
     def dancingLinks(self, random=False):
