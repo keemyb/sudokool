@@ -378,6 +378,8 @@ class Sudoku():
         self.values = maskValues
         self.undoStack = []
 
+        self.constants = [location for location in self.locations() if self.isFilled(location)]
+
 
 
 
