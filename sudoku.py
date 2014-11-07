@@ -1772,12 +1772,12 @@ class Sudoku():
                         return
 
     @undoable
-    def dancingLinks(self):
+    def dancingLinks(self, random=False):
         matrix = self.populateSparseMatrix()
         self.populateMatrixRows(matrix)
         self.coverFilledColumns(matrix)
         solutions = []
-        self.solveMatrix(matrix, solutions)
+        self.solveMatrix(matrix, solutions, random)
         self.interpretSolution(matrix, solutions)
 
     def interpretSolution(self, matrix, solutions):
@@ -1809,11 +1809,14 @@ class Sudoku():
 
 
 
-    def solveMatrix(self, matrix, solutions):
+    def solveMatrix(self, matrix, solutions, random, i=0):
         if matrix.complete():
             return
 
-        columnToCover = matrix.smallestColumn()
+        if random and i < self.unitSize():
+            columnToCover = matrix.randomColumn()
+        else:
+            columnToCover = matrix.smallestColumn()
         matrix.cover(columnToCover)
 
         for node in columnToCover.nodes():
@@ -1823,7 +1826,7 @@ class Sudoku():
 
             solutions.append(node)
 
-            self.solveMatrix(matrix, solutions)
+            self.solveMatrix(matrix, solutions, random, i+1)
 
             if matrix.complete():
                 return
