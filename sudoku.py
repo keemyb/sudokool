@@ -344,66 +344,41 @@ class Sudoku():
         return newLocations
 
     def generateSudoku(self, difficulty):
-        from collections import defaultdict
-        from random import sample
+        from copy import copy
 
-        while True:
+        solvable = False
 
-            mask = self.generateMask(difficulty)
+        maskValues = None
 
-            previouslyTriedValues = defaultdict(set)
+        blank = self.captureState()
 
-            modifiedLocations = []
+        while not solvable:
+            #reset puzzle if still not solveable
+            self.restoreState(blank)
 
-            while True:
+            #generate random puzzle (solving a blank puzzle with random matrix column choices)
+            self.dancingLinks(True)
 
-                if all(self.isFilled(location) for location in mask):
-                    self.dancingLinks()
+            self.solution = copy(self.values)
 
-                    if self.isComplete():
-                        self.undo()
-                        self.undoStack = []
-                        return
-                    else:
-                        break
+            mask = self.generateMask()
 
-                for location in mask:
+            for location in self.locations():
+                if location not in mask:
+                    self.clearLocation(location)
 
-                    if location in modifiedLocations:
-                        continue
+            maskValues = copy(self.values)
 
-                    neighbours = self.allCombinedNeighbours(location)
+            #try to solve, to see if the puzzle is still valid
+            self.dancingLinks()
 
-                    possibleValues = self.setOfPossibleValues - self.getValues(*neighbours)
-                    possibleValues -= previouslyTriedValues[location]
+            if self.isComplete():
+                solvable = True
 
-                    if possibleValues:
-                        if len(modifiedLocations) % 2 == 0:
-                            newValue = sample(possibleValues,1)[0]
-                        else:
-                            newValue = possibleValues.pop()
-                        self.setValue(location, newValue)
-                        previouslyTriedValues[location].add(newValue)
-                        modifiedLocations.append(location)
-                        break
-                    else:
-                        superBreak = False
+        self.values = maskValues
+        self.undoStack = []
 
-                        if modifiedLocations:
-                            incorrectLocation = modifiedLocations[-1]
-                            self.clearLocation(incorrectLocation)
 
-                            modifiedLocations = modifiedLocations[:-1]
-                            # Atleast one of the previous locations are incorrect,
-                            # so we may need to choose a previously chosen value again
-                            del previouslyTriedValues[location]
-                            break
-                        else:
-                            # if there are no modified locations, there are no solutions.
-                            superBreak = True
-
-                        if superBreak:
-                            break
 
 
     def processData(self, data):
