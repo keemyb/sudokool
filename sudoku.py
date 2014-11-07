@@ -48,6 +48,9 @@ class Sudoku():
 
         self.solvingCandidatesDict = {location : set([]) for location in self.locations()}
         self.userCandidatesDict = {location : set([]) for location in self.locations()}
+
+        self.edges = self.generateEdges()
+        
         self.log = []
         self.history = []
 
@@ -111,8 +114,6 @@ class Sudoku():
             self.xyzWing,
             self.remotePairs,
             ]
-
-        self.edges = self.generateEdges()
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
