@@ -344,70 +344,41 @@ class Sudoku():
         return newLocations
 
     def generateSudoku(self, difficulty):
-        from collections import defaultdict
-        from random import sample
+        from copy import copy
 
-        while True:
+        solvable = False
 
-            mask = self.generateMask(difficulty)
+        maskValues = None
 
-            previouslyTriedValues = defaultdict(set)
+        blank = self.captureState()
 
-            modifiedLocations = []
+        while not solvable:
+            #reset puzzle if still not solveable
+            self.restoreState(blank)
 
-            while True:
+            #generate random puzzle (solving a blank puzzle with random matrix column choices)
+            self.dancingLinks(True)
 
-                if all(self.isFilled(location) for location in mask):
-                    self.brute()
-                    if self.isComplete():
-                        for location in self.locations():
-                            if location not in mask:
-                                self.clearLocation(location)
-                        valuesString = "".join([str(self.getValue(location)) if self.isFilled(location) else "0" for location in self.locations()])
-                        self.__init__(valuesString)
-                        return
-                    else:
-                        for location in self.locations():
-                            self.clearLocation(location)
-                        break
+            self.solution = copy(self.values)
 
-                for location in mask:
+            mask = self.generateMask()
 
-                    if location in modifiedLocations:
-                        continue
+            for location in self.locations():
+                if location not in mask:
+                    self.clearLocation(location)
 
-                    neighbours = self.allCombinedNeighbours(location)
+            maskValues = copy(self.values)
 
-                    possibleValues = self.setOfPossibleValues - self.getValues(*neighbours)
-                    possibleValues -= previouslyTriedValues[location]
+            #try to solve, to see if the puzzle is still valid
+            self.dancingLinks()
 
-                    if possibleValues:
-                        if len(modifiedLocations) % 2 == 0:
-                            newValue = sample(possibleValues,1)[0]
-                        else:
-                            newValue = possibleValues.pop()
-                        self.setValue(location, newValue)
-                        previouslyTriedValues[location].add(newValue)
-                        modifiedLocations.append(location)
-                        break
-                    else:
-                        superBreak = False
+            if self.isComplete():
+                solvable = True
 
-                        if modifiedLocations:
-                            incorrectLocation = modifiedLocations[-1]
-                            self.clearLocation(incorrectLocation)
+        self.values = maskValues
+        self.undoStack = []
 
-                            modifiedLocations = modifiedLocations[:-1]
-                            # Atleast one of the previous locations are incorrect,
-                            # so we may need to choose a previously chosen value again
-                            del previouslyTriedValues[location]
-                            break
-                        else:
-                            # if there are no modified locations, there are no solutions.
-                            superBreak = True
 
-                        if superBreak:
-                            break
 
 
     def processData(self, data):
@@ -494,7 +465,7 @@ class Sudoku():
         else:
             #no more methods
             if bruteForceOnFail:
-                self.brute()
+                self.dancingLinks()
             return
 
 
@@ -1774,6 +1745,153 @@ class Sudoku():
                     else:
                         # if there are no modified locations, there are no solutions.
                         return
+
+    @undoable
+    def dancingLinks(self, random=False):
+        matrix = self.populateSparseMatrix()
+        self.populateMatrixRows(matrix)
+        self.coverFilledColumns(matrix)
+        solutions = []
+        self.solveMatrix(matrix, solutions, random)
+        self.interpretSolution(matrix, solutions)
+
+    def interpretSolution(self, matrix, solutions):
+        if len(self.filledLocations()) + len(solutions) != self.unitSize()**2:
+            return
+
+        solution = {}
+
+        for node in solutions:
+            while node.column.info[0] != 0: #move node in solutions to location (ID 0)
+                node = node.right
+
+            for rowNeighbour in node.rowNeighbours():
+                intersectionID = rowNeighbour.column.info[0]
+                intersectionNo = rowNeighbour.column.info[1]
+                value = rowNeighbour.column.info[2]
+
+                if intersectionID == 1:
+                    row = intersectionNo
+                elif intersectionID == 2:
+                    column = intersectionNo
+
+            location = (row - 1) * self.unitSize() + column
+
+            solution[location] = value
+
+        self.values.update(solution)
+
+
+
+
+    def solveMatrix(self, matrix, solutions, random, i=0):
+        if matrix.complete():
+            return
+
+        if random and i < self.unitSize():
+            columnToCover = matrix.randomColumn()
+        else:
+            columnToCover = matrix.smallestColumn()
+        matrix.cover(columnToCover)
+
+        for node in columnToCover.nodes():
+
+            for rowNeighbour in node.rowNeighbours():
+                matrix.cover(rowNeighbour.column)
+
+            solutions.append(node)
+
+            self.solveMatrix(matrix, solutions, random, i+1)
+
+            if matrix.complete():
+                return
+
+            solutions.pop()
+
+            for rowNeighbour in node.reverseRowNeighbours():
+                matrix.uncover(rowNeighbour.column)
+
+        matrix.uncover(columnToCover)
+
+    def populateSparseMatrix(self):
+        from toroidalLinkedList import toroidalLinkedList
+        matrix = toroidalLinkedList()
+
+        #0: locations, 1: rows, 2: columns, 3: subgrids
+        for location in self.locations():
+            matrix.addColumn((0, location, 0))
+        for intersectionID in xrange(1, 4):
+            for intersectionNumber in xrange(1, self.unitSize() + 1):
+                for value in self.possibleValues():
+                    matrix.addColumn((intersectionID, intersectionNumber, value))
+
+        return matrix
+
+    def findColumn(self, matrix, intersectionID, intersectionNumber, value):
+        NoOfColumnsPerIntersection = self.unitSize() ** 2
+        columnNumber = intersectionID * NoOfColumnsPerIntersection
+        columnNumber += (intersectionNumber - 1) * self.unitSize()
+        columnNumber += value
+
+        column = matrix.firstColumn()
+        for _ in xrange(columnNumber - 1):
+            column = column.right
+
+        return column
+
+    def populateMatrixRows(self, matrix):
+        matrixRowLinkPairs = ((0, 1), (1, 2), (2, 3), (3, 0))
+
+        for location in self.locations():
+            row = self.getRow(location)
+            column = self.getColumn(location)
+            subgrid = self.getSubGrid(location)
+
+            for value in self.possibleValues():
+                matrixRow = []
+
+                findColumnArgs = (
+                    (0, 1, location),
+                    (1, row, value),
+                    (2, column, value),
+                    (3, subgrid, value),
+                    )
+
+                for args in findColumnArgs:
+                    columnForRow = self.findColumn(matrix, *args)
+                    columnForRow.addData(None)
+                    matrixRow.append(columnForRow.lastNode())
+
+                for pair in matrixRowLinkPairs:
+                    leftNode, rightNode = pair[0], pair[1]
+                    matrixRow[leftNode].setRight(matrixRow[rightNode])
+
+                # print len(matrixRow)
+
+    def coverFilledColumns(self, matrix):
+        columnsToCover = []
+
+        for location in self.filledLocations():
+            value = self.getValue(location)
+            row = self.getRow(location)
+            column = self.getColumn(location)
+            subgrid = self.getSubGrid(location)
+
+            findColumnArgs = (
+                (0, 1, location),
+                (1, row, value),
+                (2, column, value),
+                (3, subgrid, value),
+                )
+
+            for args in findColumnArgs:
+                # accounting for covered columns
+                columnToCover = self.findColumn(matrix, *args)
+                columnsToCover.append(columnToCover)
+
+        for columnToCover in columnsToCover:
+            matrix.cover(columnToCover)
+
 
 
 
