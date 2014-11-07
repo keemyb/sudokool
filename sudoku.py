@@ -384,6 +384,10 @@ class Sudoku():
 
 
     def processData(self, data):
+        if data is None:
+            self.values = {location: 0 for location in self.locations()}
+            return
+
         self.values = {location: data[location - 1] for location in self.locations()}
         for location, value in self.values.iteritems():
             try:
