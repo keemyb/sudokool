@@ -35,6 +35,10 @@ class Sudoku():
         self.calculateDimensions(data, size, horizontalSubGrids)
         self.generatePossibleValues()
 
+        self.undoStack = []
+        self.redoStack = []
+        self.undoDepth = 0
+
         generateSudoku = False
         if data is None:
             data = "0"*self.unitSize()**2
@@ -46,10 +50,6 @@ class Sudoku():
         self.userCandidatesDict = {location : set([]) for location in self.locations()}
         self.log = []
         self.history = []
-
-        self.undoStack = []
-        self.redoStack = []
-        self.undoDepth = 0
 
         self.solveMode = False
         self.changes = False
