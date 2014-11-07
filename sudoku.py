@@ -431,7 +431,7 @@ class Sudoku():
             return True
         return False
 
-    def solve(self, maxLevel=None, maxSuccessfulSolveOperations=None, bruteForceOnFail=False):
+    def solve(self, maxLevel=None, maxSuccessfulSolveOperations=None, forceSolveOnFail=False):
 
         if maxSuccessfulSolveOperations == 0:
             return
@@ -466,7 +466,7 @@ class Sudoku():
             return self.solve(maxLevel, maxSuccessfulSolveOperations)
         else:
             #no more methods
-            if bruteForceOnFail:
+            if forceSolveOnFail:
                 self.dancingLinks()
             return
 
