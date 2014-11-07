@@ -49,8 +49,8 @@ class Sudoku():
         self.solvingCandidatesDict = {location : set([]) for location in self.locations()}
         self.userCandidatesDict = {location : set([]) for location in self.locations()}
 
-        self.edges = self.generateEdges()
-        
+        self.generateEdges()
+
         self.log = []
         self.history = []
 
@@ -245,7 +245,7 @@ class Sudoku():
 
             edges[location] = top, right, bottom, left
 
-        return edges
+        self.edges = edges
 
     def generatePossibleValues(self):
         if self.gridSize <= 9:
