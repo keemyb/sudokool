@@ -27,12 +27,12 @@ def factors(n):
 
 class Sudoku():
 
-    def __init__(self, data=None, size=None, difficulty=None, horizontalFormat=True):
+    def __init__(self, data=None, size=None, difficulty=None, horizontalSubGrids=True):
         if data is None and size is None:
             raise ValueError("No data or size info given")
 
-        self.horizontalFormat = horizontalFormat
-        self.calculateDimensions(data, size, horizontalFormat)
+        self.horizontalSubGrids = horizontalSubGrids
+        self.calculateDimensions(data, size, horizontalSubGrids)
         self.generatePossibleValues()
 
         generateSudoku = False
@@ -179,7 +179,7 @@ class Sudoku():
 
         return string
 
-    def calculateDimensions(self, data, size, horizontalFormat):
+    def calculateDimensions(self, data, size, horizontalSubGrids):
         # gridSize is the (nearest) square root of the length of the data.
         # It is the nearest square as we cannot guarantee how many values will be
         # provided
@@ -211,9 +211,9 @@ class Sudoku():
         #returns highest factor less than or equal to half the gridSize.
         factor = factors(self.gridSize)
 
-        #if the horizontalFormat is True, there will be more subGrids in the X
+        #if the horizontalSubGrids is True, there will be more subGrids in the X
         #plane than the Y
-        if horizontalFormat:
+        if horizontalSubGrids:
             self.subGridsY = factor
             self.subGridsX = self.gridSize / self.subGridsY
         else:
