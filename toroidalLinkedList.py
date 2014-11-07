@@ -143,6 +143,15 @@ class toroidalLinkedList(object):
                 smallestColumn = column
         return smallestColumn
 
+    def randomColumn(self):
+        from random import randint
+        randomNumber = randint(1, self.size)
+        randomColumn = self.head
+        for _ in xrange(randomNumber):
+            randomColumn = randomColumn.right
+
+        return randomColumn
+
     def cover(self, Column):
         Column.left.setRight(Column.right)
 
