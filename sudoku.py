@@ -44,6 +44,8 @@ class Sudoku():
         if data is None:
             self.generateSudoku(difficulty)
 
+        self.constants = [location for location in self.locations() if self.isFilled(location)]
+
         self.solvingCandidatesDict = {location : set([]) for location in self.locations()}
         self.userCandidatesDict = {location : set([]) for location in self.locations()}
         self.log = []
@@ -376,8 +378,6 @@ class Sudoku():
         self.values = maskValues
         self.undoStack = []
 
-        self.constants = [location for location in self.locations() if self.isFilled(location)]
-
 
 
 
@@ -399,8 +399,6 @@ class Sudoku():
                 # the user to use any delimiter that is not a value for simplicity.
                 if value not in self.setOfPossibleValues:
                     self.values[location] = 0
-
-        self.constants = [location for location in self.locations() if self.isFilled(location)]
 
 
 
