@@ -295,6 +295,8 @@ class Sudoku(object):
         if rotate and (self.unitSize() % 2 == 1):
             mask = selectedQuadrantLocations + selectedMiddleLocations
 
+            # making a copy of the mask while iterating to stop an infinite loop
+            # as we would otherwise keep rotating rotated elements 
             for location in mask[:]:
                 mask += self.rotate090(location)
 
