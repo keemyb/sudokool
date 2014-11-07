@@ -1823,11 +1823,14 @@ class Sudoku():
 
             solutions.append(node)
 
-            return self.solveMatrix(matrix, solutions)
+            self.solveMatrix(matrix, solutions)
+
+            if matrix.complete():
+                return
 
             solutions.pop()
 
-            for rowNeighbour in node.rowNeighbours():
+            for rowNeighbour in node.reverseRowNeighbours():
                 matrix.uncover(rowNeighbour.column)
 
         matrix.uncover(columnToCover)
@@ -1869,12 +1872,8 @@ class Sudoku():
             for value in self.possibleValues():
                 matrixRow = []
 
-                #locations
-                columnForRow = self.findColumn(matrix, 0, 1, location)
-                columnForRow.addData(None)
-                matrixRow.append(columnForRow.lastNode())
-
                 findColumnArgs = (
+                    (0, 1, location),
                     (1, row, value),
                     (2, column, value),
                     (3, subgrid, value),

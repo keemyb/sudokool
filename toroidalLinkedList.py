@@ -37,6 +37,16 @@ class Node(object):
             yield nextNeighbour
             nextNeighbour = nextNeighbour.right
 
+    def reverseRowNeighbours(self):
+        lastNeighbour = self.left
+        if lastNeighbour == self:
+            return
+
+        nextNeighbour = lastNeighbour
+        while nextNeighbour != self:
+            yield nextNeighbour
+            nextNeighbour = nextNeighbour.left
+
 class HeadNode(Node):
     def __init__(self):
         super(HeadNode, self).__init__(None, None)
@@ -82,6 +92,16 @@ class ColumnNode(Node):
         while nextNode != self:
             yield nextNode
             nextNode = nextNode.down
+
+    def nodesReverse(self):
+        lastNode = self.lastNode()
+        if lastNode == self:
+            return
+
+        nextNode = lastNode
+        while nextNode != self:
+            yield nextNode
+            nextNode = nextNode.up
 
 class toroidalLinkedList(object):
     def __init__(self):
@@ -137,9 +157,11 @@ class toroidalLinkedList(object):
         for node in Column.nodes():
             for rowNeighbour in node.rowNeighbours():
                 rowNeighbour.up.setDown(rowNeighbour)
+                rowNeighbour.down.setUp(rowNeighbour)
                 rowNeighbour.column.size += 1
 
         Column.left.setRight(Column)
+        Column.right.setLeft(Column)
 
         self.size += 1
 
