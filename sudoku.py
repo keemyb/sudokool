@@ -20,7 +20,7 @@ def factors(n):
         if n % i == 0:
             factors.append(i)
 
-    return factors[-1]
+    return factors
 
 
 
