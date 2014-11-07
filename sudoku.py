@@ -1809,6 +1809,8 @@ class Sudoku(object):
             subgrid = self.getSubGrid(location)
 
             for value in self.possibleValues():
+                if value > 9:
+                    value = ord(value) - 55
                 matrixRow = []
 
                 findColumnArgs = (
@@ -1834,6 +1836,8 @@ class Sudoku(object):
 
         for location in self.filledLocations():
             value = self.getValue(location)
+            if value > 9:
+                value = ord(value) - 55
             row = self.getRow(location)
             column = self.getColumn(location)
             subgrid = self.getSubGrid(location)
