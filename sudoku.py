@@ -1442,13 +1442,13 @@ class Sudoku():
     def captureState(self):
         from copy import copy, deepcopy
         state = []
-        state.append(copy(self.values))
-        state.append(deepcopy(self.solvingCandidatesDict))
-        state.append(deepcopy(self.userCandidatesDict))
-        state.append(deepcopy(self.log))
-        state.append(deepcopy(self.history))
-        state.append(copy(self.changes))
-        state.append(deepcopy(self.intersectionTypes))
+        state.append(copy(getattr(self, "values", {})))
+        state.append(deepcopy(getattr(self, "solvingCandidatesDict", {})))
+        state.append(deepcopy(getattr(self, "userCandidatesDict", {})))
+        state.append(deepcopy(getattr(self, "log", [])))
+        state.append(deepcopy(getattr(self, "history", [])))
+        state.append(copy(getattr(self, "changes", False)))
+        state.append(deepcopy(getattr(self, "intersectionTypes", {})))
 
         return state
 
