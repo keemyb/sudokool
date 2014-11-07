@@ -1823,11 +1823,14 @@ class Sudoku():
 
             solutions.append(node)
 
-            return self.solveMatrix(matrix, solutions)
+            self.solveMatrix(matrix, solutions)
+
+            if matrix.complete():
+                return
 
             solutions.pop()
 
-            for rowNeighbour in node.rowNeighbours():
+            for rowNeighbour in node.reverseRowNeighbours():
                 matrix.uncover(rowNeighbour.column)
 
         matrix.uncover(columnToCover)
