@@ -507,20 +507,19 @@ class Game(ScreenManager):
                 Line(points=topLeftCoords+bottomLeftCoords, width=2)
 
     def paintNeighbourOverlay(self, cell):
-        cell.canvas.after.clear()
         if not self.validSelection():
             return
         if cell.location == self.selected:
-            with cell.canvas.after:
+            with cell.canvas.before:
                 cell.highlight = Color(*self.palette.rgba("selectedOverlay"))
         elif cell.location in self.sudoku.allCombinedNeighbours(self.selected):
-            with cell.canvas.after:
+            with cell.canvas.before:
                 cell.highlight = Color(*self.palette.rgba("selectedNeighbourOverlay"))
         else:
-            with cell.canvas.after:
+            with cell.canvas.before:
                 cell.highlight = Color(*self.palette.rgba("noOverlay"))
 
-        with cell.canvas.after:
+        with cell.canvas.before:
             Rectangle(size=cell.size, pos=cell.pos)
 
     def paintLabels(self, cell):
