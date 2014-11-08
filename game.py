@@ -393,9 +393,8 @@ class Game(ScreenManager):
     def on_screenSizeChange(self, caller, size):
         self.resizeCells()
         self.gameScreenGridOrient()
-        if not self.solveMode:
-            self.resizePlayModeGrid()
-            self.miscButtonsOrient()
+        self.resizePlayModeGrid()
+        self.miscButtonsOrient()
 
     def on_selected(self, caller, selected):
         self.enforceClearLocationButtonState()
