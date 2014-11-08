@@ -315,6 +315,8 @@ class EmptyCell(GridLayout):
     def update(self, *args):
         self.MainSwitcher.paintLabels(self)
 
+        self.MainSwitcher.paintBackground(self)
+
         self.MainSwitcher.paintNeighbourOverlay(self)
 
         self.MainSwitcher.paintBorders(self)
@@ -549,6 +551,19 @@ class Game(ScreenManager):
             cell.color = self.palette.rgba(normalText)
 
     def paintBackground(self, cell):
+        if self.sudoku.isEmpty(cell.location):
+            for candidate in cell.candidates:
+                candidate.canvas.before.clear()
+                if isinstance(candidate, EmptyCandidate):
+                    with candidate.canvas.before:
+                        Color(*self.palette.rgba("cellBack"))
+                else:
+                    with candidate.canvas.before:
+                        Color(*self.palette.rgba("candidateBack"))
+                with candidate.canvas.before:
+                    Rectangle(size=candidate.size, pos=candidate.pos)
+            return
+
         if self.sudoku.isConstant(cell.location):
             modifiedBack = "clashingConstantBack"
         else:
