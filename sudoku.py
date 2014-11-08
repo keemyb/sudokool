@@ -1483,7 +1483,7 @@ class Sudoku(object):
 
             def wrapper(self, *args, **kwargs):
 
-                self.initialiseIntersections(intersections)
+                self.initialiseIntersections(*intersections)
 
                 self.changes = False
 
