@@ -206,17 +206,24 @@ class Sudoku(object):
             self.subGridsY = self.subGridsX
             return
 
-        #returns highest factor less than or equal to half the gridSize.
-        factor = factors(self.gridSize)
+        listOfFactors = factors(self.gridSize)
+
+        #if the gridsize is not a perfect square, find the two closest factors
+        #so we get subgrids as close to a square as possible instead of rectangles
+        closestDifference = self.gridSize
+        for factorOne in listOfFactors:
+            for factorTwo in listOfFactors:
+                if factorOne * factorTwo != self.gridSize:
+                    continue
+                difference = abs(factorOne-factorTwo)
+                if difference < closestDifference:
+                    closestDifference = difference
+                    self.subGridsX, self.subGridsY = sorted((factorOne, factorTwo))
 
         #if the horizontalSubGrids is True, there will be more subGrids in the X
         #plane than the Y
-        if horizontalSubGrids:
-            self.subGridsY = factor
-            self.subGridsX = self.gridSize / self.subGridsY
-        else:
-            self.subGridsX = factor
-            self.subGridsY = self.gridSize / self.subGridsX
+        if not horizontalSubGrids:
+            self.subGridsX, self.subGridsY = self.subGridsY, self.subGridsX
 
     def generateEdges(self):
         edges = {}
