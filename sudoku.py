@@ -172,8 +172,7 @@ class Sudoku(object):
             if isLastLocationInRow(location):
                 string += vPipe + "\n"
 
-            if isLastLocation(location):
-                string += horizontalDivider
+        string += horizontalDivider
 
         return string
 
