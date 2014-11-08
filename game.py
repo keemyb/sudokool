@@ -19,6 +19,11 @@ from kivy.graphics import Color
 from kivy.graphics import Rectangle
 from kivy.graphics import Line
 
+def nextPerfectSquare(n):
+    from math import ceil
+    return int(ceil(n ** 0.5) ** 2)
+
+
 class ColourPalette():
     def __init__(self):
         self.colours = {}
