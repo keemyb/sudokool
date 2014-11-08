@@ -511,6 +511,23 @@ class Game(ScreenManager):
     def paintNeighbourOverlay(self, cell):
         if not self.validSelection():
             return
+
+        if self.sudoku.isEmpty(cell.location):
+            for candidate in cell.candidates:
+                if cell.location == self.selected:
+                    with candidate.canvas.before:
+                        candidate.highlight = Color(*self.palette.rgba("selectedOverlay"))
+                elif cell.location in self.sudoku.allCombinedNeighbours(self.selected):
+                    with candidate.canvas.before:
+                        candidate.highlight = Color(*self.palette.rgba("selectedNeighbourOverlay"))
+                else:
+                    with candidate.canvas.before:
+                        candidate.highlight = Color(*self.palette.rgba("noOverlay"))
+
+                with candidate.canvas.before:
+                    Rectangle(size=candidate.size, pos=candidate.pos)
+            return
+
         if cell.location == self.selected:
             with cell.canvas.before:
                 cell.highlight = Color(*self.palette.rgba("selectedOverlay"))
@@ -553,7 +570,6 @@ class Game(ScreenManager):
     def paintBackground(self, cell):
         if self.sudoku.isEmpty(cell.location):
             for candidate in cell.candidates:
-                candidate.canvas.before.clear()
                 if isinstance(candidate, EmptyCandidate):
                     with candidate.canvas.before:
                         Color(*self.palette.rgba("cellBack"))
