@@ -20,6 +20,7 @@ from kivy.graphics import Rectangle
 from kivy.graphics import Line
 
 def nextPerfectSquare(n):
+    '''Returns the perfect square greater to n (or n if n is a perfect square)'''
     from math import ceil
     return int(ceil(n ** 0.5) ** 2)
 
@@ -652,7 +653,7 @@ class Game(ScreenManager):
     def candidateWidth(self):
         cellWidth = self.cellWidth()
 
-        widthDivisor = max(self.sudoku.subGridsInRow(), self.sudoku.subGridsInColumn())
+        widthDivisor = int(nextPerfectSquare(self.sudoku.unitSize())**0.5)
 
         candidateWidth = cellWidth/float(widthDivisor)
 
@@ -799,9 +800,7 @@ class Game(ScreenManager):
     def newEmptyCell(self, location):
         cell = EmptyCell(self)
 
-        cols = max(self.sudoku.subGridsInRow(), self.sudoku.subGridsInColumn())
-
-        cell.cols = cols
+        cell.cols = int(nextPerfectSquare(self.sudoku.unitSize())**0.5)
         cell.candidates = []
 
         if self.solveMode:
