@@ -59,7 +59,7 @@ class Sudoku(object):
         self.hasCandidates = False
         self.hasIntersections = False
 
-        self.plugins = []
+        self.plugins = {}
 
         self.multiples = ("Single", "Pair", "Triplet", "Quadruplet")
         self.units = ("row", "column", "subGrid")
@@ -1771,7 +1771,7 @@ class Sudoku(object):
 
                 class_ = getattr(module, className)
                 pluginInstance = class_()
-                self.plugins.append(pluginInstance)
+                self.plugins[pluginInstance.rank] = pluginInstance
 
     def solveMatrix(self, matrix, solutions, random, i=0):
         if matrix.complete():
