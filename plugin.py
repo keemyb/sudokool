@@ -8,8 +8,10 @@ class Plugin(object):
     def __init__(self):
         '''
         Here we set the properties of our plugin.
-        minSize: the minimum size of puzzle your plugin will work on
-        maxSize: the maximum size of puzzle your plugin will work on
+        name: the name that your plugin will be referred to.
+        description: A brief description of how you pluin works.
+        minSize: the minimum size of puzzle your plugin will work on.
+        maxSize: the maximum size of puzzle your plugin will work on.
         rank: how early you plugin will be executed. The "harder" your solution is,
               the higher rank it should have. This is for two reasons, the first
               being that "easier" solving methods will be faster to execute, and
@@ -17,6 +19,8 @@ class Plugin(object):
               moving to harder ones if they are necessary.
         '''
 
+        self.name = "Base Plugin"
+        self.description = "The only plugin that does nothing."
         self.minSize = None
         self.maxSize = None
         self.rank = 0
