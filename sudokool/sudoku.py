@@ -59,6 +59,8 @@ class Sudoku(object):
         self.hasCandidates = False
         self.hasIntersections = False
 
+        self.plugins = []
+
         self.multiples = ("Single", "Pair", "Triplet", "Quadruplet")
         self.units = ("row", "column", "subGrid")
 
@@ -1750,7 +1752,8 @@ class Sudoku(object):
 
 
     def registerPlugins(self):
-        self.plugins = []
+        if self.plugins:
+            return
 
         import plugins
 
