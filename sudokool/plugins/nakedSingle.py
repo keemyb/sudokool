@@ -1,4 +1,4 @@
-from plugin import Plugin
+from sudokool.plugin import Plugin
 
 class nakedSingle(Plugin):
 
