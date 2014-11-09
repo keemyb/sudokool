@@ -486,6 +486,7 @@ class Game(ScreenManager):
 
     def paintBorders(self, cell):
         #Cell borders
+        cell.canvas.after.clear()
         with cell.canvas.after:
             Color(*self.palette.rgba("cellBorders"))
             Line(rectangle=[cell.x, cell.y, cell.width, cell.height], width=1)
