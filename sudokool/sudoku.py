@@ -1749,7 +1749,26 @@ class Sudoku(object):
         self.values.update(solution)
 
 
+    def registerPlugins(self):
+        self.plugins = []
 
+        import plugins
+
+        import pkgutil
+        import inspect
+
+        for loader, name, is_pkg in pkgutil.walk_packages(plugins.__path__):
+            module = loader.find_module(name).load_module(name)
+
+            for className, value in inspect.getmembers(module):
+                if className.startswith('__'):
+                    continue
+                if className.startswith('Plugin'):
+                    continue
+
+                class_ = getattr(module, className)
+                pluginInstance = class_()
+                self.plugins.append(pluginInstance)
 
     def solveMatrix(self, matrix, solutions, random, i=0):
         if matrix.complete():
@@ -2348,3 +2367,6 @@ class Sudoku(object):
                     if removedCandidates:
 
                         self.addToLog(successString, removedCandidates, neighbour, remotePair, lockedChain)
+
+if __name__ == "__main__":
+    pass
