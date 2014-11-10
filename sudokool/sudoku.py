@@ -76,7 +76,6 @@ class Sudoku(object):
             "row": self.generateRowGroups,
             "column": self.generateColumnGroups,
             "subGrid": self.generateSubGridGroups,
-            "xyzWing": self.generateXYZWingGroups,
             }
 
         self.neighbourMethods = {
@@ -96,10 +95,6 @@ class Sudoku(object):
             "column": self.getColumn,
             "subGrid": self.getSubGrid,
             }
-
-        self.solvingMethods = [
-            self.xyzWing,
-            ]
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -754,78 +749,6 @@ class Sudoku(object):
 
 
 
-    def generateXYZWingGroups(self):
-        xyzWings = []
-
-        for firstPair in self.nLocations(self.emptyLocations(), 2):
-            result = self.xyzWingPairValid(firstPair)
-            if not result:
-                continue
-
-            pivot = result[0]
-            firstArm = result[1]
-            firstArmCandidates = result[2]
-
-            for secondPair in self.nLocations(self.emptyLocations(), 2):
-                if sorted(secondPair) == sorted(firstPair):
-                    continue
-
-                if pivot not in secondPair:
-                    continue
-
-                result = self.xyzWingPairValid(secondPair)
-                if not result:
-                    continue
-
-                secondArm = result[1]
-                secondArmCandidates = result[2]
-
-                if self.alignment(pivot, firstArm, secondArm):
-                    continue
-
-                if secondArmCandidates == firstArmCandidates:
-                    continue
-
-                xyzWingCandidate = self.commonSolvingCandidates(firstArm, secondArm)
-
-                arms = firstArm, secondArm
-
-                xyzWing = ([pivot] + sorted(arms), xyzWingCandidate.pop())
-
-                if xyzWing in xyzWings:
-                    continue
-
-                xyzWings.append(xyzWing)
-
-        return xyzWings
-
-    def xyzWingPairValid(self, pair):
-        alignment = self.alignment(*pair)
-        if not alignment:
-            return False
-
-        pivot, nonPivot = None, None
-
-        for location in pair:
-            candidates = self.allSolvingCandidates(location)
-            if len(candidates) == 3:
-                pivot = location
-                pivotCandidates = candidates
-            elif len(candidates) == 2:
-                nonPivot = location
-                nonPivotCandidates = candidates
-
-        if any(location is None for location in (pivot, nonPivot)):
-            return False
-
-        if not pivotCandidates > nonPivotCandidates:
-            return False
-
-        return pivot, nonPivot, nonPivotCandidates
-
-
-
-
     def updatePuzzle(self):
 
         self.updateUnits()
@@ -841,22 +764,6 @@ class Sudoku(object):
                 for location in group[:]:
                     if self.isFilled(location):
                         group.remove(location)
-
-    def updateXYZWingGroups(self):
-        if "xyzWing" not in self.intersectionTypes:
-            return
-
-        for xyzWingGroup in self.intersectionTypes["xyzWing"]:
-            xyzWingLocations = xyzWingGroup[0]
-            for location in xyzWingLocations:
-                if not self.isEmpty(location):
-                    continue
-                numberOfCandidates = len(self.allSolvingCandidates(location))
-                if numberOfCandidates not in (2,3):
-                    continue
-                if xyzWingGroup in self.intersectionTypes["xyzWing"]:
-                    self.intersectionTypes["xyzWing"].remove(xyzWingGroup)
-                    break
 
 
 
@@ -1347,34 +1254,6 @@ class Sudoku(object):
 
 
 
-
-    @solvingMethod("xyzWing")
-    @undoable
-    def xyzWing(self):
-
-        successString = "XYZ-Wing: {0} has been removed from {1}, as it can be seen by {2}, an XYZ-Wing"
-
-        for xyzWingGroup in self.intersectionTypes["xyzWing"]:
-            xyzWingLocations = xyzWingGroup[0]
-            xyzWingCandidate = xyzWingGroup[1]
-            pivot = xyzWingLocations[0]
-            firstArm = xyzWingLocations[1]
-            secondArm = xyzWingLocations[2]
-
-            pivotNeighbours = self.combinedNeighbours(pivot, *xyzWingLocations)
-            firstArmNeighbours = self.combinedNeighbours(firstArm, *xyzWingLocations)
-            secondArmNeighbours = self.combinedNeighbours(secondArm, *xyzWingLocations)
-
-            commonNeighbours = (set(pivotNeighbours) &
-                                set(firstArmNeighbours) &
-                                set(secondArmNeighbours))
-
-            for location in commonNeighbours:
-
-                removedCandidates = self.removeSolvingCandidates(location, xyzWingCandidate)
-
-                if removedCandidates:
-                    self.addToLog(successString, xyzWingCandidate, location, xyzWingLocations)
 
 if __name__ == "__main__":
     pass
