@@ -105,11 +105,8 @@ class Sudoku(object):
             }
 
         self.solvingMethods = [
-            self.hiddenSingle,
-            self.hiddenTwin,
             self.pointingPair, self.pointingTriplet,
             self.boxLineReduction2, self.boxLineReduction3,
-            self.hiddenTriplet,
             self.xWing, self.swordfish,
             self.yWing,
             self.simpleColouring,
@@ -1873,54 +1870,6 @@ class Sudoku(object):
 
         for columnToCover in columnsToCover:
             matrix.cover(columnToCover)
-
-
-
-
-    @solvingMethod()
-    @undoable
-    def hiddenN(self, n):
-
-        name = "Hidden " + self.multiples[n - 1]
-        successString = name + ": {0} has been removed from {1} as the " + name +", {2} only appears in this {3}"
-
-        for intersectionType in self.units:
-
-            for group in self.intersectionTypes[intersectionType]:
-
-                if len(group) <= n:
-                    continue
-
-                for combination in self.nLocations(group, n):
-
-                    surroundingLocations = set(group) - set(combination)
-
-                    combinationCandidates = self.allSolvingCandidates(*combination)
-                    surroundingCandidates = self.allSolvingCandidates(*surroundingLocations)
-                    uniqueCombinationCandidates = combinationCandidates - surroundingCandidates
-
-                    if len(uniqueCombinationCandidates) != n:
-                        continue
-
-                    for location in combination:
-                        removedCandidates = self.removeSolvingCandidates(location, *surroundingCandidates)
-
-                        if not removedCandidates:
-                            continue
-
-                        self.addToLog(successString, removedCandidates, location, uniqueCombinationCandidates, intersectionType)
-
-    def hiddenSingle(self):
-
-        return self.hiddenN(1)
-
-    def hiddenTwin(self):
-
-        return self.hiddenN(2)
-
-    def hiddenTriplet(self):
-
-        return self.hiddenN(3)
 
 
 
