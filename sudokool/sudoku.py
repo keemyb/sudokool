@@ -76,11 +76,7 @@ class Sudoku(object):
             "row": self.generateRowGroups,
             "column": self.generateColumnGroups,
             "subGrid": self.generateSubGridGroups,
-            "conjugatePairs": self.generateConjugatePairs,
-            "conjugateChains": self.generateConjugateChains,
             "xyzWing": self.generateXYZWingGroups,
-            "lockedPairs": self.generateLockedPairs,
-            "lockedChains": self.generateLockedChains,
             }
 
         self.neighbourMethods = {
@@ -102,9 +98,7 @@ class Sudoku(object):
             }
 
         self.solvingMethods = [
-            self.simpleColouring,
             self.xyzWing,
-            self.remotePairs,
             ]
 
     def __eq__(self, other):
@@ -760,118 +754,6 @@ class Sudoku(object):
 
 
 
-    def generateConjugatePairs(self):
-        self.initialiseIntersections()
-
-        conjugatePairs = []
-
-        for location in self.emptyLocations():
-
-            locationCandidates = self.allSolvingCandidates(location)
-
-            for candidate in locationCandidates:
-
-                for method in self.neighbourMethods.itervalues():
-
-                    candidateCount = 1
-                    prospectiveLocation = None
-
-                    for neighbour in method(location):
-                        neighbourCandidates = self.allSolvingCandidates(neighbour)
-
-                        if candidate in neighbourCandidates:
-                            candidateCount += 1
-                            prospectiveLocation = neighbour
-
-                    if candidateCount != 2:
-                        continue
-
-                    group = (sorted((location, prospectiveLocation)), candidate)
-
-                    if group not in conjugatePairs:
-                        conjugatePairs.append(group)
-
-        return conjugatePairs
-
-    def generatePairChains(self, pairType):
-        self.initialiseIntersections(pairType)
-
-        chains = []
-
-        for pairGroup in self.intersectionTypes[pairType]:
-
-            pair, candidates = pairGroup[0], pairGroup[1]
-            chain = pair[:]
-
-            lastChain = None
-            while lastChain != chain:
-
-                firstLink, lastLink = chain[0], chain[-1]
-                lastChain = chain[:]
-
-                for prospectivePairGroup in self.intersectionTypes[pairType]:
-
-                    prospectivePair = prospectivePairGroup[0]
-                    prospectiveCandidates = prospectivePairGroup[1]
-
-                    if prospectiveCandidates != candidates:
-                        continue
-
-                    if all(location in chain for location in prospectivePair):
-                        continue
-
-                    if any(location == firstLink for location in prospectivePair):
-                        if prospectivePair[0] in chain:
-                            chain.insert(0, prospectivePair[1])
-                            break
-                        else:
-                            chain.insert(0, prospectivePair[0])
-                            break
-
-                    if any(location == lastLink for location in prospectivePair):
-                        if prospectivePair[0] in chain:
-                            chain.append(prospectivePair[1])
-                            break
-                        else:
-                            chain.append(prospectivePair[0])
-                            break
-
-            if len(chain) < 3:
-                continue
-
-            chainIsASubset = False
-            for existingChainGroup in chains[:]:
-                existingChain = existingChainGroup[0]
-                existingChainCandidates = existingChainGroup[1]
-
-                if existingChainCandidates != candidates:
-                    continue
-
-                # if all locations in the current chain already exist in another,
-                # it is a subset and will not be added. We break here as the
-                # larger chain does not need to be purged.
-                if all(location in existingChain for location in chain):
-                    chainIsASubset = True
-                    break
-
-                # if all locations in the existing chain exist in the current chain,
-                # the existing chain will be removed.
-                if all(location in chain for location in existingChain):
-                    if existingChainGroup in chains:
-                        chains.remove(existingChainGroup)
-
-            if not chainIsASubset:
-                chains.append((chain, candidates))
-
-        return chains
-
-    def generateConjugateChains(self):
-
-        return self.generatePairChains("conjugatePairs")
-
-
-
-
     def generateXYZWingGroups(self):
         xyzWings = []
 
@@ -941,35 +823,6 @@ class Sudoku(object):
 
         return pivot, nonPivot, nonPivotCandidates
 
-    def generateLockedPairs(self):
-        lockedPairs = []
-
-        for pair in self.nLocations(self.emptyLocations(), 2):
-            alignment = self.alignment(*pair)
-            if not alignment:
-                continue
-
-            locationOneCandidates = self.allSolvingCandidates(pair[0])
-            if len(locationOneCandidates) != 2:
-                continue
-
-            locationTwoCandidates = self.allSolvingCandidates(pair[1])
-            if locationTwoCandidates != locationOneCandidates:
-                continue
-
-            lockedPair = (sorted(pair), locationOneCandidates)
-
-            if lockedPair in lockedPairs:
-                continue
-
-            lockedPairs.append(lockedPair)
-
-        return lockedPairs
-
-    def generateLockedChains(self):
-
-        return self.generatePairChains("lockedPairs")
-
 
 
 
@@ -989,41 +842,6 @@ class Sudoku(object):
                     if self.isFilled(location):
                         group.remove(location)
 
-    def updateConjugatePairs(self):
-        if "conjugatePairs" not in self.intersectionTypes:
-            return
-
-        for group in self.intersectionTypes["conjugatePairs"]:
-            pair = group[0]
-            if all(self.isEmpty(location) for location in pair):
-                continue
-            if group in self.intersectionTypes["conjugatePairs"]:
-                self.intersectionTypes["conjugatePairs"].remove(group)
-
-    def updateConjugateChains(self):
-        if "conjugateChains" not in self.intersectionTypes:
-            return
-
-        for chainGroup in self.intersectionTypes["conjugateChains"]:
-            if self.validConjugateChain(chainGroup):
-                continue
-            if chainGroup in self.intersectionTypes["conjugateChains"]:
-                self.intersectionTypes["conjugateChains"].remove(chainGroup)
-
-    def validConjugateChain(self, chainGroup):
-        chain, candidate = chainGroup[0], chainGroup[1]
-        if (chain, candidate) not in self.intersectionTypes["conjugateChains"]:
-            return False
-
-        for location in chain:
-            if not self.isEmpty(location):
-                return False
-            if len(self.allSolvingCandidates(location)) <= 1:
-                return False
-            if candidate not in self.solvingCandidatesDict[location]:
-                return False
-        return True
-
     def updateXYZWingGroups(self):
         if "xyzWing" not in self.intersectionTypes:
             return
@@ -1039,41 +857,6 @@ class Sudoku(object):
                 if xyzWingGroup in self.intersectionTypes["xyzWing"]:
                     self.intersectionTypes["xyzWing"].remove(xyzWingGroup)
                     break
-
-    def updateLockedPairs(self):
-        if "lockedPairs" not in self.intersectionTypes:
-            return
-
-        for group in self.intersectionTypes["lockedPairs"]:
-            pair = group[0]
-
-            if all(self.isEmpty(location) for location in pair):
-                continue
-            if group in self.intersectionTypes["lockedPairs"]:
-                self.intersectionTypes["lockedPairs"].remove(group)
-                break
-
-    def updateLockedChains(self):
-        if "lockedChains" not in self.intersectionTypes:
-            return
-
-        for chainGroup in self.intersectionTypes["lockedChains"]:
-            if not self.validLockedChain(chainGroup):
-                if chainGroup in self.intersectionTypes["lockedChains"]:
-                    self.intersectionTypes["lockedChains"].remove(chainGroup)
-
-    def validLockedChain(self, chainGroup):
-        if chainGroup not in self.intersectionTypes["lockedChains"]:
-            return False
-
-        chain, candidates = chainGroup[0], chainGroup[1]
-
-        for location in chain:
-            if not self.isEmpty(location):
-                return False
-            if candidates != self.allSolvingCandidates(location):
-                return False
-        return True
 
 
 
@@ -1565,128 +1348,6 @@ class Sudoku(object):
 
 
 
-    @solvingMethod("conjugateChains")
-    @undoable
-    def simpleColouring(self):
-
-        for chainGroup in self.intersectionTypes["conjugateChains"]:
-            chain, candidate = chainGroup[0], chainGroup[1]
-            colourOne, colourTwo = chain[::2], chain[1::2]
-
-            simpleColouringMethods = (self.chainOnOff,
-                                      self.simpleColourCase2,
-                                      self.simpleColourCase4,
-                                      self.simpleColourCase5)
-
-            for method in simpleColouringMethods:
-                method(chain, colourOne, colourTwo, candidate)
-
-    def chainOnOff(self, chain, colourOne, colourTwo, candidate):
-        """Tests to see if one colour being ON is valid, if it is invalid
-           the other colour must be the solution."""
-
-        successString = "Chain ON/OFF: {0} has been removed from locations {1}, as it is part of an invalid colour"
-
-        for testColour in (colourOne, colourTwo):
-            if not self.validConjugateChain((chain, candidate)):
-                break
-
-            candidatesToRemove = {location: [candidate] for location in testColour}
-
-            # We are looking for a contradiction, so if the prospective change
-            # checks out we haven't learnt anything new.
-            if self.testProspectiveChange(candidatesToRemove):
-                continue
-
-            for correctColour in (colourOne, colourTwo):
-                if testColour != correctColour:
-                    candidatesToRemove = {location: [candidate] for location in correctColour}
-                    self.applyProspectiveChange(candidatesToRemove)
-                    self.changes = True
-                    self.addToLog(successString, candidate, [location for location in correctColour])
-                    return
-
-    def simpleColourCase2(self, chain, colourOne, colourTwo, candidate):
-        """If two locations are in the same colour and unit, this colour must
-           be OFF, and the other colour must be ON."""
-
-        successString = "Simple Colouring Case 2: locations {0} have been set to {1}, as it shares a unit with a chain where two colours are the same"
-
-        for colour in (colourOne, colourTwo):
-            if not self.validConjugateChain((chain, candidate)):
-                break
-
-            for pair in self.nLocations(colour, 2):
-
-                if not self.alignment(*pair):
-                    continue
-
-                if colour == colourOne:
-                    correctColour = colourTwo
-                else:
-                    correctColour = colourOne
-
-                valuesToAdd = {location: candidate for location in correctColour}
-                self.applyProspectiveChange(None, valuesToAdd)
-                self.changes = True
-                self.addToLog(successString, [location for location in correctColour], candidate)
-                return
-
-    def simpleColourCase4(self, chain, colourOne, colourTwo, candidate):
-        """If two locations are in the same unit and have different colours,
-           all other locations in the unit must have that candidate removed,
-           as one colour must be OFF, and the other colour must be ON."""
-
-        successString = "Simple Colouring Case 4: {0} has been removed from {1}, as these locations are in the same unit as one of two locations that must be ON"
-
-        for pair in self.nLocations(chain, 2):
-            if not self.validConjugateChain((chain, candidate)):
-                break
-
-            for alignment in self.alignment(*pair):
-                if ((pair[0] in colourOne and pair[1] in colourTwo) or
-                    (pair[1] in colourOne and pair[0] in colourTwo)):
-                    for location in self.neighbourMethods[alignment](pair[0], *pair):
-
-                        removedCandidates = self.removeSolvingCandidates(location, candidate)
-
-                        if removedCandidates:
-                            self.addToLog(successString, candidate, location)
-
-    def simpleColourCase5(self, chain, colourOne, colourTwo, candidate):
-        """If a location can see two locations in a chain that have different
-           colours, this location must have that candidate removed,
-           as one colour must be OFF, and the other colour must be ON."""
-
-        successString = "Simple Colouring Case 5: {0} has been removed from {1}, as this location can see both {2}, locations of different colours"
-
-        for location in self.emptyLocations():
-            if location in chain:
-                continue
-
-            if candidate not in self.allSolvingCandidates(location):
-                continue
-
-            for pair in self.nLocations(chain, 2):
-                if not self.validConjugateChain((chain, candidate)):
-                    break
-
-                if not (((pair[0] in colourOne and pair[1] in colourTwo) or
-                        (pair[1] in colourOne and pair[0] in colourTwo))):
-                    continue
-
-                alignsWithFirstElement = self.alignment(pair[0], location)
-                alignsWithSecondElement = self.alignment(pair[1], location)
-                if alignsWithFirstElement and alignsWithSecondElement:
-
-                    removedCandidates = self.removeSolvingCandidates(location, candidate)
-
-                    if removedCandidates:
-                        self.addToLog(successString, candidate, location, pair)
-
-
-
-
     @solvingMethod("xyzWing")
     @undoable
     def xyzWing(self):
@@ -1714,40 +1375,6 @@ class Sudoku(object):
 
                 if removedCandidates:
                     self.addToLog(successString, xyzWingCandidate, location, xyzWingLocations)
-
-
-
-
-    @solvingMethod("lockedChains")
-    @undoable
-    def remotePairs(self):
-
-        successString = "Remote Pair: {0} has been removed from {1}, as it can be seen by the remote pair {2}, part of the locked chain {3}"
-
-        for lockedChainGroup in self.intersectionTypes["lockedChains"]:
-            lockedChain, candidates = lockedChainGroup[0], lockedChainGroup[1]
-
-            remotePairs = []
-            steps = xrange(3, len(lockedChain), 2)
-            for step in steps:
-                for i in xrange(len(lockedChain) - step):
-                    remotePairs.append((lockedChain[i], lockedChain[i+step]))
-
-            for remotePair in remotePairs:
-                locationOne, locationTwo = remotePair[0], remotePair[1]
-
-                locationOneNeighbours = self.combinedNeighbours(locationOne, *lockedChain)
-                locationTwoNeighbours = self.combinedNeighbours(locationTwo, *lockedChain)
-                remotePairNeighbours = (set(locationOneNeighbours) &
-                                        set(locationTwoNeighbours))
-
-                for neighbour in remotePairNeighbours:
-
-                    removedCandidates = self.removeSolvingCandidates(neighbour, *candidates)
-
-                    if removedCandidates:
-
-                        self.addToLog(successString, removedCandidates, neighbour, remotePair, lockedChain)
 
 if __name__ == "__main__":
     pass
