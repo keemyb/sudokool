@@ -76,7 +76,7 @@ class pointingPair(__pointingN):
         '''
         self.minSize = None
         self.maxSize = None
-        self.rank = 6
+        self.rank = 40
         self.pointers = {}
 
     def solve(self, puzzle):
@@ -97,7 +97,7 @@ class pointingTriplet(__pointingN):
         '''
         self.minSize = 3
         self.maxSize = None
-        self.rank = 7
+        self.rank = 80
         self.pointers = {}
 
     def solve(self, puzzle):
@@ -118,7 +118,7 @@ class pointingQuad(__pointingN):
         '''
         self.minSize = 4
         self.maxSize = None
-        self.rank = 8
+        self.rank = 90
         self.pointers = {}
 
     def solve(self, puzzle):

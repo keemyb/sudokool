@@ -9,7 +9,7 @@ class remotePairs(Plugin):
         '''
         self.minSize = None
         self.maxSize = None
-        self.rank = 17
+        self.rank = 170
         self.lockedChains = []
         self.lockedPairs = []
 

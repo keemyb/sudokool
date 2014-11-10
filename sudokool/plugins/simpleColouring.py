@@ -9,7 +9,7 @@ class simpleColouring(Plugin):
         '''
         self.minSize = None
         self.maxSize = None
-        self.rank = 15
+        self.rank = 150
         self.conjugateChains = []
         self.conjugatePairs = []
 

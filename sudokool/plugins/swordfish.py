@@ -9,7 +9,7 @@ class swordfish(Plugin):
         '''
         self.minSize = None
         self.maxSize = None
-        self.rank = 13
+        self.rank = 130
         self.swordfishGroups = []
 
     def solve(self, puzzle):

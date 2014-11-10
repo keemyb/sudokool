@@ -74,7 +74,7 @@ class boxLineReductionPair(__boxLineReductionN):
         '''
         self.minSize = None
         self.maxSize = None
-        self.rank = 6
+        self.rank = 50
         self.pointers = {}
 
     def solve(self, puzzle):
@@ -95,7 +95,7 @@ class boxLineReductionTriplet(__boxLineReductionN):
         '''
         self.minSize = 3
         self.maxSize = None
-        self.rank = 7
+        self.rank = 100
         self.pointers = {}
 
     def solve(self, puzzle):
@@ -116,7 +116,7 @@ class boxLineReductionQuad(__boxLineReductionN):
         '''
         self.minSize = 4
         self.maxSize = None
-        self.rank = 8
+        self.rank = 110
         self.pointers = {}
 
     def solve(self, puzzle):

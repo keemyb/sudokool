@@ -9,7 +9,7 @@ class xyzWing(Plugin):
         '''
         self.minSize = None
         self.maxSize = None
-        self.rank = 16
+        self.rank = 160
         self.xyzWingGroups = []
 
     def solve(self, puzzle):

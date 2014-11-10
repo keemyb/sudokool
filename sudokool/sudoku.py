@@ -1253,4 +1253,7 @@ class Sudoku(object):
 
 
 if __name__ == "__main__":
-    pass
+    newDoku = Sudoku("0"*81)
+    newDoku.registerPlugins()
+    for plugin in newDoku.plugins.itervalues():
+        print plugin.rank, plugin.name
