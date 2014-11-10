@@ -78,13 +78,13 @@ class boxLineReductionPair(__boxLineReductionN):
         self.pointers = {}
 
     def solve(self, puzzle):
-        return super(__boxLineReductionN, self).solve(puzzle, 2)
+        return super(boxLineReductionPair, self).solve(puzzle, 2)
 
     def generatePointerGroups(self, puzzle):
-        return super(__boxLineReductionN, self).generatePointerGroups(puzzle, 2)
+        return super(boxLineReductionPair, self).generatePointerGroups(puzzle, 2)
 
     def cleanup(self, puzzle):
-        return super(__boxLineReductionN, self).cleanup(puzzle, 2)
+        return super(boxLineReductionPair, self).cleanup(puzzle, 2)
 
 class boxLineReductionTriplet(__boxLineReductionN):
 
@@ -99,13 +99,13 @@ class boxLineReductionTriplet(__boxLineReductionN):
         self.pointers = {}
 
     def solve(self, puzzle):
-        return super(__boxLineReductionN, self).solve(puzzle, 3)
+        return super(boxLineReductionTriplet, self).solve(puzzle, 3)
 
     def generatePointerGroups(self, puzzle):
-        return super(__boxLineReductionN, self).generatePointerGroups(puzzle, 3)
+        return super(boxLineReductionTriplet, self).generatePointerGroups(puzzle, 3)
 
     def cleanup(self, puzzle):
-        return super(__boxLineReductionN, self).cleanup(puzzle, 3)
+        return super(boxLineReductionTriplet, self).cleanup(puzzle, 3)
 
 class boxLineReductionQuad(__boxLineReductionN):
 
@@ -120,10 +120,10 @@ class boxLineReductionQuad(__boxLineReductionN):
         self.pointers = {}
 
     def solve(self, puzzle):
-        return super(__boxLineReductionN, self).solve(puzzle, 4)
+        return super(boxLineReductionQuad, self).solve(puzzle, 4)
 
     def generatePointerGroups(self, puzzle):
-        return super(__boxLineReductionN, self).generatePointerGroups(puzzle, 4)
+        return super(boxLineReductionQuad, self).generatePointerGroups(puzzle, 4)
 
     def cleanup(self, puzzle):
-        return super(__boxLineReductionN, self).cleanup(puzzle, 4)
+        return super(boxLineReductionQuad, self).cleanup(puzzle, 4)

@@ -80,13 +80,13 @@ class pointingPair(__pointingN):
         self.pointers = {}
 
     def solve(self, puzzle):
-        return super(__pointingN, self).solve(puzzle, 2)
+        return super(pointingPair, self).solve(puzzle, 2)
 
     def generatePointerGroups(self, puzzle):
-        return super(__pointingN, self).generatePointerGroups(puzzle, 2)
+        return super(pointingPair, self).generatePointerGroups(puzzle, 2)
 
     def cleanup(self, puzzle):
-        return super(__pointingN, self).cleanup(puzzle, 2)
+        return super(pointingPair, self).cleanup(puzzle, 2)
 
 class pointingTriplet(__pointingN):
 
@@ -101,13 +101,13 @@ class pointingTriplet(__pointingN):
         self.pointers = {}
 
     def solve(self, puzzle):
-        return super(__pointingN, self).solve(puzzle, 3)
+        return super(pointingTriplet, self).solve(puzzle, 3)
 
     def generatePointerGroups(self, puzzle):
-        return super(__pointingN, self).generatePointerGroups(puzzle, 3)
+        return super(pointingTriplet, self).generatePointerGroups(puzzle, 3)
 
     def cleanup(self, puzzle):
-        return super(__pointingN, self).cleanup(puzzle, 3)
+        return super(pointingTriplet, self).cleanup(puzzle, 3)
 
 class pointingQuad(__pointingN):
 
@@ -122,10 +122,10 @@ class pointingQuad(__pointingN):
         self.pointers = {}
 
     def solve(self, puzzle):
-        return super(__pointingN, self).solve(puzzle, 4)
+        return super(pointingQuad, self).solve(puzzle, 4)
 
     def generatePointerGroups(self, puzzle):
-        return super(__pointingN, self).generatePointerGroups(puzzle, 4)
+        return super(pointingQuad, self).generatePointerGroups(puzzle, 4)
 
     def cleanup(self, puzzle):
-        return super(__pointingN, self).cleanup(puzzle, 4)
+        return super(pointingQuad, self).cleanup(puzzle, 4)

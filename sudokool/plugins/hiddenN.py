@@ -52,7 +52,7 @@ class hiddenSingle(__hiddenN):
         self.rank = 3
 
     def solve(self, puzzle):
-        return super(__hiddenN, self).solve(puzzle, 1)
+        return super(hiddenSingle, self).solve(puzzle, 1)
 
 class hiddenTwin(__hiddenN):
 
@@ -66,7 +66,7 @@ class hiddenTwin(__hiddenN):
         self.rank = 4
 
     def solve(self, puzzle):
-        return super(__hiddenN, self).solve(puzzle, 2)
+        return super(hiddenTwin, self).solve(puzzle, 2)
 
 class hiddenTriple(__hiddenN):
 
@@ -80,4 +80,4 @@ class hiddenTriple(__hiddenN):
         self.rank = 5
 
     def solve(self, puzzle):
-        return super(__hiddenN, self).solve(puzzle, 3)
+        return super(hiddenTriple, self).solve(puzzle, 3)
