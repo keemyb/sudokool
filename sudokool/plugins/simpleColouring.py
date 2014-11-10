@@ -15,6 +15,8 @@ class simpleColouring(Plugin):
 
     def solve(self, puzzle):
 
+        self.generateConjugateChains(puzzle)
+
         for chainGroup in self.conjugateChains:
             chain, candidate = chainGroup[0], chainGroup[1]
             colourOne, colourTwo = chain[::2], chain[1::2]
@@ -189,6 +191,8 @@ class simpleColouring(Plugin):
 
         if self.conjugateChains:
             return
+
+        self.generateConjugatePairs(puzzle)
 
         for pairGroup in self.conjugatePairs:
 
