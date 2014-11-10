@@ -1224,15 +1224,9 @@ class Sudoku(object):
         self.updateUnits()
         self.updateSolvingCandidates()
         self.updateUserCandidates()
-        self.updatePointerGroups()
-        self.updateXWingGroups()
-        self.updateSwordfishGroups()
-        self.updateConjugatePairs()
-        self.updateConjugateChains()
-        self.updateYWingGroups()
-        self.updateXYZWingGroups()
-        self.updateLockedPairs()
-        self.updateLockedChains()
+
+        for method in self.plugins.itervalues():
+            method.cleanup(self)
 
     def updateUnits(self):
         for intersectionType in self.units:
