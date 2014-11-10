@@ -442,7 +442,7 @@ class Sudoku(object):
             return True
         return False
 
-    def solve(self, maxLevel=None, maxSuccessfulSolveOperations=None, forceSolveOnFail=False):
+    def solve(self, currentLevel=0, maxSuccessfulSolveOperations=None, forceSolveOnFail=False):
 
         if maxSuccessfulSolveOperations == 0:
             return
@@ -450,36 +450,31 @@ class Sudoku(object):
         if self.isComplete():
             return
 
-        if (maxLevel is None or
-                maxLevel > len(self.solvingMethods) or
-                maxLevel < 1):
-            # maxLevel is the lenght minus 1 as lists are zero indexed, so the
-            # first method has an index 0
-            maxLevel = len(self.solvingMethods) - 1
+        self.initialiseIntersections()
+        self.registerPlugins()
 
-        #if solver is run for the first time, solve using first method
-        if not self.history:
-            self.changes = False
-            nextMethod = 0
-        #if last attempt was successful, go back to first level
-        elif self.changes:
-            nextMethod = 0
-        #or if unsuccessful, increase level
-        else:
-            lastMethod = self.history[-1]
-            nextMethod = lastMethod + 1
-
-        if nextMethod <= maxLevel:
-            self.solvingMethods[nextMethod]()
-            self.history.append(nextMethod)
-            if maxSuccessfulSolveOperations and self.changes:
-                maxSuccessfulSolveOperations -= 1
-            return self.solve(maxLevel, maxSuccessfulSolveOperations)
-        else:
-            #no more methods
-            if forceSolveOnFail:
-                self.dancingLinks()
+        availableRanks = sorted([rank for rank in self.plugins.iterkeys() if rank >= currentLevel])
+        if not availableRanks:
             return
+
+        currentLevel = availableRanks[0]
+        nextMethod = self.plugins[currentLevel]
+
+        self.changes = False
+        nextMethod.solve(self)
+
+        if self.changes:
+            currentLevel = 0
+        else:
+            if len(availableRanks) == 1:
+                #no more methods available
+                if forceSolveOnFail:
+                    self.dancingLinks()
+                return
+            else:
+                currentLevel = availableRanks[1]
+
+        return self.solve(currentLevel, maxSuccessfulSolveOperations, forceSolveOnFail)
 
 
 
