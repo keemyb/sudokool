@@ -5,7 +5,9 @@ class __nakedN(Plugin):
     def __init__(self):
         self.name = "Naked N"
         self.description ='''
-        pass
+        This plugin looks for n cells in every intersection that have n, and 
+        only n candidates in common. If these are found, these n candidates are
+        removed from every intersection all n cells have in common.
         '''
         self.minSize = None
         self.maxSize = None
@@ -44,7 +46,9 @@ class nakedTwin(__nakedN):
     def __init__(self):
         self.name = "Naked Twin"
         self.description ='''
-        pass
+        This plugin looks for 2 cells in every intersection that have 2, and 
+        only 2 candidates in common. If these are found, these 2 candidates are
+        removed from every intersection both cells have in common. 
         '''
         self.minSize = None
         self.maxSize = None
@@ -58,9 +62,11 @@ class nakedTriple(__nakedN):
     def __init__(self):
         self.name = "Naked Triple"
         self.description ='''
-        pass
+        This plugin looks for 3 cells in every intersection that have 3, and 
+        only 3 candidates in common. If these are found, these 3 candidates are
+        removed from every intersection all 3 cells have in common. 
         '''
-        self.minSize = None
+        self.minSize = 3
         self.maxSize = None
         self.rank = 2
 
