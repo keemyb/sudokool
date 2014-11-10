@@ -105,7 +105,6 @@ class Sudoku(object):
             }
 
         self.solvingMethods = [
-            self.boxLineReduction2, self.boxLineReduction3,
             self.xWing, self.swordfish,
             self.yWing,
             self.simpleColouring,
@@ -1829,44 +1828,6 @@ class Sudoku(object):
 
         for columnToCover in columnsToCover:
             matrix.cover(columnToCover)
-
-
-
-
-    @undoable
-    def boxLineReductionN(self, n):
-
-        name = "Box Line Reduction (" + self.multiples[n - 1] + ")"
-        successString = name + ": {0} has been removed from {1}, as it is part of a subGrid where {2} can only be placed along it's {3}"
-
-        for pointerGroup in self.intersectionTypes[("pointer", n)]:
-            combination, pointerType = pointerGroup[0], pointerGroup[1]
-
-            linearNeighbours = self.neighbourMethods[pointerType](combination[0], *combination)
-            linearNeighbourCandidates = self.allSolvingCandidates(*linearNeighbours)
-
-            commonPointerCandidates = self.commonSolvingCandidates(*combination)
-            uniquePointerCandidates = set([candidate for candidate in commonPointerCandidates if candidate not in linearNeighbourCandidates])
-
-            if not uniquePointerCandidates:
-                continue
-
-            subGridNeighbours = self.subGridNeighbours(combination[0], *combination)
-
-            for location in subGridNeighbours:
-                removedCandidates = self.removeSolvingCandidates(location, *uniquePointerCandidates)
-
-                if removedCandidates:
-
-                    self.addToLog(successString, removedCandidates, location, commonPointerCandidates, pointerType)
-
-    @solvingMethod(("pointer", 2))
-    def boxLineReduction2(self):
-        return self.boxLineReductionN(2)
-
-    @solvingMethod(("pointer", 3))
-    def boxLineReduction3(self):
-        return self.boxLineReductionN(3)
 
 
 
