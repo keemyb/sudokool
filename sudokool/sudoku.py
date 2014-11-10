@@ -105,7 +105,6 @@ class Sudoku(object):
             }
 
         self.solvingMethods = [
-            self.pointingPair, self.pointingTriplet,
             self.boxLineReduction2, self.boxLineReduction3,
             self.xWing, self.swordfish,
             self.yWing,
@@ -794,21 +793,6 @@ class Sudoku(object):
 
 
 
-    def generatePointerGroups(self, n):
-        self.initialiseIntersections()
-
-        pointers = []
-
-        for subGrid in self.intersectionTypes["subGrid"]:
-            for combination in self.nLocations(subGrid, n):
-
-                if "row" in self.alignment(*combination):
-                    pointers.append((combination, "row"))
-                elif "column" in self.alignment(*combination):
-                    pointers.append((combination, "column"))
-
-        return pointers
-
     def generateXWingGroups(self):
         self.initialiseIntersections()
 
@@ -1231,31 +1215,6 @@ class Sudoku(object):
                 for location in group[:]:
                     if self.isFilled(location):
                         group.remove(location)
-
-    def updatePointerGroups(self):
-        # As pointer groups uses a tuple containing the pointer name and
-        # type as the dictionary key, we must try each intersection type
-        # as it is unknown what size pointer group is initialsed.
-        for intersectionType in self.intersectionTypes:
-            try:
-                currentIntersectionType = intersectionType[0]
-                n = intersectionType[1]
-            except:
-                continue
-
-            if currentIntersectionType == "pointer":
-                # For every pointer group, we must check if any location in it
-                # has been filled (making the pointer group invalid.) In this
-                # case we remove the pointer group, after checking it still
-                # exists as there is a chance it may have been deleted by a
-                # location discovered earlier in the same combination.
-                for group in self.intersectionTypes[("pointer", n)]:
-                    combination = group[0]
-                    for location in combination:
-                        if self.isEmpty(location):
-                            continue
-                        if group in self.intersectionTypes[("pointer", n)]:
-                            self.intersectionTypes[("pointer", n)].remove(group)
 
     def updateXWingGroups(self):
         if "xWing" not in self.intersectionTypes:
@@ -1870,45 +1829,6 @@ class Sudoku(object):
 
         for columnToCover in columnsToCover:
             matrix.cover(columnToCover)
-
-
-
-
-    @undoable
-    def pointingN(self, n):
-
-        name = "Pointing " + self.multiples[n - 1]
-        successString = name + ": {0} has been removed from {1}, as it shares a {2} with the " + name + " {3}"
-
-        for pointerGroup in self.intersectionTypes[("pointer", n)]:
-            combination, pointerType = pointerGroup[0], pointerGroup[1]
-
-            subGridNeighbours = self.subGridNeighbours(combination[0], *combination)
-            subGridNeighbourCandidates = self.allSolvingCandidates(*subGridNeighbours)
-
-            commonPointerCandidates = self.commonSolvingCandidates(*combination)
-            uniquePointerCandidates = set([candidate for candidate in commonPointerCandidates if candidate not in subGridNeighbourCandidates])
-
-            if not uniquePointerCandidates:
-                continue
-
-            linearNeighbours = self.neighbourMethods[pointerType](combination[0], *combination)
-
-            for location in linearNeighbours:
-
-                removedCandidates = self.removeSolvingCandidates(location, *uniquePointerCandidates)
-
-                if removedCandidates:
-
-                    self.addToLog(successString, removedCandidates, location, pointerType, combination)
-
-    @solvingMethod(("pointer", 2))
-    def pointingPair(self):
-        return self.pointingN(2)
-
-    @solvingMethod(("pointer", 3))
-    def pointingTriplet(self):
-        return self.pointingN(3)
 
 
 
