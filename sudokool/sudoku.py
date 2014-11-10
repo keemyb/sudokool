@@ -62,6 +62,8 @@ class Sudoku(object):
         self.plugins = {}
         self.registerPlugins()
 
+        self.units = ("row", "column", "subGrid")
+
         self.intersectionTypes = {}
 
         self.staticGroups = {
