@@ -30,6 +30,21 @@ class simpleColouring(Plugin):
                 method(puzzle, chain, colourOne, colourTwo, candidate)
 
     def cleanup(self, puzzle):
+        self.cleanupConjugatePairs(puzzle)
+        self.cleanupConjugateChains(puzzle)
+
+    def cleanupConjugatePairs(self, puzzle):
+        if not self.conjugatePairs:
+            return
+
+        for group in self.conjugatePairs:
+            pair = group[0]
+            if all(puzzle.isEmpty(location) for location in pair):
+                continue
+            if group in self.conjugatePairs:
+                self.conjugatePairs.remove(group)
+
+    def cleanupConjugateChains(self, puzzle):
         if not self.conjugateChains:
             return
 
