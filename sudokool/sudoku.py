@@ -60,6 +60,7 @@ class Sudoku(object):
         self.hasIntersections = False
 
         self.plugins = {}
+        self.registerPlugins()
 
         self.intersectionTypes = {}
 
