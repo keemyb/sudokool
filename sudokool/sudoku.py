@@ -76,7 +76,6 @@ class Sudoku(object):
             "row": self.generateRowGroups,
             "column": self.generateColumnGroups,
             "subGrid": self.generateSubGridGroups,
-            "swordfish": self.generateSwordfishGroups,
             "conjugatePairs": self.generateConjugatePairs,
             "conjugateChains": self.generateConjugateChains,
             "yWing": self.generateYWingGroups,
@@ -104,7 +103,6 @@ class Sudoku(object):
             }
 
         self.solvingMethods = [
-            self.swordfish,
             self.yWing,
             self.simpleColouring,
             self.xyzWing,
@@ -761,121 +759,8 @@ class Sudoku(object):
                    self.allRowNeighbours(location, *exclusions) +
                    self.allColumnNeighbours(location, *exclusions))
 
-    def swordfishRowNeighbours(self, swordfish):
-
-        rowNeighbours = set([]).union(*[self.rowNeighbours(location) for location in swordfish])
-
-        rowNeighbours -= set(swordfish)
-
-        return rowNeighbours
-
-    def swordfishColumnNeighbours(self, swordfish):
-
-        columnNeighbours = set([]).union(*[self.columnNeighbours(location) for location in swordfish])
-
-        columnNeighbours -= set(swordfish)
-
-        return columnNeighbours
-
-    def swordfishNeighbours(self, swordfish):
-
-        return self.swordfishRowNeighbours(swordfish).union(
-            self.swordfishColumnNeighbours(swordfish))
 
 
-
-
-    def generateSwordfishGroups(self):
-        self.initialiseIntersections()
-
-        return self.generate2SwordfishGroups() + self.generate3SwordfishGroups()
-
-    def generate2SwordfishGroups(self):
-
-        swordfishGroups = []
-
-        # 2 location per line swordfish
-        for firstRowIndex, firstRow in enumerate(self.intersectionTypes["row"][:-3]):
-            if len(firstRow) < 2:
-                continue
-
-            for firstRowGroup in self.nLocations(firstRow, 2):
-
-                for secondRowIndex, secondRow in enumerate(self.intersectionTypes["row"][firstRowIndex + 1:-2]):
-                    if len(secondRow) < 2:
-                        continue
-
-                    for secondRowGroup in self.nLocations(secondRow, 2):
-                        alignments = 0
-
-                        for locationOne in firstRowGroup:
-                            for locationTwo in secondRowGroup:
-                                if "column" in self.alignment(locationOne, locationTwo):
-                                    alignments += 1
-                                    locationsInSameColumn = (locationOne, locationTwo)
-
-                        if alignments != 1:
-                            continue
-
-                        for thirdRow in self.intersectionTypes["row"][firstRowIndex + secondRowIndex + 2:]:
-                            if len(thirdRow) < 2:
-                                continue
-
-                            for thirdRowGroup in self.nLocations(thirdRow, 2):
-                                alignments2 = 0
-
-                                for locationOne in thirdRowGroup:
-                                    for row in (firstRowGroup, secondRowGroup):
-                                        for locationTwo in [location for location in row if location not in locationsInSameColumn]:
-                                            if "column" in self.alignment(locationOne, locationTwo):
-                                                alignments2 += 1
-
-                                if alignments2 == 2:
-                                    swordfishGroups.append(firstRowGroup + secondRowGroup + thirdRowGroup)
-
-        return swordfishGroups
-
-    def generate3SwordfishGroups(self):
-        self.initialiseIntersections()
-
-        swordfishGroups = []
-
-        # 3 location per line swordfish
-        for firstRowIndex, firstRow in enumerate(self.intersectionTypes["row"][:-3]):
-            if len(firstRow) < 3:
-                continue
-
-            for firstRowGroup in self.nLocations(firstRow, 3):
-
-                for secondRowIndex, secondRow in enumerate(self.intersectionTypes["row"][firstRowIndex + 1:-2]):
-                    if len(secondRow) < 3:
-                        continue
-
-                    for secondRowGroup in self.nLocations(secondRow, 3):
-                        alignments = 0
-
-                        for i in xrange(3):
-                            if "column" in self.alignment(firstRowGroup[i], secondRowGroup[i]):
-                                    alignments += 1
-
-                        if alignments != 3:
-                            continue
-
-                        for thirdRow in self.intersectionTypes["row"][firstRowIndex + secondRowIndex + 2:]:
-                            if len(thirdRow) < 3:
-                                continue
-
-                            for thirdRowGroup in self.nLocations(thirdRow, 3):
-                                alignments2 = 0
-
-                                for i in xrange(3):
-                                    if "column" in self.alignment(firstRowGroup[i], thirdRowGroup[i]):
-                                        alignments2 += 1
-
-                                if alignments2 == 3:
-                                    swordfishGroups.append(firstRowGroup + secondRowGroup + thirdRowGroup)
-
-        return swordfishGroups
 
     def generateConjugatePairs(self):
         self.initialiseIntersections()
@@ -1179,19 +1064,6 @@ class Sudoku(object):
                 for location in group[:]:
                     if self.isFilled(location):
                         group.remove(location)
-
-    def updateSwordfishGroups(self):
-        if "swordfish" not in self.intersectionTypes:
-            return
-
-        for group in self.intersectionTypes["swordfish"]:
-            for location in group:
-                if self.isEmpty(location):
-                    continue
-                if location not in group:
-                    continue
-                if group in self.intersectionTypes["swordfish"]:
-                    self.intersectionTypes["swordfish"].remove(group)
 
     def updateConjugatePairs(self):
         if "conjugatePairs" not in self.intersectionTypes:
@@ -1780,53 +1652,6 @@ class Sudoku(object):
 
         for columnToCover in columnsToCover:
             matrix.cover(columnToCover)
-
-
-
-
-    @solvingMethod("swordfish")
-    @undoable
-    def swordfish(self):
-
-        successString = "Swordfish: {0} has been removed from {1}, as it is in alignment with the Swordfish, {2}"
-
-        from collections import defaultdict
-
-        swordfishes = defaultdict(list)
-
-        for group in self.intersectionTypes["swordfish"]:
-
-            commonCandidates = self.commonSolvingCandidates(*group)
-
-            if len(commonCandidates) == 0:
-                continue
-
-            rowCandidates = defaultdict(set)
-            for neighbour in self.swordfishRowNeighbours(group):
-                rowCandidates[self.getRow(neighbour)].union(self.allSolvingCandidates(neighbour))
-
-            columnCandidates = defaultdict(set)
-            for neighbour in self.swordfishColumnNeighbours(group):
-                columnCandidates[self.getColumn(neighbour)].union(self.allSolvingCandidates(neighbour))
-
-            for candidate in commonCandidates:
-                inAllRows = all(candidate in candidates for candidates in rowCandidates.itervalues())
-                inAllColumns = all(candidate in candidates for candidates in columnCandidates.itervalues())
-                notInRows = not any(candidate in candidates for candidates in rowCandidates.itervalues())
-                notInColumns = not any(candidate in candidates for candidates in columnCandidates.itervalues())
-
-                if (inAllRows and notInColumns) or (inAllColumns and notInRows):
-                    swordfishes[group].append(candidate)
-
-        for group, candidates in swordfishes.iteritems():
-            neighbours = self.swordfishNeighbours(group)
-
-            for location in neighbours:
-
-                removedCandidates = self.removeSolvingCandidates(location, *candidates)
-
-                if removedCandidates:
-                    self.addToLog(successString, removedCandidates, location, group)
 
 
 
