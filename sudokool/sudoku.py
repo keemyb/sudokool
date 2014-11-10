@@ -76,7 +76,6 @@ class Sudoku(object):
             "row": self.generateRowGroups,
             "column": self.generateColumnGroups,
             "subGrid": self.generateSubGridGroups,
-            "xWing": self.generateXWingGroups,
             "swordfish": self.generateSwordfishGroups,
             "conjugatePairs": self.generateConjugatePairs,
             "conjugateChains": self.generateConjugateChains,
@@ -105,7 +104,7 @@ class Sudoku(object):
             }
 
         self.solvingMethods = [
-            self.xWing, self.swordfish,
+            self.swordfish,
             self.yWing,
             self.simpleColouring,
             self.xyzWing,
@@ -762,12 +761,6 @@ class Sudoku(object):
                    self.allRowNeighbours(location, *exclusions) +
                    self.allColumnNeighbours(location, *exclusions))
 
-    def xWingNeighbours(self, xWing):
-        return (self.rowNeighbours(xWing[0], *xWing) +
-                self.rowNeighbours(xWing[2], *xWing) +
-                self.columnNeighbours(xWing[0], *xWing) +
-                self.columnNeighbours(xWing[1], *xWing))
-
     def swordfishRowNeighbours(self, swordfish):
 
         rowNeighbours = set([]).union(*[self.rowNeighbours(location) for location in swordfish])
@@ -791,34 +784,6 @@ class Sudoku(object):
 
 
 
-
-    def generateXWingGroups(self):
-        self.initialiseIntersections()
-
-        xWingGroups = []
-
-        # gridSize: gridSize * 2 are the indices for the row groups
-        # we use the indices from intersection groups instead of row groups,
-        # as the row groups in intersection groups will be pre-pruned.
-        for firstRowIndex, firstRow in enumerate(self.intersectionTypes["row"]):
-            if len(firstRow) < 2:
-                continue
-
-            for firstRowGroup in self.nLocations(firstRow, 2):
-
-                    for secondRow in self.intersectionTypes["row"][firstRowIndex + 1:]:
-                        if len(secondRow) < 2:
-                            continue
-
-                        for secondRowGroup in self.nLocations(secondRow, 2):
-                                if "subGrid" in self.alignment(firstRowGroup[0], secondRowGroup[1]):
-                                    continue
-
-                                if "column" in self.alignment(firstRowGroup[0], secondRowGroup[0]) and \
-                                   "column" in self.alignment(firstRowGroup[1], secondRowGroup[1]):
-                                    xWingGroups.append((firstRowGroup + secondRowGroup))
-
-        return xWingGroups
 
     def generateSwordfishGroups(self):
         self.initialiseIntersections()
@@ -1214,19 +1179,6 @@ class Sudoku(object):
                 for location in group[:]:
                     if self.isFilled(location):
                         group.remove(location)
-
-    def updateXWingGroups(self):
-        if "xWing" not in self.intersectionTypes:
-            return
-
-        for group in self.intersectionTypes["xWing"]:
-            for location in group:
-                if self.isEmpty(location):
-                    continue
-                if location not in group:
-                    continue
-                if group in self.intersectionTypes["xWing"]:
-                    self.intersectionTypes["xWing"].remove(group)
 
     def updateSwordfishGroups(self):
         if "swordfish" not in self.intersectionTypes:
@@ -1828,47 +1780,6 @@ class Sudoku(object):
 
         for columnToCover in columnsToCover:
             matrix.cover(columnToCover)
-
-
-
-
-    @solvingMethod("xWing")
-    @undoable
-    def xWing(self):
-
-        successString = "X-Wing: {0} has been removed from {1}, as it is in alignment with the X-Wing, {2}"
-
-        from collections import defaultdict
-        from itertools import chain
-
-        xWings = defaultdict(list)
-
-        for group in self.intersectionTypes["xWing"]:
-
-            commonXWingCandidates = self.commonSolvingCandidates(*group)
-
-            if len(commonXWingCandidates) == 0:
-                continue
-
-            rowCandidates = (self.allSolvingCandidates(*self.rowNeighbours(group[0], *group)) |
-                             self.allSolvingCandidates(*self.rowNeighbours(group[2], *group)))
-            columnCandidates = (self.allSolvingCandidates(*self.columnNeighbours(group[0], *group)) |
-                                self.allSolvingCandidates(*self.columnNeighbours(group[1], *group)))
-
-            for candidate in commonXWingCandidates:
-                if (candidate not in rowCandidates or candidate not in columnCandidates):
-                    xWings[group].append(candidate)
-
-        for group, candidates in xWings.iteritems():
-
-            for location in self.xWingNeighbours(group):
-
-                removedCandidates = self.removeSolvingCandidates(location, *candidates)
-
-                if removedCandidates:
-
-                    # Needs to be more verbose, showing where the alignment occours
-                    self.addToLog(successString, removedCandidates, location, group)
 
 
 
