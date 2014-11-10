@@ -105,11 +105,11 @@ class Sudoku(object):
             }
 
         self.solvingMethods = [
-            self.nakedSingle, self.hiddenSingle,
-            self.nakedTwin, self.hiddenTwin,
+            self.hiddenSingle,
+            self.hiddenTwin,
             self.pointingPair, self.pointingTriplet,
             self.boxLineReduction2, self.boxLineReduction3,
-            self.nakedTriplet, self.hiddenTriplet,
+            self.hiddenTriplet,
             self.xWing, self.swordfish,
             self.yWing,
             self.simpleColouring,
@@ -1873,63 +1873,6 @@ class Sudoku(object):
 
         for columnToCover in columnsToCover:
             matrix.cover(columnToCover)
-
-
-
-
-    @solvingMethod()
-    @undoable
-    def nakedSingle(self):
-
-        successString = "Naked Single: {0} was set to {1}"
-
-        for location in self.emptyLocations():
-            candidates = self.allSolvingCandidates(location)
-            if len(candidates) == 1:
-                nakedSingle = candidates.pop()
-
-                self.setValue(location, nakedSingle)
-
-                self.addToLog(successString, location, nakedSingle)
-
-    @solvingMethod()
-    @undoable
-    def nakedN(self, n):
-
-        name = "Naked " + self.multiples[n - 1]
-        successString = name + ": {0} have been removed from {1} as it shares a {2} with the " + name + ", {3}"
-
-        for intersectionType in self.units:
-
-            for group in self.intersectionTypes[intersectionType]:
-
-                if len(group) <= n:
-                    continue
-
-                for combination in self.nLocations(group, n):
-
-                    nakedNcandidates = self.allSolvingCandidates(*combination)
-
-                    if len(nakedNcandidates) != n:
-                        continue
-
-                    surroundingLocations = [location for location in group if location not in combination]
-
-                    for surroundingLocation in surroundingLocations:
-
-                        removedCandidates = self.removeSolvingCandidates(surroundingLocation, *nakedNcandidates)
-
-                        if removedCandidates:
-
-                            self.addToLog(successString, removedCandidates, location, self.alignment(*combination)[0], combination)
-
-    def nakedTwin(self):
-
-        return self.nakedN(2)
-
-    def nakedTriplet(self):
-
-        return self.nakedN(3)
 
 
 
