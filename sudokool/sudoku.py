@@ -493,7 +493,7 @@ class Sudoku(object):
 
 
 
-    def initialiseIntersections(self, *requiredIntersections):
+    def initialiseIntersections(self):
         self.solveMode = True
         #three main intersection types needed for candidates to work
         for intersectionType in self.units:
@@ -506,26 +506,6 @@ class Sudoku(object):
 
         if not self.hasCandidates:
             self.initialiseCandidates()
-
-        for intersectionType in requiredIntersections:
-            if intersectionType in self.intersectionTypes:
-                continue
-
-            if intersectionType not in self.generationMethods:
-                continue
-
-            self.intersectionTypes[intersectionType] = self.generationMethods[intersectionType]()
-
-        for intersectionType in requiredIntersections:
-            try:
-                # n variable
-                currentIntersectionType = intersectionType[0]
-                n = intersectionType[1]
-            except:
-                continue
-            if currentIntersectionType == "pointer":
-                if ("pointer", n) not in self.intersectionTypes:
-                    self.intersectionTypes[("pointer", n)] = self.generatePointerGroups(n)
 
         self.updatePuzzle()
 
