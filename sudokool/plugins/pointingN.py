@@ -67,7 +67,7 @@ class __pointingN(Plugin):
                 if group in puzzle.intersectionTypes[("pointer", n)]:
                     puzzle.intersectionTypes[("pointer", n)].remove(group)
 
-class pointingPair(Plugin):
+class pointingPair(__pointingN):
 
     def __init__(self):
         self.name = "Pointing Pair"
@@ -88,7 +88,7 @@ class pointingPair(Plugin):
     def cleanup(self, puzzle):
         return super(__pointingN, self).cleanup(puzzle, 2)
 
-class pointingTriplet(Plugin):
+class pointingTriplet(__pointingN):
 
     def __init__(self):
         self.name = "Pointing Triplet"
@@ -109,7 +109,7 @@ class pointingTriplet(Plugin):
     def cleanup(self, puzzle):
         return super(__pointingN, self).cleanup(puzzle, 3)
 
-class pointingQuad(Plugin):
+class pointingQuad(__pointingN):
 
     def __init__(self):
         self.name = "Pointing Quad"
