@@ -1250,11 +1250,12 @@ class Sudoku(object):
         for columnToCover in columnsToCover:
             matrix.cover(columnToCover)
 
+    def showRegisteredPlugins(self):
+        for rank, plugin in sorted(self.plugins.iteritems()):
+            print rank, plugin.name
+
 
 
 
 if __name__ == "__main__":
-    newDoku = Sudoku("0"*81)
-    newDoku.registerPlugins()
-    for plugin in newDoku.plugins.itervalues():
-        print plugin.rank, plugin.name
+    pass
