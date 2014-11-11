@@ -17,6 +17,9 @@ class nakedSingle(Plugin):
 
         for location in puzzle.emptyLocations():
             candidates = puzzle.allSolvingCandidates(location)
+
+            # If there is only one candidate, it must be the value of that cell,
+            # assuming the puzzle is valid.
             if len(candidates) == 1:
                 nakedSingle = candidates.pop()
 
