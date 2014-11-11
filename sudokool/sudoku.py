@@ -1111,9 +1111,12 @@ class Sudoku(object):
             module = loader.find_module(name).load_module(name)
 
             for className, value in inspect.getmembers(module):
+                # User Made Plugin "Base" Class with n parameter
                 if className.startswith('__'):
                     continue
-                if className.startswith('Plugin'):
+
+                # Base Plugin Class
+                if className == 'Plugin':
                     continue
 
                 class_ = getattr(module, className)
