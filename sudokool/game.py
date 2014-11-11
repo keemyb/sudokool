@@ -1,7 +1,7 @@
 import kivy
 kivy.require('1.8.0')
 
-from sudoku import Sudoku
+from sudokool import Sudoku
 from kivy.app import App
 
 from kivy.core.window import Window
