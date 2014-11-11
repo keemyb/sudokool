@@ -1,6 +1,13 @@
 from sudokool.plugin import Plugin
 
 class xWing(Plugin):
+    '''X-Wing
+
+    An X-Wing is a group of 4 locations arranged in a rectangle that share a
+    common candidate. The X-Wing candidate must also not be found anywhere else
+    in either it's rows or columns. If found the X-Wing candidate will be
+    removed from the locations in the plane (row or column) where they are found.
+    '''
 
     def __init__(self):
         self.name = "X-Wing"
@@ -16,6 +23,10 @@ class xWing(Plugin):
 
         from collections import defaultdict
 
+        # creating a dictionary, where the keys are the X-Wing locations, and
+        # the values are a list of candidates. The reason for this is that a
+        # single X-Wing formation may have many candidates, so it is more
+        # efficient to find all candidates applicable to a formation at once.
         xWings = defaultdict(list)
 
         for group in self.xWingGroups:
@@ -49,23 +60,30 @@ class xWing(Plugin):
         if self.xWingGroups:
             return
 
-        # gridSize: gridSize * 2 are the indices for the row groups
-        # we use the indices from intersection groups instead of row groups,
-        # as the row groups in intersection groups will be pre-pruned.
         for firstRowIndex, firstRow in enumerate(puzzle.intersectionTypes["row"]):
             if len(firstRow) < 2:
                 continue
 
             for firstRowGroup in puzzle.nLocations(firstRow, 2):
 
+                    # We use the first row index so that we only find X-Wings
+                    # were the second row is below the first. This prevents us
+                    # finding duplicate formations.
                     for secondRow in puzzle.intersectionTypes["row"][firstRowIndex + 1:]:
                         if len(secondRow) < 2:
                             continue
 
                         for secondRowGroup in puzzle.nLocations(secondRow, 2):
+                                # if the top left and bottom right locations
+                                # are in the same subGrid, the other two
+                                # locations are as well and this is not a valid
+                                # X-Wing formation. 
                                 if "subGrid" in puzzle.alignment(firstRowGroup[0], secondRowGroup[1]):
                                     continue
 
+                                # if the first and second locations from both
+                                # rows share the same column, we have found a
+                                # rectangular shape. 
                                 if "column" in puzzle.alignment(firstRowGroup[0], secondRowGroup[0]) and \
                                    "column" in puzzle.alignment(firstRowGroup[1], secondRowGroup[1]):
                                     self.xWingGroups.append((firstRowGroup + secondRowGroup))
