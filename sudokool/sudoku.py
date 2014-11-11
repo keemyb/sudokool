@@ -500,41 +500,6 @@ class Sudoku(object):
 
 
 
-    def testProspectiveChange(self, candidatesToRemove=None, valuesToAdd=None, maxSuccessfulSolveOperations=0):
-        from copy import deepcopy
-
-        prospectivePuzzle = deepcopy(self)
-
-        if candidatesToRemove is not None:
-            for location, candidates in candidatesToRemove.iteritems():
-                prospectivePuzzle.removeSolvingCandidates(location, *candidates)
-
-        if valuesToAdd is not None:
-            for location, value in valuesToAdd.iteritems():
-                del prospectivePuzzle.candidates[location]
-                prospectivePuzzle.values[location] = value
-
-        prospectivePuzzle.updatePuzzle()
-        if maxSuccessfulSolveOperations:
-            prospectivePuzzle.solve(maxSuccessfulSolveOperations=maxSuccessfulSolveOperations)
-
-        return prospectivePuzzle.isValid()
-
-    def applyProspectiveChange(self, candidatesToRemove=None, valuesToAdd=None):
-        if candidatesToRemove is not None:
-            for location, candidates in candidatesToRemove.iteritems():
-                self.removeSolvingCandidates(location, *candidates)
-
-        if valuesToAdd is not None:
-            for location, value in valuesToAdd.iteritems():
-                del self.solvingCandidatesDict[location]
-                self.values[location] = value
-
-        self.updatePuzzle()
-
-
-
-
     def initialiseIntersections(self):
         self.solveMode = True
         #three main intersection types needed for candidates to work
@@ -1253,6 +1218,41 @@ class Sudoku(object):
         formattedVariables = self.logVariableFormatter(*variables)
 
         self.log.append(string.format(*formattedVariables))
+
+
+
+
+    def testProspectiveChange(self, candidatesToRemove=None, valuesToAdd=None, maxSuccessfulSolveOperations=0):
+        from copy import deepcopy
+
+        prospectivePuzzle = deepcopy(self)
+
+        if candidatesToRemove is not None:
+            for location, candidates in candidatesToRemove.iteritems():
+                prospectivePuzzle.removeSolvingCandidates(location, *candidates)
+
+        if valuesToAdd is not None:
+            for location, value in valuesToAdd.iteritems():
+                del prospectivePuzzle.candidates[location]
+                prospectivePuzzle.values[location] = value
+
+        prospectivePuzzle.updatePuzzle()
+        if maxSuccessfulSolveOperations:
+            prospectivePuzzle.solve(maxSuccessfulSolveOperations=maxSuccessfulSolveOperations)
+
+        return prospectivePuzzle.isValid()
+
+    def applyProspectiveChange(self, candidatesToRemove=None, valuesToAdd=None):
+        if candidatesToRemove is not None:
+            for location, candidates in candidatesToRemove.iteritems():
+                self.removeSolvingCandidates(location, *candidates)
+
+        if valuesToAdd is not None:
+            for location, value in valuesToAdd.iteritems():
+                del self.solvingCandidatesDict[location]
+                self.values[location] = value
+
+        self.updatePuzzle()
 
 
 
