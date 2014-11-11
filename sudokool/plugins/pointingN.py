@@ -1,6 +1,13 @@
 from sudokool.plugin import Plugin
 
 class __pointingN(Plugin):
+    '''Pointing N
+
+    This plugin looks in every subGrid for n locations in either the same row or
+    column, that share a candidate (a pointing n). If found this candidate is
+    removed from every other location in the same row or column on which the
+    pointing n were aligned.
+    '''
 
     def __init__(self):
         self.name = "Pointing N"
@@ -61,6 +68,13 @@ class __pointingN(Plugin):
                     self.pointers.remove(group)
 
 class pointingPair(__pointingN):
+    '''Pointing Pair
+
+    This plugin looks in every subGrid for 2 locations in either the same row or
+    column, that share a candidate (a pointing pair). If found this candidate is
+    removed from every other location in the same row or column on which the
+    pointing pair were aligned.
+    '''
 
     def __init__(self):
         self.name = "Pointing Pair"
@@ -79,6 +93,13 @@ class pointingPair(__pointingN):
         return super(pointingPair, self).cleanup(puzzle)
 
 class pointingTriplet(__pointingN):
+    '''Pointing Triplet
+
+    This plugin looks in every subGrid for 3 locations in either the same row or
+    column, that share a candidate (a pointing triplet). If found this candidate is
+    removed from every other location in the same row or column on which the
+    pointing triplet were aligned.
+    '''
 
     def __init__(self):
         self.name = "Pointing Triplet"
@@ -97,6 +118,13 @@ class pointingTriplet(__pointingN):
         return super(pointingTriplet, self).cleanup(puzzle)
 
 class pointingQuad(__pointingN):
+    '''Pointing Quad
+
+    This plugin looks in every subGrid for 4 locations in either the same row or
+    column, that share a candidate (a pointing quad). If found this candidate is
+    removed from every other location in the same row or column on which the
+    pointing quad were aligned.
+    '''
 
     def __init__(self):
         self.name = "Pointing Quad"
