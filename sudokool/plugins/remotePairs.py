@@ -4,9 +4,6 @@ class remotePairs(Plugin):
 
     def __init__(self):
         self.name = "Remote Pairs"
-        self.description ='''
-        pass
-        '''
         self.minSize = None
         self.maxSize = None
         self.rank = 170
