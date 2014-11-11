@@ -10,14 +10,14 @@ class __pointingN(Plugin):
         self.minSize = None
         self.maxSize = None
         self.rank = 0
-        self.pointers = {}
+        self.pointers = []
 
-    def solve(self, puzzle, n):
-        self.generatePointerGroups(puzzle, n)
+    def solve(self, puzzle):
+        self.generatePointerGroups(puzzle)
 
         successString = self.name + ": {0} has been removed from {1}, as it shares a {2} with the " + self.name + " {3}"
 
-        for pointerGroup in self.intersectionTypes[("pointer", n)]:
+        for pointerGroup in self.pointers:
             combination, pointerType = pointerGroup[0], pointerGroup[1]
 
             subGridNeighbours = puzzle.subGridNeighbours(combination[0], *combination)
@@ -40,32 +40,28 @@ class __pointingN(Plugin):
                     puzzle.addToLog(successString, removedCandidates, location, pointerType, combination)
 
     def generatePointerGroups(self, puzzle, n):
-        if n in self.pointers:
+        if self.pointers:
             return
-
-        pointers = []
 
         for subGrid in puzzle.intersectionTypes["subGrid"]:
             for combination in puzzle.nLocations(subGrid, n):
 
                 if "row" in puzzle.alignment(*combination):
-                    pointers.append((combination, "row"))
+                    self.pointers.append((combination, "row"))
                 elif "column" in puzzle.alignment(*combination):
-                    pointers.append((combination, "column"))
+                    self.pointers.append((combination, "column"))
 
-        self.pointers[n] = pointers
-
-    def cleanup(self, puzzle, n):
-        if n not in self.pointers:
+    def cleanup(self, puzzle):
+        if not self.pointers:
             return
 
-        for group in self.pointers[n]:
+        for group in self.pointers:
             combination = group[0]
             for location in combination:
                 if puzzle.isEmpty(location):
                     continue
-                if group in puzzle.intersectionTypes[("pointer", n)]:
-                    puzzle.intersectionTypes[("pointer", n)].remove(group)
+                if group in self.pointers:
+                    self.pointers.remove(group)
 
 class pointingPair(__pointingN):
 
@@ -77,16 +73,16 @@ class pointingPair(__pointingN):
         self.minSize = None
         self.maxSize = None
         self.rank = 40
-        self.pointers = {}
+        self.pointers = []
 
     def solve(self, puzzle):
-        return super(pointingPair, self).solve(puzzle, 2)
+        return super(pointingPair, self).solve(puzzle)
 
     def generatePointerGroups(self, puzzle):
         return super(pointingPair, self).generatePointerGroups(puzzle, 2)
 
     def cleanup(self, puzzle):
-        return super(pointingPair, self).cleanup(puzzle, 2)
+        return super(pointingPair, self).cleanup(puzzle)
 
 class pointingTriplet(__pointingN):
 
@@ -98,16 +94,16 @@ class pointingTriplet(__pointingN):
         self.minSize = 3
         self.maxSize = None
         self.rank = 80
-        self.pointers = {}
+        self.pointers = []
 
     def solve(self, puzzle):
-        return super(pointingTriplet, self).solve(puzzle, 3)
+        return super(pointingTriplet, self).solve(puzzle)
 
     def generatePointerGroups(self, puzzle):
         return super(pointingTriplet, self).generatePointerGroups(puzzle, 3)
 
     def cleanup(self, puzzle):
-        return super(pointingTriplet, self).cleanup(puzzle, 3)
+        return super(pointingTriplet, self).cleanup(puzzle)
 
 class pointingQuad(__pointingN):
 
@@ -119,13 +115,13 @@ class pointingQuad(__pointingN):
         self.minSize = 4
         self.maxSize = None
         self.rank = 90
-        self.pointers = {}
+        self.pointers = []
 
     def solve(self, puzzle):
-        return super(pointingQuad, self).solve(puzzle, 4)
+        return super(pointingQuad, self).solve(puzzle)
 
     def generatePointerGroups(self, puzzle):
         return super(pointingQuad, self).generatePointerGroups(puzzle, 4)
 
     def cleanup(self, puzzle):
-        return super(pointingQuad, self).cleanup(puzzle, 4)
+        return super(pointingQuad, self).cleanup(puzzle)
