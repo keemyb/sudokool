@@ -3,20 +3,21 @@ from sudokool.plugin import Plugin
 class __boxLineReductionN(Plugin):
 
     def __init__(self):
-        self.name = "Box Line Reduction (N)"
+        self.name = "Box Line Reduction N"
         self.description ='''
         pass
         '''
         self.minSize = None
         self.maxSize = None
         self.rank = 0
-        self.pointers = {}
+        self.pointers = []
 
-    def solve(self, puzzle, n):
+    def solve(self, puzzle):
+        self.generatePointerGroups(puzzle)
 
         successString = self.name + ": {0} has been removed from {1}, as it is part of a subGrid where {2} can only be placed along it's {3}"
 
-        for pointerGroup in puzzle.intersectionTypes[("pointer", n)]:
+        for pointerGroup in self.pointers:
             combination, pointerType = pointerGroup[0], pointerGroup[1]
 
             linearNeighbours = puzzle.neighbourMethods[pointerType](combination[0], *combination)
@@ -38,32 +39,28 @@ class __boxLineReductionN(Plugin):
                     puzzle.addToLog(successString, removedCandidates, location, commonPointerCandidates, pointerType)
 
     def generatePointerGroups(self, puzzle, n):
-        if n in self.pointers:
+        if self.pointers:
             return
-
-        pointers = []
 
         for subGrid in puzzle.intersectionTypes["subGrid"]:
             for combination in puzzle.nLocations(subGrid, n):
 
                 if "row" in puzzle.alignment(*combination):
-                    pointers.append((combination, "row"))
+                    self.pointers.append((combination, "row"))
                 elif "column" in puzzle.alignment(*combination):
-                    pointers.append((combination, "column"))
+                    self.pointers.append((combination, "column"))
 
-        self.pointers[n] = pointers
-
-    def cleanup(self, puzzle, n):
-        if n not in self.pointers:
+    def cleanup(self, puzzle):
+        if not self.pointers:
             return
 
-        for group in self.pointers[n]:
+        for group in self.pointers:
             combination = group[0]
             for location in combination:
                 if puzzle.isEmpty(location):
                     continue
-                if group in puzzle.intersectionTypes[("pointer", n)]:
-                    puzzle.intersectionTypes[("pointer", n)].remove(group)
+                if group in self.pointers:
+                    self.pointers.remove(group)
 
 class boxLineReductionPair(__boxLineReductionN):
 
@@ -75,16 +72,16 @@ class boxLineReductionPair(__boxLineReductionN):
         self.minSize = None
         self.maxSize = None
         self.rank = 50
-        self.pointers = {}
+        self.pointers = []
 
     def solve(self, puzzle):
-        return super(boxLineReductionPair, self).solve(puzzle, 2)
+        return super(boxLineReductionPair, self).solve(puzzle)
 
     def generatePointerGroups(self, puzzle):
         return super(boxLineReductionPair, self).generatePointerGroups(puzzle, 2)
 
     def cleanup(self, puzzle):
-        return super(boxLineReductionPair, self).cleanup(puzzle, 2)
+        return super(boxLineReductionPair, self).cleanup(puzzle)
 
 class boxLineReductionTriplet(__boxLineReductionN):
 
@@ -96,16 +93,16 @@ class boxLineReductionTriplet(__boxLineReductionN):
         self.minSize = 3
         self.maxSize = None
         self.rank = 100
-        self.pointers = {}
+        self.pointers = []
 
     def solve(self, puzzle):
-        return super(boxLineReductionTriplet, self).solve(puzzle, 3)
+        return super(boxLineReductionTriplet, self).solve(puzzle)
 
     def generatePointerGroups(self, puzzle):
         return super(boxLineReductionTriplet, self).generatePointerGroups(puzzle, 3)
 
     def cleanup(self, puzzle):
-        return super(boxLineReductionTriplet, self).cleanup(puzzle, 3)
+        return super(boxLineReductionTriplet, self).cleanup(puzzle)
 
 class boxLineReductionQuad(__boxLineReductionN):
 
@@ -117,13 +114,13 @@ class boxLineReductionQuad(__boxLineReductionN):
         self.minSize = 4
         self.maxSize = None
         self.rank = 110
-        self.pointers = {}
+        self.pointers = []
 
     def solve(self, puzzle):
-        return super(boxLineReductionQuad, self).solve(puzzle, 4)
+        return super(boxLineReductionQuad, self).solve(puzzle)
 
     def generatePointerGroups(self, puzzle):
         return super(boxLineReductionQuad, self).generatePointerGroups(puzzle, 4)
 
     def cleanup(self, puzzle):
-        return super(boxLineReductionQuad, self).cleanup(puzzle, 4)
+        return super(boxLineReductionQuad, self).cleanup(puzzle)
