@@ -82,7 +82,7 @@ class pointingTriplet(__pointingN):
 
     def __init__(self):
         self.name = "Pointing Triplet"
-        self.minSize = 3
+        self.minSize = 6
         self.maxSize = None
         self.rank = 80
         self.pointers = []
@@ -100,7 +100,7 @@ class pointingQuad(__pointingN):
 
     def __init__(self):
         self.name = "Pointing Quad"
-        self.minSize = 4
+        self.minSize = 8
         self.maxSize = None
         self.rank = 90
         self.pointers = []
