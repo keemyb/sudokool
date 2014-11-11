@@ -500,7 +500,7 @@ class Sudoku(object):
 
 
 
-    def testProspectiveChange(self, candidatesToRemove=None, valuesToAdd=None, solveDepth=None):
+    def testProspectiveChange(self, candidatesToRemove=None, valuesToAdd=None, maxSuccessfulSolveOperations=0):
         from copy import deepcopy
 
         prospectivePuzzle = deepcopy(self)
@@ -515,8 +515,8 @@ class Sudoku(object):
                 prospectivePuzzle.values[location] = value
 
         prospectivePuzzle.updatePuzzle()
-        if solveDepth:
-            prospectivePuzzle.solve(solveDepth)
+        if maxSuccessfulSolveOperations:
+            prospectivePuzzle.solve(maxSuccessfulSolveOperations=maxSuccessfulSolveOperations)
 
         return prospectivePuzzle.isValid()
 
