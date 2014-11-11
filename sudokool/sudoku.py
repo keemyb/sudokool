@@ -458,6 +458,48 @@ class Sudoku(object):
 
 
 
+    def registerPlugins(self):
+        if self.plugins:
+            return
+
+        import plugins
+
+        import pkgutil
+        import inspect
+
+        for loader, name, is_pkg in pkgutil.walk_packages(plugins.__path__):
+            module = loader.find_module(name).load_module(name)
+
+            for className, value in inspect.getmembers(module):
+                # User Made Plugin "Base" Class with n parameter
+                if className.startswith('__'):
+                    continue
+
+                # Base Plugin Class
+                if className == 'Plugin':
+                    continue
+
+                class_ = getattr(module, className)
+                pluginInstance = class_()
+
+                minSize = pluginInstance.minSize
+                maxSize = pluginInstance.maxSize
+
+                # Don't register plugins not made for this size sudoku
+                if minSize and self.unitSize() < minSize:
+                    continue
+                elif maxSize and self.unitSize() > maxSize:
+                    continue
+
+                self.plugins[pluginInstance.rank] = pluginInstance
+
+    def showRegisteredPlugins(self):
+        for rank, plugin in sorted(self.plugins.iteritems()):
+            print rank, plugin.name
+
+
+
+
     def testProspectiveChange(self, candidatesToRemove=None, valuesToAdd=None, solveDepth=None):
         from copy import deepcopy
 
@@ -1098,40 +1140,7 @@ class Sudoku(object):
         self.values.update(solution)
 
 
-    def registerPlugins(self):
-        if self.plugins:
-            return
 
-        import plugins
-
-        import pkgutil
-        import inspect
-
-        for loader, name, is_pkg in pkgutil.walk_packages(plugins.__path__):
-            module = loader.find_module(name).load_module(name)
-
-            for className, value in inspect.getmembers(module):
-                # User Made Plugin "Base" Class with n parameter
-                if className.startswith('__'):
-                    continue
-
-                # Base Plugin Class
-                if className == 'Plugin':
-                    continue
-
-                class_ = getattr(module, className)
-                pluginInstance = class_()
-
-                minSize = pluginInstance.minSize
-                maxSize = pluginInstance.maxSize
-
-                # Don't register plugins not made for this size sudoku
-                if minSize and self.unitSize() < minSize:
-                    continue
-                elif maxSize and self.unitSize() > maxSize:
-                    continue
-
-                self.plugins[pluginInstance.rank] = pluginInstance
 
     def solveMatrix(self, matrix, solutions, random, i=0):
         if matrix.complete():
@@ -1244,10 +1253,6 @@ class Sudoku(object):
 
         for columnToCover in columnsToCover:
             matrix.cover(columnToCover)
-
-    def showRegisteredPlugins(self):
-        for rank, plugin in sorted(self.plugins.iteritems()):
-            print rank, plugin.name
 
 
 
