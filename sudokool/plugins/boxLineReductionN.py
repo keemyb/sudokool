@@ -1,6 +1,12 @@
 from sudokool.plugin import Plugin
 
 class __boxLineReductionN(Plugin):
+    '''Box Line Reduction N
+
+    This plugin looks in every row and column for n locations in the same
+    subGrid, that share a candidate. If found this candidate is removed from
+    every other location in the same subGrid.
+    '''
 
     def __init__(self):
         self.name = "Box Line Reduction N"
@@ -60,6 +66,12 @@ class __boxLineReductionN(Plugin):
                     self.pointers.remove(group)
 
 class boxLineReductionPair(__boxLineReductionN):
+    '''Box Line Reduction Pair
+
+    This plugin looks in every row and column for 2 locations in the same
+    subGrid, that share a candidate. If found this candidate is removed from
+    every other location in the same subGrid.
+    '''
 
     def __init__(self):
         self.name = "Box Line Reduction Pair"
@@ -78,6 +90,12 @@ class boxLineReductionPair(__boxLineReductionN):
         return super(boxLineReductionPair, self).cleanup(puzzle)
 
 class boxLineReductionTriplet(__boxLineReductionN):
+    '''Box Line Reduction Triplet
+
+    This plugin looks in every row and column for 3 locations in the same
+    subGrid, that share a candidate. If found this candidate is removed from
+    every other location in the same subGrid.
+    '''
 
     def __init__(self):
         self.name = "Box Line Reduction Triplet"
@@ -96,6 +114,12 @@ class boxLineReductionTriplet(__boxLineReductionN):
         return super(boxLineReductionTriplet, self).cleanup(puzzle)
 
 class boxLineReductionQuad(__boxLineReductionN):
+    '''Box Line Reduction Quad
+
+    This plugin looks in every row and column for 4 locations in the same
+    subGrid, that share a candidate. If found this candidate is removed from
+    every other location in the same subGrid.
+    '''
 
     def __init__(self):
         self.name = "Box Line Reduction Quad"
