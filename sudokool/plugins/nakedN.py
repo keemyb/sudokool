@@ -55,7 +55,7 @@ class nakedTwin(__nakedN):
         self.rank = 20
 
     def solve(self, puzzle):
-        return super(__nakedN, self).solve(puzzle, 2)
+        return super(nakedTwin, self).solve(puzzle, 2)
 
 class nakedTriple(__nakedN):
 
@@ -71,4 +71,4 @@ class nakedTriple(__nakedN):
         self.rank = 60
 
     def solve(self, puzzle):
-        return super(__nakedN, self).solve(puzzle, 3)
+        return super(nakedTriple, self).solve(puzzle, 3)
