@@ -4,9 +4,6 @@ class __pointingN(Plugin):
 
     def __init__(self):
         self.name = "Pointing N"
-        self.description ='''
-        pass
-        '''
         self.minSize = None
         self.maxSize = None
         self.rank = 0
@@ -67,9 +64,6 @@ class pointingPair(__pointingN):
 
     def __init__(self):
         self.name = "Pointing Pair"
-        self.description ='''
-        pass
-        '''
         self.minSize = None
         self.maxSize = None
         self.rank = 40
@@ -88,9 +82,6 @@ class pointingTriplet(__pointingN):
 
     def __init__(self):
         self.name = "Pointing Triplet"
-        self.description ='''
-        pass
-        '''
         self.minSize = 3
         self.maxSize = None
         self.rank = 80
@@ -109,9 +100,6 @@ class pointingQuad(__pointingN):
 
     def __init__(self):
         self.name = "Pointing Quad"
-        self.description ='''
-        pass
-        '''
         self.minSize = 4
         self.maxSize = None
         self.rank = 90
