@@ -4,9 +4,6 @@ class xWing(Plugin):
 
     def __init__(self):
         self.name = "X-Wing"
-        self.description ='''
-        pass
-        '''
         self.minSize = None
         self.maxSize = None
         self.rank = 120
