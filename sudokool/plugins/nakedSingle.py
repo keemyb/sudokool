@@ -1,13 +1,15 @@
 from sudokool.plugin import Plugin
 
 class nakedSingle(Plugin):
+    '''Naked Single
+
+    This plugin looks for a location in every intersection
+    (e.g. row, column, subGrid) that has only one candidate. If such location is
+    found it's value is set to the value of the remaining candidate.
+    '''
 
     def __init__(self):
         self.name = "Naked Single"
-        self.description ='''
-        This plugin looks in every intersection (e.g. row, column, subGrid) and
-        places a number if only one can exist in that intersection.
-        '''
         self.minSize = None
         self.maxSize = None
         self.rank = 0
