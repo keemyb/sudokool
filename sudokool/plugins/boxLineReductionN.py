@@ -4,9 +4,6 @@ class __boxLineReductionN(Plugin):
 
     def __init__(self):
         self.name = "Box Line Reduction N"
-        self.description ='''
-        pass
-        '''
         self.minSize = None
         self.maxSize = None
         self.rank = 0
@@ -66,9 +63,6 @@ class boxLineReductionPair(__boxLineReductionN):
 
     def __init__(self):
         self.name = "Box Line Reduction Pair"
-        self.description ='''
-        pass
-        '''
         self.minSize = None
         self.maxSize = None
         self.rank = 50
@@ -87,9 +81,6 @@ class boxLineReductionTriplet(__boxLineReductionN):
 
     def __init__(self):
         self.name = "Box Line Reduction Triplet"
-        self.description ='''
-        pass
-        '''
         self.minSize = 3
         self.maxSize = None
         self.rank = 100
@@ -108,9 +99,6 @@ class boxLineReductionQuad(__boxLineReductionN):
 
     def __init__(self):
         self.name = "Box Line Reduction Quad"
-        self.description ='''
-        pass
-        '''
         self.minSize = 4
         self.maxSize = None
         self.rank = 110
