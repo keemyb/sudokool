@@ -602,38 +602,6 @@ class Sudoku(object):
 
 
 
-    def logVariableFormatter(self, *variables):
-
-        seperator = ", "
-
-        formattedVariables = []
-
-        for variable in variables:
-            if hasattr(variable, "__iter__"):
-                for value in variable:
-                    try:
-                        float(value)
-                    except:
-                        formattedVariables.append(variable)
-                        break
-                else:
-                    variable = [str(value) for value in variable]
-                    newVariable = str(seperator).join(variable)
-                    formattedVariables.append(newVariable)
-            else:
-                formattedVariables.append(variable)
-
-        return formattedVariables
-
-    def addToLog(self, string, *variables):
-
-        formattedVariables = self.logVariableFormatter(*variables)
-
-        self.log.append(string.format(*formattedVariables))
-
-
-
-
     def getSubGridStartLocations(self):
         subGridStartLocations = []
 
@@ -1253,6 +1221,38 @@ class Sudoku(object):
 
         for columnToCover in columnsToCover:
             matrix.cover(columnToCover)
+
+
+
+
+    def logVariableFormatter(self, *variables):
+
+        seperator = ", "
+
+        formattedVariables = []
+
+        for variable in variables:
+            if hasattr(variable, "__iter__"):
+                for value in variable:
+                    try:
+                        float(value)
+                    except:
+                        formattedVariables.append(variable)
+                        break
+                else:
+                    variable = [str(value) for value in variable]
+                    newVariable = str(seperator).join(variable)
+                    formattedVariables.append(newVariable)
+            else:
+                formattedVariables.append(variable)
+
+        return formattedVariables
+
+    def addToLog(self, string, *variables):
+
+        formattedVariables = self.logVariableFormatter(*variables)
+
+        self.log.append(string.format(*formattedVariables))
 
 
 
