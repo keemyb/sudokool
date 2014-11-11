@@ -33,6 +33,8 @@ class __pointingN(Plugin):
             if not uniquePointerCandidates:
                 continue
 
+            # linear neighbours are neighbours that are in the same row or
+            # column as the pointing group.
             linearNeighbours = puzzle.neighbourMethods[pointerType](combination[0], *combination)
 
             for location in linearNeighbours:
