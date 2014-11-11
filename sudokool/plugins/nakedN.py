@@ -21,11 +21,16 @@ class __nakedN(Plugin):
 
             for group in puzzle.intersectionTypes[intersectionType]:
 
+                # If the number of locations in a group is not greater than n,
+                # there is nothing to look for.
                 if len(group) <= n:
                     continue
 
                 for combination in puzzle.nLocations(group, n):
 
+                    # Trying every n sized group combination to see if they have
+                    # n candidates in common (which means they will have the
+                    # same candidates).
                     nakedNcandidates = puzzle.allSolvingCandidates(*combination)
 
                     if len(nakedNcandidates) != n:
@@ -35,6 +40,8 @@ class __nakedN(Plugin):
 
                     for surroundingLocation in surroundingLocations:
 
+                        # Removing every candidate from the surrounding
+                        # locations that could be found in the naked n group.
                         removedCandidates = puzzle.removeSolvingCandidates(surroundingLocation, *nakedNcandidates)
 
                         if removedCandidates:
