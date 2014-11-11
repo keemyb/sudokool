@@ -1121,6 +1121,16 @@ class Sudoku(object):
 
                 class_ = getattr(module, className)
                 pluginInstance = class_()
+
+                minSize = pluginInstance.minSize
+                maxSize = pluginInstance.maxSize
+
+                # Don't register plugins not made for this size sudoku
+                if minSize and self.unitSize() < minSize:
+                    continue
+                elif maxSize and self.unitSize() > maxSize:
+                    continue
+
                 self.plugins[pluginInstance.rank] = pluginInstance
 
     def solveMatrix(self, matrix, solutions, random, i=0):
