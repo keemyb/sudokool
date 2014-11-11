@@ -99,7 +99,7 @@ class boxLineReductionTriplet(__boxLineReductionN):
 
     def __init__(self):
         self.name = "Box Line Reduction Triplet"
-        self.minSize = 3
+        self.minSize = 6
         self.maxSize = None
         self.rank = 100
         self.pointers = []
@@ -123,7 +123,7 @@ class boxLineReductionQuad(__boxLineReductionN):
 
     def __init__(self):
         self.name = "Box Line Reduction Quad"
-        self.minSize = 4
+        self.minSize = 8
         self.maxSize = None
         self.rank = 110
         self.pointers = []
