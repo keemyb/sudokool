@@ -1,6 +1,10 @@
 from sudokool.plugin import Plugin
 
 class yWing(Plugin):
+    '''Y-Wing
+
+
+    '''
 
     def __init__(self):
         self.name = "Y-Wing"

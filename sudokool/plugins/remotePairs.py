@@ -1,6 +1,10 @@
 from sudokool.plugin import Plugin
 
 class remotePairs(Plugin):
+    '''Remote Pairs
+
+
+    '''
 
     def __init__(self):
         self.name = "Remote Pairs"
