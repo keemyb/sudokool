@@ -1,12 +1,13 @@
 from sudokool.plugin import Plugin
 
 class swordfish(Plugin):
+    '''Swordfish
+
+
+    '''
 
     def __init__(self):
         self.name = "Swordfish"
-        self.description ='''
-        pass
-        '''
         self.minSize = None
         self.maxSize = None
         self.rank = 130
