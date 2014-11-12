@@ -26,6 +26,20 @@ def factors(n):
 
 
 class Sudoku(object):
+    '''A sudoku puzzle
+
+    A sudoku can use user provided values or it can generate puzzles on the fly.
+
+    Args:
+        data (str): The values that will populate the values of the sudoku. If
+                    no size has been provided than a size must be provided.
+        size (int): The number of rows and columns that a sudoku will have. This
+                    is unecessary if data has been provided.
+        difficulty (float): A number between 0 and 1, higher difficulty values
+                    generate harder sudokus.
+        horizontalSubGrids (boolean): Sets the orientation of subGrids. Defaults
+                    to true.
+    '''
 
     def __init__(self, data=None, size=None, difficulty=None, horizontalSubGrids=True):
         if data is None and size is None:
