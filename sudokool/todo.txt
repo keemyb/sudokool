@@ -1,0 +1,13 @@
+Add a docstring to the following plugins: Swordfish, Y-Wing, XYZ-Wing, Remote
+    Pairs.
+
+Fix distribution of the mask so that rows and columns aren't crowded or empty.
+
+Replace prospective change method with undo.
+
+GUI:
+    Puzzle Selector
+    Eng game state
+    Move highlighting to behind text. (Canvas.before)
+    Move away from gridlayout for cells to prevent having to copy a whole
+        bunch of cells when contents change
