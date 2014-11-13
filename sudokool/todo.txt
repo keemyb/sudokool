@@ -5,6 +5,9 @@ Fix distribution of the mask so that rows and columns aren't crowded or empty.
 
 Replace prospective change method with undo.
 
+Change generate mask so it produces better puzzles (taking into account things
+    such as diagonally adjacent clues)
+
 GUI:
     Puzzle Selector
     Eng game state
