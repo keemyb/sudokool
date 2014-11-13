@@ -347,14 +347,12 @@ class Sudoku(object):
     def generateSudoku(self, difficulty):
         from copy import copy
 
-        solvable = False
-
-        maskValues = None
+        unique = False
 
         blank = self.captureState()
 
-        while not solvable:
-            #reset puzzle if still not solveable
+        while not unique:
+
             self.restoreState(blank)
 
             #generate random puzzle (solving a blank puzzle with random matrix column choices)
@@ -373,11 +371,22 @@ class Sudoku(object):
 
             maskValues = copy(self.values)
 
-            #try to solve, to see if the puzzle is still valid
+            numberOfLocations = len(self.locations())
+
+            reversedValues = {numberOfLocations - location + 1:value for location, value in self.values.iteritems()}
+
+            self.values = reversedValues
+
             self.dancingLinks()
 
-            if self.isComplete():
-                solvable = True
+            reversedValues = {numberOfLocations - location + 1:value for location, value in self.values.iteritems()}
+
+            self.values = reversedValues
+
+            #the puzzle is unique if the same answer has been found in forward
+            #and reverse
+            if self.values == self.solution:
+                unique = True
 
         self.values = maskValues
         self.undoStack = []
