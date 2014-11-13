@@ -169,7 +169,7 @@ class SolveAll(Button):
             if self.MainSwitcher.sudoku.solveMode:
                 self.MainSwitcher.logOutput.logStart = len(self.MainSwitcher.sudoku.log)
 
-                self.MainSwitcher.sudoku.solve(bruteForceOnFail=True)
+                self.MainSwitcher.sudoku.solve(forceSolveOnFail=True)
 
                 self.MainSwitcher.logOutput.update()
 
@@ -420,7 +420,7 @@ class Game(ScreenManager):
             if modifiedLocations:
                 valuesString = "".join([str(self.sudoku.getValue(location)) if self.sudoku.isConstant(location) else "0" for location in self.sudoku.locations()])
                 solvedPuzzle = Sudoku(valuesString)
-                solvedPuzzle.solve(10, bruteForceOnFail=True)
+                solvedPuzzle.solve(10, forceSolveOnFail=True)
 
                 for location in self.sudoku.modifiedLocations():
                     if self.sudoku.getValue(location) != solvedPuzzle.getValue(location):
