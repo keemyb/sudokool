@@ -30,11 +30,11 @@ class swordfish(Plugin):
                 continue
 
             rowCandidates = defaultdict(set)
-            for neighbour in self.swordfishRowNeighbours(group):
+            for neighbour in self.swordfishRowNeighbours(puzzle, group):
                 rowCandidates[puzzle.getRow(neighbour)].union(puzzle.allSolvingCandidates(neighbour))
 
             columnCandidates = defaultdict(set)
-            for neighbour in self.swordfishColumnNeighbours(group):
+            for neighbour in self.swordfishColumnNeighbours(puzzle, group):
                 columnCandidates[puzzle.getColumn(neighbour)].union(puzzle.allSolvingCandidates(neighbour))
 
             for candidate in commonCandidates:
@@ -47,7 +47,7 @@ class swordfish(Plugin):
                     swordfishes[group].append(candidate)
 
         for group, candidates in swordfishes.iteritems():
-            neighbours = self.swordfishNeighbours(group)
+            neighbours = self.swordfishNeighbours(puzzle, group)
 
             for location in neighbours:
 
@@ -164,7 +164,7 @@ class swordfish(Plugin):
 
     def swordfishRowNeighbours(self, puzzle, swordfish):
 
-        rowNeighbours = set([]).union(*[self.rowNeighbours(location) for location in swordfish])
+        rowNeighbours = set([]).union(*[puzzle.rowNeighbours(location) for location in swordfish])
 
         rowNeighbours -= set(swordfish)
 
@@ -172,7 +172,7 @@ class swordfish(Plugin):
 
     def swordfishColumnNeighbours(self, puzzle, swordfish):
 
-        columnNeighbours = set([]).union(*[self.columnNeighbours(location) for location in swordfish])
+        columnNeighbours = set([]).union(*[puzzle.columnNeighbours(location) for location in swordfish])
 
         columnNeighbours -= set(swordfish)
 
@@ -180,5 +180,5 @@ class swordfish(Plugin):
 
     def swordfishNeighbours(self, puzzle, swordfish):
 
-        return self.swordfishRowNeighbours(swordfish).union(
-            self.swordfishColumnNeighbours(swordfish))
+        return self.swordfishRowNeighbours(puzzle, swordfish).union(
+            self.swordfishColumnNeighbours(puzzle, swordfish))
