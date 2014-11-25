@@ -462,8 +462,7 @@ class Sudoku(object):
         currentLevel = availableRanks[0]
         nextMethod = self.plugins[currentLevel]
 
-        self.changes = False
-        nextMethod.solve(self)
+        self.runSolvingMethod(nextMethod)
 
         if self.changes:
             currentLevel = 0
@@ -477,6 +476,29 @@ class Sudoku(object):
                 currentLevel = availableRanks[1]
 
         return self.solve(currentLevel, maxSuccessfulSolveOperations, forceSolveOnFail)
+
+    def undoable(function):
+
+        def wrapper(self, *args, **kwargs):
+
+            self.undoDepth += 1
+
+            if self.undoDepth == 1:
+                currentState = self.captureState()
+                self.addStateToUndo(currentState)
+
+            originalFunctionOutput = function(self, *args, **kwargs)
+
+            self.undoDepth -= 1
+
+            return originalFunctionOutput
+
+        return wrapper
+
+    @undoable
+    def runSolvingMethod(self, method):
+        self.changes = False
+        method.solve(self)
 
 
 
@@ -745,24 +767,6 @@ class Sudoku(object):
 
 
 
-
-    def undoable(function):
-
-        def wrapper(self, *args, **kwargs):
-
-            self.undoDepth += 1
-
-            if self.undoDepth == 1:
-                currentState = self.captureState()
-                self.addStateToUndo(currentState)
-
-            originalFunctionOutput = function(self, *args, **kwargs)
-
-            self.undoDepth -= 1
-
-            return originalFunctionOutput
-
-        return wrapper
 
     def undo(self):
         if not self.undoStack:
