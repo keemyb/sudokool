@@ -81,13 +81,13 @@ class boxLineReductionPair(__boxLineReductionN):
         self.pointers = []
 
     def solve(self, puzzle):
-        return super(boxLineReductionPair, self).solve(puzzle)
+        return super(self.__class__, self).solve(puzzle)
 
     def generatePointerGroups(self, puzzle):
-        return super(boxLineReductionPair, self).generatePointerGroups(puzzle, 2)
+        return super(self.__class__, self).generatePointerGroups(puzzle, 2)
 
     def cleanup(self, puzzle):
-        return super(boxLineReductionPair, self).cleanup(puzzle)
+        return super(self.__class__, self).cleanup(puzzle)
 
 class boxLineReductionTriplet(__boxLineReductionN):
     '''Box Line Reduction Triplet
@@ -105,13 +105,13 @@ class boxLineReductionTriplet(__boxLineReductionN):
         self.pointers = []
 
     def solve(self, puzzle):
-        return super(boxLineReductionTriplet, self).solve(puzzle)
+        return super(self.__class__, self).solve(puzzle)
 
     def generatePointerGroups(self, puzzle):
-        return super(boxLineReductionTriplet, self).generatePointerGroups(puzzle, 3)
+        return super(self.__class__, self).generatePointerGroups(puzzle, 3)
 
     def cleanup(self, puzzle):
-        return super(boxLineReductionTriplet, self).cleanup(puzzle)
+        return super(self.__class__, self).cleanup(puzzle)
 
 class boxLineReductionQuad(__boxLineReductionN):
     '''Box Line Reduction Quad
@@ -129,10 +129,10 @@ class boxLineReductionQuad(__boxLineReductionN):
         self.pointers = []
 
     def solve(self, puzzle):
-        return super(boxLineReductionQuad, self).solve(puzzle)
+        return super(self.__class__, self).solve(puzzle)
 
     def generatePointerGroups(self, puzzle):
-        return super(boxLineReductionQuad, self).generatePointerGroups(puzzle, 4)
+        return super(self.__class__, self).generatePointerGroups(puzzle, 4)
 
     def cleanup(self, puzzle):
-        return super(boxLineReductionQuad, self).cleanup(puzzle)
+        return super(self.__class__, self).cleanup(puzzle)
