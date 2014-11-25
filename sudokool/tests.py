@@ -199,7 +199,7 @@ print len(easy.undoStack)
 # print blank.log
 # blank = Sudoku(size=8)
 # # print blank.generateMask()
-# blank.solve(bruteForceOnFail=True)
+# blank.solve(forceSolveOnFail=True)
 # print blank
 
 # for puzzleNo in [6,7,42,47,48,49,50]:
