@@ -1,3 +1,4 @@
+from unittest import TestCase
 from toroidalLinkedList import toroidalLinkedList
 
 
@@ -12,7 +13,7 @@ def setupFourColumnsWithData():
     newList = setupFourColumns()
     for i, column in enumerate(newList.columns()):
         for j in xrange(1, 4):
-            column.addData(i*3 + j)
+            column.addData(i * 3 + j)
     return newList
 
 
@@ -30,52 +31,48 @@ def setupListWithRows():
     return newList
 
 
-def test_AddColumn():
-    newList = toroidalLinkedList()
-    newList.addColumn("A")
-    return newList.head.right.info == "A"
+class TestToroidalLinkedList(TestCase):
+    def test_AddColumn(self):
+        newList = toroidalLinkedList()
+        newList.addColumn("A")
+        self.assertEquals(newList.head.right.info, "A")
 
 
-def test_AddNodeToColumn():
-    newList = setupFourColumns()
-    newList.firstColumn().addData(1)
-    return newList.firstColumn().down.data == 1 and newList.firstColumn().size == 1
+    def test_AddNodeToColumn(self):
+        newList = setupFourColumns()
+        newList.firstColumn().addData(1)
+        self.assertEquals(newList.firstColumn().down.data, 1)
+        self.assertEquals(newList.firstColumn().size, 1)
 
 
-def test_Cover():
-    newList = setupListWithRows()
-    for column in newList.columns():
-        if column.info == "B":
-            columnB = column
+    def test_Cover(self):
+        newList = setupListWithRows()
+        for column in newList.columns():
+            if column.info == "B":
+                columnB = column
 
-    newList.cover(columnB)
+        newList.cover(columnB)
 
-    contents = []
-    for column in newList.columns():
-        for node in column.nodes():
-            contents.append(node.data)
+        contents = []
+        for column in newList.columns():
+            for node in column.nodes():
+                contents.append(node.data)
 
-    return contents == [2, 3, 7, 9, 10, 11, 12]
+        self.assertEquals(contents, [2, 3, 7, 9, 10, 11, 12])
 
 
-def test_Uncover():
-    newList = setupListWithRows()
-    for column in newList.columns():
-        if column.info == "B":
-            columnB = column
+    def test_Uncover(self):
+        newList = setupListWithRows()
+        for column in newList.columns():
+            if column.info == "B":
+                columnB = column
 
-    newList.cover(columnB)
-    newList.uncover(columnB)
+        newList.cover(columnB)
+        newList.uncover(columnB)
 
-    contents = []
-    for column in newList.columns():
-        for node in column.nodes():
-            contents.append(node.data)
+        contents = []
+        for column in newList.columns():
+            for node in column.nodes():
+                contents.append(node.data)
 
-    return contents == range(1, 13)
-
-if __name__ == "__main__":
-    print test_AddColumn()
-    print test_AddNodeToColumn()
-    print test_Cover()
-    print test_Uncover()
+        self.assertEquals(contents, range(1,13))
