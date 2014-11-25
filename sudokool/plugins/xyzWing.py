@@ -3,7 +3,12 @@ from sudokool.plugin import Plugin
 class xyzWing(Plugin):
     '''XYZ-Wing
 
+    This plugin looks for a group of 3 locations. One location must contain
+    only three candidates (X, Y, Z). It must be aligned with two locations,
+    one of which contain only (X, Z) and one that only contains (Y, Z).
 
+    Any locations that are aligned in either the same row, column and subGrid
+    as all 3 locations cannot contain the candidate Z, so it is removed.
     '''
 
     def __init__(self):

@@ -3,7 +3,23 @@ from sudokool.plugin import Plugin
 class swordfish(Plugin):
     '''Swordfish
 
+    A regular swordfish is a group of 9 locations arranged such that there are
+    3 rows and 3 columns, each containing 3 locations. These locations must
+    A regular swordfish contains 9 locations, 3 in each row and column.
+    If candidate the swordfish has in common does not appear in any of the
+    swordfish columns, that candidate can be removed from every other location
+    in it's rows, and vice versa.
 
+    A regular               Another               One More
+    Swordfish pattern       Swordfish pattern     Swordfish pattern
+    # # #                   # #                   # #
+    # # #                   #   #                 #   #
+    # # #                     # #                 # # #
+
+    Note the swordfish pattern on the middle and right. They are still valid
+    configurations as they cover 3 rows and 3 columns. The below implementation
+    can only find regular swordfishes and those like the middle one where there
+    are two locations in every row and column.
     '''
 
     def __init__(self):

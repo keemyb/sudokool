@@ -3,7 +3,20 @@ from sudokool.plugin import Plugin
 class remotePairs(Plugin):
     '''Remote Pairs
 
+    This plugin looks for a chain of locked pairs that are linked
+    together remotely. (A locked pair is a set of two locations in
+    the same row, column or subGrid, that have two identical
+    candidates).
 
+    The intersection of these ends is then checked to see if it
+    contains one candidate in the locked pair. If this is the case
+    then that candidate is removed.
+
+    Only chains of an even length need to be analysed. If a candidate
+    is the right value for a cell, then the next cell in the chain
+    cannot contain that value, and this pattern alternates.
+    So it follows that the two ends of the chain will have different
+    values.
     '''
 
     def __init__(self):
