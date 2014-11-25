@@ -4,9 +4,6 @@ class simpleColouring(Plugin):
 
     def __init__(self):
         self.name = "Simple Colouring"
-        self.description ='''
-        pass
-        '''
         self.minSize = None
         self.maxSize = None
         self.rank = 150
