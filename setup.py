@@ -8,4 +8,6 @@ setup(name='sudokool',
       author_email='None',
       license='None',
       packages=['sudokool'],
-      zip_safe=False)
+      zip_safe=False,
+      requires=['kivy', 'kivy'],
+      )
