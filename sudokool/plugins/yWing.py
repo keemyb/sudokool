@@ -64,7 +64,7 @@ class yWing(Plugin):
             return
 
         for firstPair in puzzle.nLocations(puzzle.emptyLocations(), 2):
-            yWingResult = self.yWingPairValid(firstPair)
+            yWingResult = self.yWingPairValid(puzzle, firstPair)
             if not yWingResult:
                 continue
 
@@ -78,7 +78,7 @@ class yWing(Plugin):
                 if not any(location in firstPair for location in secondPair):
                     continue
 
-                yWingResult = self.yWingPairValid(secondPair)
+                yWingResult = self.yWingPairValid(puzzle, secondPair)
                 if not yWingResult:
                     continue
 

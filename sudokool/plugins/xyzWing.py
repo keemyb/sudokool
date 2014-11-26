@@ -66,7 +66,7 @@ class xyzWing(Plugin):
             return
 
         for firstPair in puzzle.nLocations(puzzle.emptyLocations(), 2):
-            result = self.xyzWingPairValid(firstPair)
+            result = self.xyzWingPairValid(puzzle, firstPair)
             if not result:
                 continue
 
@@ -81,7 +81,7 @@ class xyzWing(Plugin):
                 if pivot not in secondPair:
                     continue
 
-                result = self.xyzWingPairValid(secondPair)
+                result = self.xyzWingPairValid(puzzle, secondPair)
                 if not result:
                     continue
 
