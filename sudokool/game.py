@@ -19,6 +19,16 @@ from kivy.graphics import Color
 from kivy.graphics import Rectangle
 from kivy.graphics import Line
 
+def nextSquareNumber(n):
+    '''
+    Returns the next square number, or itself if it is a square
+    '''
+    squareRoot = n**0.5
+    if squareRoot == int(squareRoot):
+        return n
+    else:
+        return int(squareRoot+1)**2
+
 class ColourPalette():
     def __init__(self):
         self.colours = {}
@@ -648,7 +658,8 @@ class Game(ScreenManager):
     def candidateWidth(self):
         cellWidth = self.cellWidth()
 
-        widthDivisor = max(self.sudoku.subGridsInRow(), self.sudoku.subGridsInColumn())
+        # Using the square root of the next highest square number, so that the cells don't look cramped.
+        widthDivisor = nextSquareNumber(self.sudoku.unitSize())**0.5
 
         candidateWidth = cellWidth/float(widthDivisor)
 
@@ -795,7 +806,8 @@ class Game(ScreenManager):
     def newEmptyCell(self, location):
         cell = EmptyCell(self)
 
-        cols = max(self.sudoku.subGridsInRow(), self.sudoku.subGridsInColumn())
+        # Using the square root of the next highest square number, so that the cells don't look cramped.
+        cols = int(nextSquareNumber(self.sudoku.unitSize())**0.5)
 
         cell.cols = cols
         cell.candidates = []
