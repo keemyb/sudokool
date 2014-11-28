@@ -258,11 +258,12 @@ class Input(Button):
             self.MainSwitcher.setValue(self.value)
 
             return True
-        
+
 class Cell(Label):
-    def __init__(self, MainSwitcher, **kwargs):
+    def __init__(self, MainSwitcher, location, **kwargs):
         super(Cell, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
+        self.location = location
         self.bind(size=self.update, pos=self.update)
 
     def on_touch_down(self, touch):
@@ -270,6 +271,9 @@ class Cell(Label):
             self.MainSwitcher.selected = self.location
 
             return True
+
+    def update(self, *args):
+        return
 
 class ModifiedCell(Label):
     def __init__(self, MainSwitcher, **kwargs):
@@ -782,9 +786,11 @@ class Game(ScreenManager):
         self.ids.puzzleView.cells = []
 
         for location in self.sudoku.locations():
+            touchCell = Cell(self, location)
             cell = self.newCell(location)
 
             self.ids.puzzleView.add_widget(cell)
+            self.ids.puzzleView.add_widget(touchCell)
             self.ids.puzzleView.cells.append(cell)
 
         self.resizeCells()
