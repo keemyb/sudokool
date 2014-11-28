@@ -258,6 +258,18 @@ class Input(Button):
             self.MainSwitcher.setValue(self.value)
 
             return True
+        
+class Cell(Label):
+    def __init__(self, MainSwitcher, **kwargs):
+        super(Cell, self).__init__(**kwargs)
+        self.MainSwitcher = MainSwitcher
+        self.bind(size=self.update, pos=self.update)
+
+    def on_touch_down(self, touch):
+        if self.collide_point(*touch.pos):
+            self.MainSwitcher.selected = self.location
+
+            return True
 
 class ModifiedCell(Label):
     def __init__(self, MainSwitcher, **kwargs):
