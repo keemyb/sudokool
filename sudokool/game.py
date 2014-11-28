@@ -281,13 +281,6 @@ class ModifiedCell(Label):
         self.MainSwitcher = MainSwitcher
         self.bind(size=self.update, pos=self.update)
 
-    def on_touch_down(self, touch):
-
-        if self.collide_point(*touch.pos):
-            self.MainSwitcher.selected = self.location
-
-            return True
-
     def update(self, *args):
         self.MainSwitcher.paintLabels(self)
 
@@ -303,13 +296,6 @@ class ConstantCell(Label):
         self.MainSwitcher = MainSwitcher
         self.bind(size=self.update, pos=self.update)
 
-    def on_touch_down(self, touch):
-
-        if self.collide_point(*touch.pos):
-            self.MainSwitcher.selected = self.location
-
-            return True
-
     def update(self, *args):
         self.MainSwitcher.paintLabels(self)
 
@@ -324,13 +310,6 @@ class EmptyCell(GridLayout):
         super(EmptyCell, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
         self.bind(size=self.update, pos=self.update)
-
-    def on_touch_down(self, touch):
-
-        if self.collide_point(*touch.pos):
-            self.MainSwitcher.selected = self.location
-
-            return True
 
     def update(self, *args):
         self.MainSwitcher.paintLabels(self)
