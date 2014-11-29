@@ -286,8 +286,6 @@ class ModifiedCell(Label):
 
         self.MainSwitcher.paintBackground(self)
 
-        self.MainSwitcher.paintNeighbourOverlay(self)
-
 class ConstantCell(Label):
     def __init__(self, MainSwitcher, **kwargs):
         super(ConstantCell, self).__init__(**kwargs)
@@ -299,8 +297,6 @@ class ConstantCell(Label):
 
         self.MainSwitcher.paintBackground(self)
 
-        self.MainSwitcher.paintNeighbourOverlay(self)
-
 class EmptyCell(GridLayout):
     def __init__(self, MainSwitcher, **kwargs):
         super(EmptyCell, self).__init__(**kwargs)
@@ -309,8 +305,6 @@ class EmptyCell(GridLayout):
 
     def update(self, *args):
         self.MainSwitcher.paintLabels(self)
-
-        self.MainSwitcher.paintNeighbourOverlay(self)
 
 class Candidate(Label):
     pass
@@ -502,6 +496,7 @@ class Game(ScreenManager):
                 Line(points=topLeftCoords+bottomLeftCoords, width=2)
 
     def paintNeighbourOverlay(self, cell):
+        return
         cell.canvas.after.clear()
         if not self.validSelection():
             return
