@@ -10,6 +10,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import BooleanProperty, NumericProperty, ObjectProperty
 
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.listview import ListView
 
 from kivy.uix.label import Label
@@ -308,6 +309,9 @@ class EmptyCell(GridLayout):
             self.opacity = 1
         else:
             self.opacity = 0
+
+class CellHolder(FloatLayout):
+    pass
 
 class Candidate(Label):
     pass
@@ -749,33 +753,30 @@ class Game(ScreenManager):
         self.ids.puzzleView.emptyCells = []
 
         for location in self.sudoku.locations():
-            cells = self.newCells(location)
-
-            for index, cell in enumerate(cells):
-                self.ids.puzzleView.add_widget(cell)
-                if index == 0:
-                    self.ids.puzzleView.touchCells.append(cell)
-                elif index == 1:
-                    self.ids.puzzleView.constantCells.append(cell)
-                elif index == 2:
-                    self.ids.puzzleView.modifiedCells.append(cell)
-                else:
-                    self.ids.puzzleView.emptyCells.append(cell)
+            cellHolder = self.newCellHolder(location)
+            self.ids.puzzleView.add_widget(cellHolder)
 
         self.resizeCells()
 
-    def newCells(self, location):
+    def newCellHolder(self, location):
+        cellHolder = CellHolder()
         touchCell = Cell(self, location)
         constantCell = self.newFilledCell(location, True)
         modifiedCell = self.newFilledCell(location, False)
         emptyCell = self.newEmptyCell(location)
 
+        self.ids.puzzleView.touchCells.append(touchCell)
+        self.ids.puzzleView.constantCells.append(constantCell)
+        self.ids.puzzleView.modifiedCells.append(modifiedCell)
+        self.ids.puzzleView.emptyCells.append(emptyCell)
+
         for cell in (touchCell, constantCell, modifiedCell, emptyCell):
             cell.location = location
             cell.size = self.cellSize()
             cell.update()
+            cellHolder.add_widget(cell)
 
-        return touchCell, constantCell, modifiedCell, emptyCell
+        return cellHolder
 
     def newFilledCell(self, location, constant):
         if constant:
