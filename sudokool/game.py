@@ -282,8 +282,6 @@ class ModifiedCell(Label):
         self.bind(size=self.update, pos=self.update)
 
     def update(self, *args):
-        self.MainSwitcher.paintLabels(self)
-
         self.MainSwitcher.paintBackground(self)
 
 class ConstantCell(Label):
@@ -293,8 +291,6 @@ class ConstantCell(Label):
         self.bind(size=self.update, pos=self.update)
 
     def update(self, *args):
-        self.MainSwitcher.paintLabels(self)
-
         self.MainSwitcher.paintBackground(self)
 
 class EmptyCell(GridLayout):
@@ -304,7 +300,7 @@ class EmptyCell(GridLayout):
         self.bind(size=self.update, pos=self.update)
 
     def update(self, *args):
-        self.MainSwitcher.paintLabels(self)
+        pass
 
 class Candidate(Label):
     pass
@@ -514,6 +510,7 @@ class Game(ScreenManager):
             Rectangle(size=cell.size, pos=cell.pos)
 
     def paintLabels(self, cell):
+        return
         if self.sudoku.isEmpty(cell.location):
             if self.highlightOccourences and self.validSelection():
                 for candidate in cell.candidates:
