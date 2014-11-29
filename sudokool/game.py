@@ -361,7 +361,7 @@ class Game(ScreenManager):
         else:
             return False
 
-    def updateCells(self, modifiedLocations=None):
+    def updateCells(self):
         self.enforceUndoButtons()
 
         for cell in self.ids.puzzleView.constantCells:
