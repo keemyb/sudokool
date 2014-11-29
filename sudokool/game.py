@@ -288,8 +288,6 @@ class ModifiedCell(Label):
 
         self.MainSwitcher.paintNeighbourOverlay(self)
 
-        self.MainSwitcher.paintBorders(self)
-
 class ConstantCell(Label):
     def __init__(self, MainSwitcher, **kwargs):
         super(ConstantCell, self).__init__(**kwargs)
@@ -303,8 +301,6 @@ class ConstantCell(Label):
 
         self.MainSwitcher.paintNeighbourOverlay(self)
 
-        self.MainSwitcher.paintBorders(self)
-
 class EmptyCell(GridLayout):
     def __init__(self, MainSwitcher, **kwargs):
         super(EmptyCell, self).__init__(**kwargs)
@@ -315,8 +311,6 @@ class EmptyCell(GridLayout):
         self.MainSwitcher.paintLabels(self)
 
         self.MainSwitcher.paintNeighbourOverlay(self)
-
-        self.MainSwitcher.paintBorders(self)
 
 class Candidate(Label):
     pass
@@ -482,7 +476,8 @@ class Game(ScreenManager):
     def on_highlightClashes(self, caller, value):
         self.updateCells()
 
-    def paintBorders(self, cell):
+    def paintBorders(self):
+        return
         #Cell borders
         with cell.canvas.after:
             Color(*self.palette.rgba("cellBorders"))
