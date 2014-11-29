@@ -824,7 +824,7 @@ class Game(ScreenManager):
 
         return cell
 
-    def newCandidateCell(self, value, candidates):
+    def newCandidateCell(self, value):
         candidateCell = Candidate()
         candidateCell.text = str(value)
         candidateCell.value = value
