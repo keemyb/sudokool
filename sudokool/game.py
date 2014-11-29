@@ -391,8 +391,6 @@ class Game(ScreenManager):
             return False
 
     def updateCells(self):
-        self.enforceUndoButtons()
-
         for cell in self.ids.puzzleView.constantCells:
             cell.update()
         for cell in self.ids.puzzleView.modifiedCells:
@@ -588,6 +586,7 @@ class Game(ScreenManager):
                     affectedLocations.add(self.selected)
             else:
                 self.sudoku.toggleUserCandidate(self.selected, value)
+            self.enforceUndoButtons()
             self.updateCells()
 
     def resizePlayModeGrid(self):
