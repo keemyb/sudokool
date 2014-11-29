@@ -284,6 +284,7 @@ class ModifiedCell(Label):
 
     def update(self, *args):
         self.text = str(self.MainSwitcher.sudoku.getValue(self.location))
+        self.MainSwitcher.paintBackground(self)
         self.MainSwitcher.paintFilledNeighbourOverlay(self)
 
         if self.MainSwitcher.sudoku.isModified(self.location):
@@ -300,6 +301,7 @@ class ConstantCell(Label):
         self.bind(size=self.update, pos=self.update)
 
     def update(self, *args):
+        self.MainSwitcher.paintBackground(self)
         self.MainSwitcher.paintFilledNeighbourOverlay(self)
 
         if self.MainSwitcher.sudoku.isConstant(self.location):
@@ -514,6 +516,21 @@ class Game(ScreenManager):
                 Line(points=[0, i*self.cellWidth(),
                              self.ids.puzzleView.height, i*self.cellWidth()],
                      width=2)
+
+    def paintBackground(self, cell):
+        cell.canvas.before.clear()
+        if self.highlightClashes and self.sudoku.isClashing(cell.location):
+            with cell.canvas.before:
+                if isinstance(cell, ConstantCell):
+                    Color(*self.palette.rgba("clashingConstantBack"))
+                else:
+                    Color(*self.palette.rgba("clashingModifiedBack"))
+        else:
+            with cell.canvas.before:
+                Color(*self.palette.rgba("cellBack"))
+
+        with cell.canvas.before:
+            Rectangle(size=cell.size, pos=cell.pos)
 
     def paintFilledNeighbourOverlay(self, cell):
         if not self.validSelection():
