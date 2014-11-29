@@ -97,8 +97,7 @@ class Redo(Button):
         if self.collide_point(*touch.pos):
             if not self.MainSwitcher.solveMode:
                 self.MainSwitcher.sudoku.redo()
-                allLocations = self.MainSwitcher.sudoku.locations()
-                self.MainSwitcher.updateCells(allLocations)
+                self.MainSwitcher.updateCells()
 
             return True
 
@@ -118,8 +117,7 @@ class Undo(Button):
         if self.collide_point(*touch.pos):
             if not self.MainSwitcher.solveMode:
                 self.MainSwitcher.sudoku.undo()
-                allLocations = self.MainSwitcher.sudoku.locations()
-                self.MainSwitcher.updateCells(allLocations)
+                self.MainSwitcher.updateCells()
 
             return True
 
@@ -138,7 +136,7 @@ class ClearLocation(Button):
                 return True
             else:
                 self.MainSwitcher.sudoku.clearLocation(self.MainSwitcher.selected)
-                self.MainSwitcher.updateCells([self.MainSwitcher.selected])
+                self.MainSwitcher.updateCells()
 
                 return True
 
@@ -374,7 +372,7 @@ class Game(ScreenManager):
     def on_updateUserCandidates(self, caller, value):
         if self.updateUserCandidates:
             self.sudoku.updateUserCandidates()
-            self.updateCells(self.sudoku.locations())
+            self.updateCells()
 
     def on_screenSizeChange(self, caller, size):
         self.resizeCells()
@@ -561,13 +559,9 @@ class Game(ScreenManager):
 
                     affectedLocations = self.sudoku.allCombinedNeighbours(self.selected)
                     affectedLocations.add(self.selected)
-
-                    self.updateCells(affectedLocations)
-                else:
-                    self.updateCells([self.selected])
             else:
                 self.sudoku.toggleUserCandidate(self.selected, value)
-                self.updateCells([self.selected])
+            self.updateCells()
 
     def resizePlayModeGrid(self):
 
@@ -780,6 +774,7 @@ class Game(ScreenManager):
         for cell in (constantCell, modifiedCell, emptyCell):
             cell.location = location
             cell.size = self.cellSize()
+            cell.update()
 
         return constantCell, modifiedCell, emptyCell
 
