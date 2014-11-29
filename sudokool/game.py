@@ -352,26 +352,11 @@ class Game(ScreenManager):
     def updateCells(self, modifiedLocations=None):
         self.enforceUndoButtons()
 
-        if self.solveMode:
-            self.ids.puzzleView.clear_widgets()
-            self.initialisePuzzleView()
-        else:
-            unchangedCells = [cell for cell in self.ids.puzzleView.cells if cell.location not in modifiedLocations]
-
-            self.ids.puzzleView.clear_widgets()
-            self.ids.puzzleView.cells = []
-
-            for location in self.sudoku.locations():
-                if location not in modifiedLocations:
-                    cell = unchangedCells[0]
-                    unchangedCells = unchangedCells[1:]
-                else:
-                    cell = self.newCells(location)
-
-                self.ids.puzzleView.add_widget(cell)
-                self.ids.puzzleView.cells.append(cell)
-
-        for cell in self.ids.puzzleView.cells:
+        for cell in self.ids.puzzleView.constantCells:
+            cell.update()
+        for cell in self.ids.puzzleView.modifiedCells:
+            cell.update()
+        for cell in self.ids.puzzleView.emptyCells:
             cell.update()
 
     def on_updateUserCandidates(self, caller, value):
