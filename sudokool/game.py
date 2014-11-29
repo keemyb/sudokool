@@ -478,10 +478,11 @@ class Game(ScreenManager):
         self.updateCells()
 
     def paintBorders(self):
-        #Cell borders
         self.ids.puzzleView.canvas.after.clear()
+        #Cell borders
         with self.ids.puzzleView.canvas.after:
             Color(*self.palette.rgba("cellBorders"))
+
             for i in xrange(1, self.sudoku.unitSize()):
                 Line(points=[i*self.cellWidth(), 0,
                              i*self.cellWidth(), self.ids.puzzleView.height],
@@ -490,25 +491,18 @@ class Game(ScreenManager):
                              self.ids.puzzleView.height, i*self.cellWidth()],
                      width=1)
 
-        return
-
-        topLeftCoords = cell.x, cell.y + cell.height
-        topRightCoords = cell.x + cell.width, cell.y + cell.height
-        bottomRightCoords = cell.x + cell.width, cell.y
-        bottomLeftCoords = cell.x, cell.y
-
         #Subgrid borders
-        with cell.canvas.after:
+        with self.ids.puzzleView.canvas.after:
             Color(*self.palette.rgba("subGridBorders"))
 
-            if self.sudoku.edges[cell.location][0]:
-                Line(points=topLeftCoords+topRightCoords, width=2)
-            elif self.sudoku.edges[cell.location][2]:
-                Line(points=bottomLeftCoords+bottomRightCoords, width=2)
-            if self.sudoku.edges[cell.location][1]:
-                Line(points=topRightCoords+bottomRightCoords, width=2)
-            elif self.sudoku.edges[cell.location][3]:
-                Line(points=topLeftCoords+bottomLeftCoords, width=2)
+            for i in xrange(0, self.sudoku.unitSize()+1, self.sudoku.subGridsInColumn()):
+                Line(points=[i*self.cellWidth(), 0,
+                             i*self.cellWidth(), self.ids.puzzleView.height],
+                     width=2)
+
+                Line(points=[0, i*self.cellWidth(),
+                             self.ids.puzzleView.height, i*self.cellWidth()],
+                     width=2)
 
     def paintNeighbourOverlay(self, cell):
         return
