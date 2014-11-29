@@ -555,6 +555,8 @@ class Game(ScreenManager):
         if not self.validSelection():
             return
 
+        self.paintFilledNeighbourOverlay(cell)
+
         for candidate in cell.candidates:
             candidate.canvas.before.remove(candidate.highlight)
             if self.highlightOccourences and cell.location == self.selected:
@@ -828,6 +830,9 @@ class Game(ScreenManager):
 
         cell.cols = cols
         cell.candidates = []
+
+        with cell.canvas.before:
+            cell.highlight = Color(*self.palette.rgba("noOverlay"))
 
         for value in self.sudoku.setOfPossibleValues:
             candidateCell = self.newCandidateCell(value)
