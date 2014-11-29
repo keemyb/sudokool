@@ -386,10 +386,7 @@ class Game(ScreenManager):
     def on_selected(self, caller, selected):
         self.enforceClearLocationButtonState()
         self.enforceInputButtonState()
-        if not self.validSelection():
-            self.updateCells([])
-        else:
-            self.updateCells([self.selected])
+        self.updateCells()
 
     def on_solveMode(self, caller, selected):
         self.enforceSolveModeText()
