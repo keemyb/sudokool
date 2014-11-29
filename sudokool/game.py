@@ -61,6 +61,8 @@ class ColourPalette():
         self.colours["noOverlay"] = 0, 0, 0, 0
         self.colours["selectedNeighbourOverlay"] = list(self.colours["yellow"][:-1])+[.1]
         self.colours["selectedOverlay"] = list(self.colours["yellow"][:-1])+[.3]
+        self.colours["selectedCandidateNeighbourOverlay"] = list(self.colours["yellow"][:-1])+[.2]
+        self.colours["selectedCandidateOverlay"] = list(self.colours["yellow"][:-1])+[.4]
 
         self.colours["cellBorders"] = self.colours["black"]
         self.colours["subGridBorders"] = self.colours["black"]
@@ -536,10 +538,10 @@ class Game(ScreenManager):
                 candidate.canvas.before.remove(candidate.highlight)
                 if cell.location == self.selected:
                     with candidate.canvas.before:
-                        candidate.highlight = Color(*self.palette.rgba("selectedOverlay"))
+                        candidate.highlight = Color(*self.palette.rgba("selectedCandidateOverlay"))
                 elif cell.location in self.sudoku.allCombinedNeighbours(self.selected):
                     with candidate.canvas.before:
-                        candidate.highlight = Color(*self.palette.rgba("selectedNeighbourOverlay"))
+                        candidate.highlight = Color(*self.palette.rgba("selectedCandidateNeighbourOverlay"))
                 else:
                     with candidate.canvas.before:
                         candidate.highlight = Color(*self.palette.rgba("noOverlay"))
