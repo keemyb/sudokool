@@ -281,6 +281,7 @@ class ModifiedCell(Label):
         self.bind(size=self.update, pos=self.update)
 
     def update(self, *args):
+        self.text = str(self.MainSwitcher.sudoku.getValue(self.location))
         if self.MainSwitcher.sudoku.isModified(self.location):
             self.opacity = 1
         else:
