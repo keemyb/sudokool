@@ -311,7 +311,12 @@ class EmptyCell(GridLayout):
             self.opacity = 0
 
 class CellHolder(ScatterLayout):
-    pass
+    def __init__(self, **kwargs):
+        super(CellHolder, self).__init__(**kwargs)
+        self.auto_bring_to_front = False
+        self.do_rotation = False
+        self.do_scale = False
+        self.do_translation = False
 
 class Candidate(Label):
     pass
