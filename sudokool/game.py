@@ -395,6 +395,7 @@ class Game(ScreenManager):
     def on_screenSizeChange(self, caller, size):
         self.resizeCells()
         self.gameScreenGridOrient()
+        self.paintBorders()
         if not self.solveMode:
             self.resizePlayModeGrid()
             self.miscButtonsOrient()
@@ -477,11 +478,19 @@ class Game(ScreenManager):
         self.updateCells()
 
     def paintBorders(self):
-        return
         #Cell borders
-        with cell.canvas.after:
+        self.ids.puzzleView.canvas.after.clear()
+        with self.ids.puzzleView.canvas.after:
             Color(*self.palette.rgba("cellBorders"))
-            Line(rectangle=[cell.x, cell.y, cell.width, cell.height], width=1)
+            for i in xrange(1, self.sudoku.unitSize()):
+                Line(points=[i*self.cellWidth(), 0,
+                             i*self.cellWidth(), self.ids.puzzleView.height],
+                     width=1)
+                Line(points=[0, i*self.cellWidth(),
+                             self.ids.puzzleView.height, i*self.cellWidth()],
+                     width=1)
+
+        return
 
         topLeftCoords = cell.x, cell.y + cell.height
         topRightCoords = cell.x + cell.width, cell.y + cell.height
