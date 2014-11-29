@@ -284,7 +284,7 @@ class ModifiedCell(Label):
 
     def update(self, *args):
         self.text = str(self.MainSwitcher.sudoku.getValue(self.location))
-        self.MainSwitcher.paintNeighbourOverlay(self)
+        self.MainSwitcher.paintFilledNeighbourOverlay(self)
 
         if self.MainSwitcher.sudoku.isModified(self.location):
             self.opacity = 1
@@ -300,7 +300,7 @@ class ConstantCell(Label):
         self.bind(size=self.update, pos=self.update)
 
     def update(self, *args):
-        self.MainSwitcher.paintNeighbourOverlay(self)
+        self.MainSwitcher.paintFilledNeighbourOverlay(self)
 
         if self.MainSwitcher.sudoku.isConstant(self.location):
             self.opacity = 1
@@ -315,7 +315,7 @@ class EmptyCell(GridLayout):
         self.bind(size=self.update, pos=self.update)
 
     def update(self, *args):
-        self.MainSwitcher.paintNeighbourOverlay(self)
+        self.MainSwitcher.paintEmptyNeighbourOverlay(self)
 
         if self.MainSwitcher.solveMode:
             candidates = self.MainSwitcher.sudoku.allSolvingCandidates(self.location)
@@ -515,39 +515,42 @@ class Game(ScreenManager):
                              self.ids.puzzleView.height, i*self.cellWidth()],
                      width=2)
 
-    def paintNeighbourOverlay(self, cell):
+    def paintFilledNeighbourOverlay(self, cell):
         if not self.validSelection():
             return
 
-        if isinstance(cell, ConstantCell) or isinstance(cell, ModifiedCell):
-            cell.canvas.before.remove(cell.highlight)
-            if cell.location == self.selected:
-                with cell.canvas.before:
-                    cell.highlight = Color(*self.palette.rgba("selectedOverlay"))
-            elif cell.location in self.sudoku.allCombinedNeighbours(self.selected):
-                with cell.canvas.before:
-                    cell.highlight = Color(*self.palette.rgba("selectedNeighbourOverlay"))
-            else:
-                with cell.canvas.before:
-                    cell.highlight = Color(*self.palette.rgba("noOverlay"))
-
+        cell.canvas.before.remove(cell.highlight)
+        if cell.location == self.selected:
             with cell.canvas.before:
-                Rectangle(size=cell.size, pos=cell.pos)
+                cell.highlight = Color(*self.palette.rgba("selectedOverlay"))
+        elif cell.location in self.sudoku.allCombinedNeighbours(self.selected):
+            with cell.canvas.before:
+                cell.highlight = Color(*self.palette.rgba("selectedNeighbourOverlay"))
         else:
-            for candidate in cell.candidates:
-                candidate.canvas.before.remove(candidate.highlight)
-                if cell.location == self.selected:
-                    with candidate.canvas.before:
-                        candidate.highlight = Color(*self.palette.rgba("selectedCandidateOverlay"))
-                elif cell.location in self.sudoku.allCombinedNeighbours(self.selected):
-                    with candidate.canvas.before:
-                        candidate.highlight = Color(*self.palette.rgba("selectedCandidateNeighbourOverlay"))
-                else:
-                    with candidate.canvas.before:
-                        candidate.highlight = Color(*self.palette.rgba("noOverlay"))
+            with cell.canvas.before:
+                cell.highlight = Color(*self.palette.rgba("noOverlay"))
 
+        with cell.canvas.before:
+            Rectangle(size=cell.size, pos=cell.pos)
+
+    def paintEmptyNeighbourOverlay(self, cell):
+        if not self.validSelection():
+            return
+
+        for candidate in cell.candidates:
+            candidate.canvas.before.remove(candidate.highlight)
+            if cell.location == self.selected:
                 with candidate.canvas.before:
-                    Rectangle(size=candidate.size, pos=candidate.pos)
+                    candidate.highlight = Color(*self.palette.rgba("selectedCandidateOverlay"))
+            elif cell.location in self.sudoku.allCombinedNeighbours(self.selected):
+                with candidate.canvas.before:
+                    candidate.highlight = Color(*self.palette.rgba("selectedCandidateNeighbourOverlay"))
+            else:
+                with candidate.canvas.before:
+                    candidate.highlight = Color(*self.palette.rgba("noOverlay"))
+
+            with candidate.canvas.before:
+                Rectangle(size=candidate.size, pos=candidate.pos)
 
     def setValue(self, value):
         if not self.validSelection():
