@@ -633,7 +633,7 @@ class Game(ScreenManager):
         if self.sudoku is None:
             return
 
-        for cell in self.ids.puzzleView.cells:
+        def resize(cell):
             cell.size = self.cellSize()
             cell.font_size = self.cellWidth() * self.padDecimal
 
@@ -641,6 +641,13 @@ class Game(ScreenManager):
                 for candidate in cell.candidates:
                     candidate.size = self.candidateSize()
                     candidate.font_size = self.candidateWidth() * self.padDecimal
+
+        for cell in self.ids.puzzleView.constantCells:
+            resize(cell)
+        for cell in self.ids.puzzleView.modifiedCells:
+            resize(cell)
+        for cell in self.ids.puzzleView.emptyCells:
+            resize(cell)
 
         self.ids.puzzleView.size = [self.cellWidth() * self.sudoku.unitSize()] * 2
 
