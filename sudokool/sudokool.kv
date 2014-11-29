@@ -1,5 +1,5 @@
 #: import sm kivy.uix.screenmanager
-#: import palette game.ColourPalette
+#: import palette sudokool.game.ColourPalette
 
 <Game>:
     id: MainSwitcher
@@ -144,16 +144,6 @@
     canvas.before:
         Color:
             rgba: palette().rgba("candidateBack")
-        Rectangle:
-            pos: self.pos
-            size: self.size
-
-<EmptyCandidate@Label>:
-    size_hint: None, None
-
-    canvas.before:
-        Color:
-            rgba: palette().rgba("cellBack")
         Rectangle:
             pos: self.pos
             size: self.size

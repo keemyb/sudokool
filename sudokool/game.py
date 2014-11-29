@@ -10,6 +10,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import BooleanProperty, NumericProperty, ObjectProperty
 
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.scatterlayout import ScatterLayout
 from kivy.uix.listview import ListView
 
 from kivy.uix.label import Label
@@ -60,6 +61,8 @@ class ColourPalette():
         self.colours["noOverlay"] = 0, 0, 0, 0
         self.colours["selectedNeighbourOverlay"] = list(self.colours["yellow"][:-1])+[.1]
         self.colours["selectedOverlay"] = list(self.colours["yellow"][:-1])+[.3]
+        self.colours["selectedCandidateNeighbourOverlay"] = list(self.colours["yellow"][:-1])+[.2]
+        self.colours["selectedCandidateOverlay"] = list(self.colours["yellow"][:-1])+[.4]
 
         self.colours["cellBorders"] = self.colours["black"]
         self.colours["subGridBorders"] = self.colours["black"]
@@ -97,8 +100,7 @@ class Redo(Button):
         if self.collide_point(*touch.pos):
             if not self.MainSwitcher.solveMode:
                 self.MainSwitcher.sudoku.redo()
-                allLocations = self.MainSwitcher.sudoku.locations()
-                self.MainSwitcher.updateCells(allLocations)
+                self.MainSwitcher.updateCells()
 
             return True
 
@@ -118,8 +120,7 @@ class Undo(Button):
         if self.collide_point(*touch.pos):
             if not self.MainSwitcher.solveMode:
                 self.MainSwitcher.sudoku.undo()
-                allLocations = self.MainSwitcher.sudoku.locations()
-                self.MainSwitcher.updateCells(allLocations)
+                self.MainSwitcher.updateCells()
 
             return True
 
@@ -138,7 +139,7 @@ class ClearLocation(Button):
                 return True
             else:
                 self.MainSwitcher.sudoku.clearLocation(self.MainSwitcher.selected)
-                self.MainSwitcher.updateCells([self.MainSwitcher.selected])
+                self.MainSwitcher.updateCells()
 
                 return True
 
@@ -259,27 +260,39 @@ class Input(Button):
 
             return True
 
-class ModifiedCell(Label):
-    def __init__(self, MainSwitcher, **kwargs):
-        super(ModifiedCell, self).__init__(**kwargs)
+class Cell(Label):
+    def __init__(self, MainSwitcher, location, **kwargs):
+        super(Cell, self).__init__(**kwargs)
         self.MainSwitcher = MainSwitcher
+        self.location = location
         self.bind(size=self.update, pos=self.update)
 
     def on_touch_down(self, touch):
-
         if self.collide_point(*touch.pos):
             self.MainSwitcher.selected = self.location
 
             return True
 
     def update(self, *args):
-        self.MainSwitcher.paintLabels(self)
+        return
 
+class ModifiedCell(Label):
+    def __init__(self, MainSwitcher, **kwargs):
+        super(ModifiedCell, self).__init__(**kwargs)
+        self.MainSwitcher = MainSwitcher
+        self.bind(size=self.update, pos=self.update)
+
+    def update(self, *args):
+        self.text = str(self.MainSwitcher.sudoku.getValue(self.location))
         self.MainSwitcher.paintBackground(self)
+        self.MainSwitcher.paintFilledNeighbourOverlay(self)
 
-        self.MainSwitcher.paintNeighbourOverlay(self)
+        if self.MainSwitcher.sudoku.isModified(self.location):
+            self.opacity = 1
+        else:
+            self.opacity = 0
 
-        self.MainSwitcher.paintBorders(self)
+
 
 class ConstantCell(Label):
     def __init__(self, MainSwitcher, **kwargs):
@@ -287,21 +300,15 @@ class ConstantCell(Label):
         self.MainSwitcher = MainSwitcher
         self.bind(size=self.update, pos=self.update)
 
-    def on_touch_down(self, touch):
-
-        if self.collide_point(*touch.pos):
-            self.MainSwitcher.selected = self.location
-
-            return True
-
     def update(self, *args):
-        self.MainSwitcher.paintLabels(self)
-
         self.MainSwitcher.paintBackground(self)
+        self.MainSwitcher.paintFilledNeighbourOverlay(self)
 
-        self.MainSwitcher.paintNeighbourOverlay(self)
+        if self.MainSwitcher.sudoku.isConstant(self.location):
+            self.opacity = 1
+        else:
+            self.opacity = 0
 
-        self.MainSwitcher.paintBorders(self)
 
 class EmptyCell(GridLayout):
     def __init__(self, MainSwitcher, **kwargs):
@@ -309,19 +316,32 @@ class EmptyCell(GridLayout):
         self.MainSwitcher = MainSwitcher
         self.bind(size=self.update, pos=self.update)
 
-    def on_touch_down(self, touch):
-
-        if self.collide_point(*touch.pos):
-            self.MainSwitcher.selected = self.location
-
-            return True
-
     def update(self, *args):
-        self.MainSwitcher.paintLabels(self)
+        self.MainSwitcher.paintEmptyNeighbourOverlay(self)
 
-        self.MainSwitcher.paintNeighbourOverlay(self)
+        if self.MainSwitcher.solveMode:
+            candidates = self.MainSwitcher.sudoku.allSolvingCandidates(self.location)
+        else:
+            candidates = self.MainSwitcher.sudoku.userCandidates(self.location)
 
-        self.MainSwitcher.paintBorders(self)
+        for candidate in self.candidates:
+            if candidate.value in candidates:
+                candidate.opacity = 1
+            else:
+                candidate.opacity = 0
+
+        if self.MainSwitcher.sudoku.isEmpty(self.location):
+            self.opacity = 1
+        else:
+            self.opacity = 0
+
+class CellHolder(ScatterLayout):
+    def __init__(self, **kwargs):
+        super(CellHolder, self).__init__(**kwargs)
+        self.auto_bring_to_front = False
+        self.do_rotation = False
+        self.do_scale = False
+        self.do_translation = False
 
 class Candidate(Label):
     pass
@@ -370,39 +390,23 @@ class Game(ScreenManager):
         else:
             return False
 
-    def updateCells(self, modifiedLocations=None):
-        self.enforceUndoButtons()
-
-        if self.solveMode:
-            self.ids.puzzleView.clear_widgets()
-            self.initialisePuzzleView()
-        else:
-            unchangedCells = [cell for cell in self.ids.puzzleView.cells if cell.location not in modifiedLocations]
-
-            self.ids.puzzleView.clear_widgets()
-            self.ids.puzzleView.cells = []
-
-            for location in self.sudoku.locations():
-                if location not in modifiedLocations:
-                    cell = unchangedCells[0]
-                    unchangedCells = unchangedCells[1:]
-                else:
-                    cell = self.newCell(location)
-
-                self.ids.puzzleView.add_widget(cell)
-                self.ids.puzzleView.cells.append(cell)
-
-        for cell in self.ids.puzzleView.cells:
+    def updateCells(self):
+        for cell in self.ids.puzzleView.constantCells:
+            cell.update()
+        for cell in self.ids.puzzleView.modifiedCells:
+            cell.update()
+        for cell in self.ids.puzzleView.emptyCells:
             cell.update()
 
     def on_updateUserCandidates(self, caller, value):
         if self.updateUserCandidates:
             self.sudoku.updateUserCandidates()
-            self.updateCells(self.sudoku.locations())
+            self.updateCells()
 
     def on_screenSizeChange(self, caller, size):
         self.resizeCells()
         self.gameScreenGridOrient()
+        self.paintBorders()
         if not self.solveMode:
             self.resizePlayModeGrid()
             self.miscButtonsOrient()
@@ -410,10 +414,7 @@ class Game(ScreenManager):
     def on_selected(self, caller, selected):
         self.enforceClearLocationButtonState()
         self.enforceInputButtonState()
-        if not self.validSelection():
-            self.updateCells([])
-        else:
-            self.updateCells([self.selected])
+        self.updateCells()
 
     def on_solveMode(self, caller, selected):
         self.enforceSolveModeText()
@@ -487,89 +488,88 @@ class Game(ScreenManager):
     def on_highlightClashes(self, caller, value):
         self.updateCells()
 
-    def paintBorders(self, cell):
+    def paintBorders(self):
+        self.ids.puzzleView.canvas.after.clear()
         #Cell borders
-        with cell.canvas.after:
+        with self.ids.puzzleView.canvas.after:
             Color(*self.palette.rgba("cellBorders"))
-            Line(rectangle=[cell.x, cell.y, cell.width, cell.height], width=1)
 
-        topLeftCoords = cell.x, cell.y + cell.height
-        topRightCoords = cell.x + cell.width, cell.y + cell.height
-        bottomRightCoords = cell.x + cell.width, cell.y
-        bottomLeftCoords = cell.x, cell.y
+            for i in xrange(1, self.sudoku.unitSize()):
+                Line(points=[i*self.cellWidth(), 0,
+                             i*self.cellWidth(), self.ids.puzzleView.height],
+                     width=1)
+                Line(points=[0, i*self.cellWidth(),
+                             self.ids.puzzleView.height, i*self.cellWidth()],
+                     width=1)
 
         #Subgrid borders
-        with cell.canvas.after:
+        with self.ids.puzzleView.canvas.after:
             Color(*self.palette.rgba("subGridBorders"))
 
-            if self.sudoku.edges[cell.location][0]:
-                Line(points=topLeftCoords+topRightCoords, width=2)
-            elif self.sudoku.edges[cell.location][2]:
-                Line(points=bottomLeftCoords+bottomRightCoords, width=2)
-            if self.sudoku.edges[cell.location][1]:
-                Line(points=topRightCoords+bottomRightCoords, width=2)
-            elif self.sudoku.edges[cell.location][3]:
-                Line(points=topLeftCoords+bottomLeftCoords, width=2)
+            for i in xrange(0, self.sudoku.unitSize()+1, self.sudoku.subGridsInColumn()):
+                Line(points=[i*self.cellWidth(), 0,
+                             i*self.cellWidth(), self.ids.puzzleView.height],
+                     width=2)
 
-    def paintNeighbourOverlay(self, cell):
-        cell.canvas.after.clear()
-        if not self.validSelection():
-            return
-        if cell.location == self.selected:
-            with cell.canvas.after:
-                cell.highlight = Color(*self.palette.rgba("selectedOverlay"))
-        elif cell.location in self.sudoku.allCombinedNeighbours(self.selected):
-            with cell.canvas.after:
-                cell.highlight = Color(*self.palette.rgba("selectedNeighbourOverlay"))
-        else:
-            with cell.canvas.after:
-                cell.highlight = Color(*self.palette.rgba("noOverlay"))
-
-        with cell.canvas.after:
-            Rectangle(size=cell.size, pos=cell.pos)
-
-    def paintLabels(self, cell):
-        if self.sudoku.isEmpty(cell.location):
-            if self.highlightOccourences and self.validSelection():
-                for candidate in cell.candidates:
-                    if candidate.value == self.sudoku.getValue(self.selected):
-                        candidate.color = self.palette.rgba("occourenceText")
-                    else:
-                        candidate.color = self.palette.rgba("candidateText")
-            else:
-                for candidate in cell.candidates:
-                    candidate.color = self.palette.rgba("candidateText")
-            return
-
-        if self.sudoku.isConstant(cell.location):
-            normalText = "constantText"
-        else:
-            normalText = "modifiedText"
-
-        if self.highlightOccourences and self.validSelection():
-            if cell.value == self.sudoku.getValue(self.selected):
-                cell.color = self.palette.rgba("occourenceText")
-            else:
-                cell.color = self.palette.rgba(normalText)
-        else:
-            cell.color = self.palette.rgba(normalText)
+                Line(points=[0, i*self.cellWidth(),
+                             self.ids.puzzleView.height, i*self.cellWidth()],
+                     width=2)
 
     def paintBackground(self, cell):
-        if self.sudoku.isConstant(cell.location):
-            modifiedBack = "clashingConstantBack"
-        else:
-            modifiedBack = "clashingModifiedBack"
-
         cell.canvas.before.clear()
         if self.highlightClashes and self.sudoku.isClashing(cell.location):
             with cell.canvas.before:
-                Color(*self.palette.rgba(modifiedBack))
+                if isinstance(cell, ConstantCell):
+                    Color(*self.palette.rgba("clashingConstantBack"))
+                else:
+                    Color(*self.palette.rgba("clashingModifiedBack"))
         else:
             with cell.canvas.before:
                 Color(*self.palette.rgba("cellBack"))
 
         with cell.canvas.before:
             Rectangle(size=cell.size, pos=cell.pos)
+
+    def paintFilledNeighbourOverlay(self, cell):
+        if not self.validSelection():
+            return
+
+        cell.canvas.before.remove(cell.highlight)
+        if self.highlightOccourences and cell.location == self.selected:
+            with cell.canvas.before:
+                cell.highlight = Color(*self.palette.rgba("selectedOverlay"))
+        elif self.highlightOccourences and \
+                        cell.location in self.sudoku.allCombinedNeighbours(self.selected):
+            with cell.canvas.before:
+                cell.highlight = Color(*self.palette.rgba("selectedNeighbourOverlay"))
+        else:
+            with cell.canvas.before:
+                cell.highlight = Color(*self.palette.rgba("noOverlay"))
+
+        with cell.canvas.before:
+            Rectangle(size=cell.size, pos=cell.pos)
+
+    def paintEmptyNeighbourOverlay(self, cell):
+        if not self.validSelection():
+            return
+
+        self.paintFilledNeighbourOverlay(cell)
+
+        for candidate in cell.candidates:
+            candidate.canvas.before.remove(candidate.highlight)
+            if self.highlightOccourences and cell.location == self.selected:
+                with candidate.canvas.before:
+                    candidate.highlight = Color(*self.palette.rgba("selectedCandidateOverlay"))
+            elif self.highlightOccourences and \
+                            cell.location in self.sudoku.allCombinedNeighbours(self.selected):
+                with candidate.canvas.before:
+                    candidate.highlight = Color(*self.palette.rgba("selectedCandidateNeighbourOverlay"))
+            else:
+                with candidate.canvas.before:
+                    candidate.highlight = Color(*self.palette.rgba("noOverlay"))
+
+            with candidate.canvas.before:
+                Rectangle(size=candidate.size, pos=candidate.pos)
 
     def setValue(self, value):
         if not self.validSelection():
@@ -582,15 +582,11 @@ class Game(ScreenManager):
                 if self.updateUserCandidates:
                     self.sudoku.updateUserCandidates()
 
-                    affectedLocations = self.sudoku.allCombinedNeighbours(self.selected)
-                    affectedLocations.add(self.selected)
-
-                    self.updateCells(affectedLocations)
-                else:
-                    self.updateCells([self.selected])
             else:
                 self.sudoku.toggleUserCandidate(self.selected, value)
-                self.updateCells([self.selected])
+
+            self.enforceUndoButtons()
+            self.updateCells()
 
     def resizePlayModeGrid(self):
 
@@ -638,16 +634,25 @@ class Game(ScreenManager):
         if self.sudoku is None:
             return
 
-        for cell in self.ids.puzzleView.cells:
+        def resize(cell, empty):
             cell.size = self.cellSize()
             cell.font_size = self.cellWidth() * self.padDecimal
 
-            if self.sudoku.isEmpty(cell.location):
+            if empty:
                 for candidate in cell.candidates:
                     candidate.size = self.candidateSize()
                     candidate.font_size = self.candidateWidth() * self.padDecimal
+        for cell in self.ids.puzzleView.touchCells:
+            resize(cell, False)
+        for cell in self.ids.puzzleView.constantCells:
+            resize(cell, False)
+        for cell in self.ids.puzzleView.modifiedCells:
+            resize(cell, False)
+        for cell in self.ids.puzzleView.emptyCells:
+            resize(cell, True)
 
         self.ids.puzzleView.size = [self.cellWidth() * self.sudoku.unitSize()] * 2
+        self.updateCells()
 
     def cellWidth(self):
         windowWidth = min(Window.size)
@@ -767,28 +772,38 @@ class Game(ScreenManager):
         self.ids.puzzleView.size_hint = None, None
         self.ids.puzzleView.size = [self.cellWidth() * self.sudoku.unitSize()] * 2
 
-        self.ids.puzzleView.cells = []
+        self.ids.puzzleView.touchCells = []
+        self.ids.puzzleView.constantCells = []
+        self.ids.puzzleView.modifiedCells = []
+        self.ids.puzzleView.emptyCells = []
+
+        cellSize = self.cellSize()
 
         for location in self.sudoku.locations():
-            cell = self.newCell(location)
-
-            self.ids.puzzleView.add_widget(cell)
-            self.ids.puzzleView.cells.append(cell)
+            cellHolder = self.newCellHolder(location, cellSize)
+            self.ids.puzzleView.add_widget(cellHolder)
 
         self.resizeCells()
 
-    def newCell(self, location):
-        if self.sudoku.isConstant(location):
-            newCell = self.newFilledCell(location, True)
-        elif self.sudoku.isModified(location):
-            newCell = self.newFilledCell(location, False)
-        else:
-            newCell = self.newEmptyCell(location)
+    def newCellHolder(self, location, cellSize):
+        cellHolder = CellHolder(size=cellSize)
+        touchCell = Cell(self, location)
+        constantCell = self.newFilledCell(location, True)
+        modifiedCell = self.newFilledCell(location, False)
+        emptyCell = self.newEmptyCell(location)
 
-        newCell.location = location
-        newCell.size = self.cellSize()
+        self.ids.puzzleView.touchCells.append(touchCell)
+        self.ids.puzzleView.constantCells.append(constantCell)
+        self.ids.puzzleView.modifiedCells.append(modifiedCell)
+        self.ids.puzzleView.emptyCells.append(emptyCell)
 
-        return newCell
+        for cell in (touchCell, constantCell, modifiedCell, emptyCell):
+            cell.location = location
+            cell.size = self.cellSize()
+            cell.update()
+            cellHolder.add_widget(cell)
+
+        return cellHolder
 
     def newFilledCell(self, location, constant):
         if constant:
@@ -797,6 +812,9 @@ class Game(ScreenManager):
             cell = ModifiedCell(self)
 
         cell.font_size = self.cellWidth() * self.padDecimal
+
+        with cell.canvas.before:
+            cell.highlight = Color(*self.palette.rgba("noOverlay"))
 
         cell.value = self.sudoku.getValue(location)
         cell.text = str(cell.value)
@@ -812,27 +830,24 @@ class Game(ScreenManager):
         cell.cols = cols
         cell.candidates = []
 
-        if self.solveMode:
-            candidates = self.sudoku.allSolvingCandidates(location)
-        else:
-            candidates = self.sudoku.userCandidates(location)
+        with cell.canvas.before:
+            cell.highlight = Color(*self.palette.rgba("noOverlay"))
 
         for value in self.sudoku.setOfPossibleValues:
-            candidateCell = self.newCandidateCell(value, candidates)
+            candidateCell = self.newCandidateCell(value)
 
             cell.add_widget(candidateCell)
             cell.candidates.append(candidateCell)
 
         return cell
 
-    def newCandidateCell(self, value, candidates):
-        if value in candidates:
-            candidateCell = Candidate()
-            candidateCell.text = str(value)
-            candidateCell.value = value
-        else:
-            candidateCell = EmptyCandidate()
-            candidateCell.value = 0
+    def newCandidateCell(self, value):
+        candidateCell = Candidate()
+        candidateCell.text = str(value)
+        candidateCell.value = value
+
+        with candidateCell.canvas.before:
+            candidateCell.highlight = Color(*self.palette.rgba("noOverlay"))
 
         candidateCell.size = self.candidateSize()
         candidateCell.font_size = self.candidateWidth() * self.padDecimal
