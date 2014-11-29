@@ -282,12 +282,13 @@ class ModifiedCell(Label):
 
     def update(self, *args):
         self.text = str(self.MainSwitcher.sudoku.getValue(self.location))
+        self.MainSwitcher.paintNeighbourOverlay(self)
+
         if self.MainSwitcher.sudoku.isModified(self.location):
             self.opacity = 1
         else:
             self.opacity = 0
 
-        self.MainSwitcher.paintNeighbourOverlay(self)
 
 
 class ConstantCell(Label):
@@ -297,12 +298,13 @@ class ConstantCell(Label):
         self.bind(size=self.update, pos=self.update)
 
     def update(self, *args):
+        self.MainSwitcher.paintNeighbourOverlay(self)
+
         if self.MainSwitcher.sudoku.isConstant(self.location):
             self.opacity = 1
         else:
             self.opacity = 0
 
-        self.MainSwitcher.paintNeighbourOverlay(self)
 
 class EmptyCell(GridLayout):
     def __init__(self, MainSwitcher, **kwargs):
@@ -311,6 +313,8 @@ class EmptyCell(GridLayout):
         self.bind(size=self.update, pos=self.update)
 
     def update(self, *args):
+        self.MainSwitcher.paintNeighbourOverlay(self)
+
         if self.MainSwitcher.solveMode:
             candidates = self.MainSwitcher.sudoku.allSolvingCandidates(self.location)
         else:
@@ -510,21 +514,38 @@ class Game(ScreenManager):
                      width=2)
 
     def paintNeighbourOverlay(self, cell):
-        cell.canvas.after.clear()
         if not self.validSelection():
             return
-        if cell.location == self.selected:
-            with cell.canvas.after:
-                cell.highlight = Color(*self.palette.rgba("selectedOverlay"))
-        elif cell.location in self.sudoku.allCombinedNeighbours(self.selected):
-            with cell.canvas.after:
-                cell.highlight = Color(*self.palette.rgba("selectedNeighbourOverlay"))
-        else:
-            with cell.canvas.after:
-                cell.highlight = Color(*self.palette.rgba("noOverlay"))
 
-        with cell.canvas.after:
-            Rectangle(size=cell.size, pos=cell.pos)
+        if isinstance(cell, ConstantCell) or isinstance(cell, ModifiedCell):
+            cell.canvas.before.remove(cell.highlight)
+            if cell.location == self.selected:
+                with cell.canvas.before:
+                    cell.highlight = Color(*self.palette.rgba("selectedOverlay"))
+            elif cell.location in self.sudoku.allCombinedNeighbours(self.selected):
+                with cell.canvas.before:
+                    cell.highlight = Color(*self.palette.rgba("selectedNeighbourOverlay"))
+            else:
+                with cell.canvas.before:
+                    cell.highlight = Color(*self.palette.rgba("noOverlay"))
+
+            with cell.canvas.before:
+                Rectangle(size=cell.size, pos=cell.pos)
+        else:
+            for candidate in cell.candidates:
+                candidate.canvas.before.remove(candidate.highlight)
+                if cell.location == self.selected:
+                    with candidate.canvas.before:
+                        candidate.highlight = Color(*self.palette.rgba("selectedOverlay"))
+                elif cell.location in self.sudoku.allCombinedNeighbours(self.selected):
+                    with candidate.canvas.before:
+                        candidate.highlight = Color(*self.palette.rgba("selectedNeighbourOverlay"))
+                else:
+                    with candidate.canvas.before:
+                        candidate.highlight = Color(*self.palette.rgba("noOverlay"))
+
+                with candidate.canvas.before:
+                    Rectangle(size=candidate.size, pos=candidate.pos)
 
     def setValue(self, value):
         if not self.validSelection():
@@ -767,6 +788,9 @@ class Game(ScreenManager):
 
         cell.font_size = self.cellWidth() * self.padDecimal
 
+        with cell.canvas.before:
+            cell.highlight = Color(*self.palette.rgba("noOverlay"))
+
         cell.value = self.sudoku.getValue(location)
         cell.text = str(cell.value)
 
@@ -793,6 +817,9 @@ class Game(ScreenManager):
         candidateCell = Candidate()
         candidateCell.text = str(value)
         candidateCell.value = value
+
+        with candidateCell.canvas.before:
+            candidateCell.highlight = Color(*self.palette.rgba("noOverlay"))
 
         candidateCell.size = self.candidateSize()
         candidateCell.font_size = self.candidateWidth() * self.padDecimal
