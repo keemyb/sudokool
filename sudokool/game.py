@@ -816,13 +816,8 @@ class Game(ScreenManager):
         cell.cols = cols
         cell.candidates = []
 
-        if self.solveMode:
-            candidates = self.sudoku.allSolvingCandidates(location)
-        else:
-            candidates = self.sudoku.userCandidates(location)
-
         for value in self.sudoku.setOfPossibleValues:
-            candidateCell = self.newCandidateCell(value, candidates)
+            candidateCell = self.newCandidateCell(value)
 
             cell.add_widget(candidateCell)
             cell.candidates.append(candidateCell)
@@ -830,13 +825,9 @@ class Game(ScreenManager):
         return cell
 
     def newCandidateCell(self, value, candidates):
-        if value in candidates:
-            candidateCell = Candidate()
-            candidateCell.text = str(value)
-            candidateCell.value = value
-        else:
-            candidateCell = EmptyCandidate()
-            candidateCell.value = 0
+        candidateCell = Candidate()
+        candidateCell.text = str(value)
+        candidateCell.value = value
 
         candidateCell.size = self.candidateSize()
         candidateCell.font_size = self.candidateWidth() * self.padDecimal
