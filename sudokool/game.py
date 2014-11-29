@@ -382,7 +382,7 @@ class Game(ScreenManager):
                     cell = unchangedCells[0]
                     unchangedCells = unchangedCells[1:]
                 else:
-                    cell = self.newCell(location)
+                    cell = self.newCells(location)
 
                 self.ids.puzzleView.add_widget(cell)
                 self.ids.puzzleView.cells.append(cell)
@@ -762,30 +762,37 @@ class Game(ScreenManager):
         self.ids.puzzleView.size_hint = None, None
         self.ids.puzzleView.size = [self.cellWidth() * self.sudoku.unitSize()] * 2
 
-        self.ids.puzzleView.cells = []
+        self.ids.puzzleView.constantCells = []
+        self.ids.puzzleView.modifiedCells = []
+        self.ids.puzzleView.emptyCells = []
 
         for location in self.sudoku.locations():
             touchCell = Cell(self, location)
-            cell = self.newCell(location)
-
-            self.ids.puzzleView.add_widget(cell)
             self.ids.puzzleView.add_widget(touchCell)
-            self.ids.puzzleView.cells.append(cell)
+
+            cells = self.newCells(location)
+
+            for index, cell in enumerate(cells):
+                self.ids.puzzleView.add_widget(cell)
+                if index == 0:
+                    self.ids.puzzleView.constantCells.append(cell)
+                elif index == 1:
+                    self.ids.puzzleView.modifiedCells.append(cell)
+                else:
+                    self.ids.puzzleView.emptyCells.append(cell)
 
         self.resizeCells()
 
-    def newCell(self, location):
-        if self.sudoku.isConstant(location):
-            newCell = self.newFilledCell(location, True)
-        elif self.sudoku.isModified(location):
-            newCell = self.newFilledCell(location, False)
-        else:
-            newCell = self.newEmptyCell(location)
+    def newCells(self, location):
+        constantCell = self.newFilledCell(location, True)
+        modifiedCell = self.newFilledCell(location, False)
+        emptyCell = self.newEmptyCell(location)
 
-        newCell.location = location
-        newCell.size = self.cellSize()
+        for cell in (constantCell, modifiedCell, emptyCell):
+            cell.location = location
+            cell.size = self.cellSize()
 
-        return newCell
+        return constantCell, modifiedCell, emptyCell
 
     def newFilledCell(self, location, constant):
         if constant:
