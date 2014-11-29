@@ -582,10 +582,9 @@ class Game(ScreenManager):
                 if self.updateUserCandidates:
                     self.sudoku.updateUserCandidates()
 
-                    affectedLocations = self.sudoku.allCombinedNeighbours(self.selected)
-                    affectedLocations.add(self.selected)
             else:
                 self.sudoku.toggleUserCandidate(self.selected, value)
+
             self.enforceUndoButtons()
             self.updateCells()
 
