@@ -652,6 +652,7 @@ class Game(ScreenManager):
             resize(cell, True)
 
         self.ids.puzzleView.size = [self.cellWidth() * self.sudoku.unitSize()] * 2
+        self.updateCells()
 
     def cellWidth(self):
         windowWidth = min(Window.size)
