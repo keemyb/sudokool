@@ -287,6 +287,9 @@ class ModifiedCell(Label):
         else:
             self.opacity = 0
 
+        self.MainSwitcher.paintNeighbourOverlay(self)
+
+
 class ConstantCell(Label):
     def __init__(self, MainSwitcher, **kwargs):
         super(ConstantCell, self).__init__(**kwargs)
@@ -298,6 +301,8 @@ class ConstantCell(Label):
             self.opacity = 1
         else:
             self.opacity = 0
+
+        self.MainSwitcher.paintNeighbourOverlay(self)
 
 class EmptyCell(GridLayout):
     def __init__(self, MainSwitcher, **kwargs):
@@ -505,7 +510,6 @@ class Game(ScreenManager):
                      width=2)
 
     def paintNeighbourOverlay(self, cell):
-        return
         cell.canvas.after.clear()
         if not self.validSelection():
             return
