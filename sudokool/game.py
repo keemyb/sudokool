@@ -282,7 +282,7 @@ class ModifiedCell(Label):
         self.bind(size=self.update, pos=self.update)
 
     def update(self, *args):
-        self.MainSwitcher.paintBackground(self)
+        pass
 
 class ConstantCell(Label):
     def __init__(self, MainSwitcher, **kwargs):
@@ -291,7 +291,7 @@ class ConstantCell(Label):
         self.bind(size=self.update, pos=self.update)
 
     def update(self, *args):
-        self.MainSwitcher.paintBackground(self)
+        pass
 
 class EmptyCell(GridLayout):
     def __init__(self, MainSwitcher, **kwargs):
@@ -537,6 +537,7 @@ class Game(ScreenManager):
             cell.color = self.palette.rgba(normalText)
 
     def paintBackground(self, cell):
+        return
         if self.sudoku.isConstant(cell.location):
             modifiedBack = "clashingConstantBack"
         else:
