@@ -306,6 +306,17 @@ class EmptyCell(GridLayout):
         self.bind(size=self.update, pos=self.update)
 
     def update(self, *args):
+        if self.MainSwitcher.solveMode:
+            candidates = self.MainSwitcher.sudoku.allSolvingCandidates(self.location)
+        else:
+            candidates = self.MainSwitcher.sudoku.userCandidates(self.location)
+
+        for candidate in self.candidates:
+            if candidate.value in candidates:
+                candidate.opacity = 1
+            else:
+                candidate.opacity = 0
+
         if self.MainSwitcher.sudoku.isEmpty(self.location):
             self.opacity = 1
         else:
