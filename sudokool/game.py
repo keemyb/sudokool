@@ -742,21 +742,21 @@ class Game(ScreenManager):
         self.ids.puzzleView.size_hint = None, None
         self.ids.puzzleView.size = [self.cellWidth() * self.sudoku.unitSize()] * 2
 
+        self.ids.puzzleView.touchCells = []
         self.ids.puzzleView.constantCells = []
         self.ids.puzzleView.modifiedCells = []
         self.ids.puzzleView.emptyCells = []
 
         for location in self.sudoku.locations():
-            touchCell = Cell(self, location)
-            self.ids.puzzleView.add_widget(touchCell)
-
             cells = self.newCells(location)
 
             for index, cell in enumerate(cells):
                 self.ids.puzzleView.add_widget(cell)
                 if index == 0:
-                    self.ids.puzzleView.constantCells.append(cell)
+                    self.ids.puzzleView.touchCells.append(cell)
                 elif index == 1:
+                    self.ids.puzzleView.constantCells.append(cell)
+                elif index == 2:
                     self.ids.puzzleView.modifiedCells.append(cell)
                 else:
                     self.ids.puzzleView.emptyCells.append(cell)
@@ -764,16 +764,17 @@ class Game(ScreenManager):
         self.resizeCells()
 
     def newCells(self, location):
+        touchCell = Cell(self, location)
         constantCell = self.newFilledCell(location, True)
         modifiedCell = self.newFilledCell(location, False)
         emptyCell = self.newEmptyCell(location)
 
-        for cell in (constantCell, modifiedCell, emptyCell):
+        for cell in (touchCell, constantCell, modifiedCell, emptyCell):
             cell.location = location
             cell.size = self.cellSize()
             cell.update()
 
-        return constantCell, modifiedCell, emptyCell
+        return touchCell, constantCell, modifiedCell, emptyCell
 
     def newFilledCell(self, location, constant):
         if constant:
