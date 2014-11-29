@@ -537,10 +537,11 @@ class Game(ScreenManager):
             return
 
         cell.canvas.before.remove(cell.highlight)
-        if cell.location == self.selected:
+        if self.highlightOccourences and cell.location == self.selected:
             with cell.canvas.before:
                 cell.highlight = Color(*self.palette.rgba("selectedOverlay"))
-        elif cell.location in self.sudoku.allCombinedNeighbours(self.selected):
+        elif self.highlightOccourences and \
+                        cell.location in self.sudoku.allCombinedNeighbours(self.selected):
             with cell.canvas.before:
                 cell.highlight = Color(*self.palette.rgba("selectedNeighbourOverlay"))
         else:
@@ -556,10 +557,11 @@ class Game(ScreenManager):
 
         for candidate in cell.candidates:
             candidate.canvas.before.remove(candidate.highlight)
-            if cell.location == self.selected:
+            if self.highlightOccourences and cell.location == self.selected:
                 with candidate.canvas.before:
                     candidate.highlight = Color(*self.palette.rgba("selectedCandidateOverlay"))
-            elif cell.location in self.sudoku.allCombinedNeighbours(self.selected):
+            elif self.highlightOccourences and \
+                            cell.location in self.sudoku.allCombinedNeighbours(self.selected):
                 with candidate.canvas.before:
                     candidate.highlight = Color(*self.palette.rgba("selectedCandidateNeighbourOverlay"))
             else:
