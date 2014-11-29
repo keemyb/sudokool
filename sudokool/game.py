@@ -10,7 +10,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import BooleanProperty, NumericProperty, ObjectProperty
 
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.scatterlayout import ScatterLayout
 from kivy.uix.listview import ListView
 
 from kivy.uix.label import Label
@@ -310,7 +310,7 @@ class EmptyCell(GridLayout):
         else:
             self.opacity = 0
 
-class CellHolder(FloatLayout):
+class CellHolder(ScatterLayout):
     pass
 
 class Candidate(Label):
@@ -752,14 +752,16 @@ class Game(ScreenManager):
         self.ids.puzzleView.modifiedCells = []
         self.ids.puzzleView.emptyCells = []
 
+        cellSize = self.cellSize()
+
         for location in self.sudoku.locations():
-            cellHolder = self.newCellHolder(location)
+            cellHolder = self.newCellHolder(location, cellSize)
             self.ids.puzzleView.add_widget(cellHolder)
 
         self.resizeCells()
 
-    def newCellHolder(self, location):
-        cellHolder = CellHolder()
+    def newCellHolder(self, location, cellSize):
+        cellHolder = CellHolder(size=cellSize)
         touchCell = Cell(self, location)
         constantCell = self.newFilledCell(location, True)
         modifiedCell = self.newFilledCell(location, False)
