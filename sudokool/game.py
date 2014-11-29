@@ -614,7 +614,8 @@ class Game(ScreenManager):
                 for candidate in cell.candidates:
                     candidate.size = self.candidateSize()
                     candidate.font_size = self.candidateWidth() * self.padDecimal
-
+        for cell in self.ids.puzzleView.touchCells:
+            resize(cell, False)
         for cell in self.ids.puzzleView.constantCells:
             resize(cell, False)
         for cell in self.ids.puzzleView.modifiedCells:
