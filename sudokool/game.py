@@ -281,10 +281,9 @@ class ModifiedCell(Label):
 
     def update(self, *args):
         if self.MainSwitcher.sudoku.isModified(self.location):
-            self.opacity = 0
-        else:
             self.opacity = 1
-        pass
+        else:
+            self.opacity = 0
 
 class ConstantCell(Label):
     def __init__(self, MainSwitcher, **kwargs):
@@ -294,10 +293,9 @@ class ConstantCell(Label):
 
     def update(self, *args):
         if self.MainSwitcher.sudoku.isConstant(self.location):
-            self.opacity = 0
-        else:
             self.opacity = 1
-        pass
+        else:
+            self.opacity = 0
 
 class EmptyCell(GridLayout):
     def __init__(self, MainSwitcher, **kwargs):
@@ -307,10 +305,9 @@ class EmptyCell(GridLayout):
 
     def update(self, *args):
         if self.MainSwitcher.sudoku.isEmpty(self.location):
-            self.opacity = 0
-        else:
             self.opacity = 1
-        pass
+        else:
+            self.opacity = 0
 
 class Candidate(Label):
     pass
