@@ -522,51 +522,6 @@ class Game(ScreenManager):
         with cell.canvas.after:
             Rectangle(size=cell.size, pos=cell.pos)
 
-    def paintLabels(self, cell):
-        return
-        if self.sudoku.isEmpty(cell.location):
-            if self.highlightOccourences and self.validSelection():
-                for candidate in cell.candidates:
-                    if candidate.value == self.sudoku.getValue(self.selected):
-                        candidate.color = self.palette.rgba("occourenceText")
-                    else:
-                        candidate.color = self.palette.rgba("candidateText")
-            else:
-                for candidate in cell.candidates:
-                    candidate.color = self.palette.rgba("candidateText")
-            return
-
-        if self.sudoku.isConstant(cell.location):
-            normalText = "constantText"
-        else:
-            normalText = "modifiedText"
-
-        if self.highlightOccourences and self.validSelection():
-            if cell.value == self.sudoku.getValue(self.selected):
-                cell.color = self.palette.rgba("occourenceText")
-            else:
-                cell.color = self.palette.rgba(normalText)
-        else:
-            cell.color = self.palette.rgba(normalText)
-
-    def paintBackground(self, cell):
-        return
-        if self.sudoku.isConstant(cell.location):
-            modifiedBack = "clashingConstantBack"
-        else:
-            modifiedBack = "clashingModifiedBack"
-
-        cell.canvas.before.clear()
-        if self.highlightClashes and self.sudoku.isClashing(cell.location):
-            with cell.canvas.before:
-                Color(*self.palette.rgba(modifiedBack))
-        else:
-            with cell.canvas.before:
-                Color(*self.palette.rgba("cellBack"))
-
-        with cell.canvas.before:
-            Rectangle(size=cell.size, pos=cell.pos)
-
     def setValue(self, value):
         if not self.validSelection():
             return
